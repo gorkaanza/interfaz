@@ -1,0 +1,7 @@
+{
+"jsonFam": [
+{"idFam": 1, "nombreFam": "Familia1", "showFam": true },
+{"idFam": 2, "nombreFam": "Familia2", "showFam": true },
+{"idFam": 3, "nombreFam": "Familia3", "showFam": true }
+]
+}

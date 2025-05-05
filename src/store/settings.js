@@ -1,0 +1,244 @@
+'use strict'
+
+import Vue from 'vue'
+
+import { resetSettingsTimer } from './observer.js'
+
+import i18n from '@/i18n'
+
+import { localStorageSupported, getLocalSetting, setLocalSetting, removeLocalSetting } from '@/utils/localStorage.js'
+import patch from '@/utils/patch.js'
+import Path from '@/utils/path.js'
+import { mapState } from 'vuex'
+
+export const DashboardMode = {
+	default: 'Default',
+	fff: 'FFF',
+	cnc: 'CNC'
+}
+import store from '../store'
+export const UnitOfMeasure = {
+	metric: 'mm',
+	imperial: 'inch'
+}
+
+export default {
+	namespaced: true,
+	computed:{
+		...mapState('machine/model', {
+			mainboard: state => (state.boards.length > 0) ? state.boards[0] : {},
+		}),
+	},
+	state: {
+		usuarioAvanzado: false, //luis
+		emailUsuario: '',
+		hideContainer: true,
+		language: 'en',
+		lastHostname: location.host,
+
+		darkTheme: false,
+		useBinaryPrefix: true,
+		disableAutoComplete: false,
+        dashboardMode: DashboardMode.default,
+        bottomNavigation: true,
+        numericInputs: false,
+		iconMenu: false,
+		displayUnits: UnitOfMeasure.metric,
+		decimalPlaces: 1,
+
+		settingsStorageLocal: false,
+		settingsSaveDelay: 500,							// ms - how long to wait before settings updates are saved
+		cacheStorageLocal: localStorageSupported,
+		cacheSaveDelay: 1000,							// ms - how long to wait before cache updates are saved
+
+        notifications: {
+			errorsPersistent: true,
+			timeout: 5000								// ms
+		},
+
+		webcam: {
+			url: '',
+			updateInterval: 5000,						// ms
+			liveUrl: '',
+			useFix: false,								// do not append extra HTTP qualifier when reloading images
+			embedded: false,							// use iframe to embed webcam stream
+			rotation: 0,
+			flip: 'none'
+		},
+
+		enabledPlugins: ['Height Map'],
+		plugins: {},									    // Third-party values
+		displayedExtruders: []  // Estado inicial de los extrusores visibles
+	},
+	actions: {
+		async applyDefaults({ state, dispatch }) {
+			// Load settings that are enabled by default
+			if (state.enabledPlugins) {
+				for (let i = 0; i < state.enabledPlugins.length; i++) {
+					try {
+						await dispatch('loadDwcPlugin', { id: state.enabledPlugins[i], saveSettings: false }, { root: true });
+					} catch (e) {
+						console.warn(`Failed to load built-in plugin ${state.enabledPlugins[i]}`);
+						console.warn(e);
+					}
+				}
+			}
+		},
+		async load({ rootGetters, commit, dispatch }) {
+			// First attempt to load the last hostname from the local storage if running in dev mode
+			if (process.env.NODE_ENV !== 'production') {
+				const lastHostname = getLocalSetting('lastHostname');
+				if (lastHostname) {
+					commit('load', { lastHostname });
+				}
+			}
+
+			const mainSettings = getLocalSetting('settings');
+			if (mainSettings) {
+				// Load the global settings from the local storage
+				commit('load', mainSettings);
+
+				if (mainSettings.enabledPlugins) {
+					for (let i = 0; i < mainSettings.enabledPlugins.length; i++) {
+						try {
+							await dispatch('loadDwcPlugin', { id: mainSettings.enabledPlugins[i], saveSettings: false }, { root: true });
+						} catch (e) {
+							console.warn(`Failed to load built-in plugin ${mainSettings.enabledPlugins[i]}`);
+							console.warn(e);
+						}
+					}
+				}
+			} else if (rootGetters.isConnected) {
+				// Otherwise try to load the settings from the selected board
+				await dispatch('machine/settings/load', undefined, { root: true });
+			}
+		},
+		async save({ state, rootGetters, dispatch }) {
+			resetSettingsTimer();
+
+			// See if we need to save everything in the local storage
+			if (state.settingsStorageLocal) {
+				setLocalSetting('settings', state);
+			} else {
+				// If not, remove the local settings again
+				removeLocalSetting('settings');
+
+				// And try to save everything on the selected board
+				if (rootGetters.isConnected) {
+					await dispatch('machine/settings/save', undefined, { root: true });
+				}
+			}
+		},
+		async reset({ rootState, dispatch }) {
+			// Delete settings
+			removeLocalSetting('settings');
+			removeLocalSetting(`machines/${rootState.selectedMachine}`);
+			try {
+				await dispatch('machine/delete', Path.dwcSettingsFile, { root: true });
+			} catch (e) {
+				console.warn(e);
+			}
+
+			// Delete cache
+			removeLocalSetting(`cache/${rootState.selectedMachine}`);
+			try {
+				await dispatch('machine/delete', Path.dwcCacheFile, { root: true });
+			} catch (e) {
+				console.warn(e);
+			}
+
+			// Check if there is a factory defaults file
+			try {
+				const defaults = await dispatch('machine/download', { filename: Path.dwcFactoryDefaults, showProgress: false, showSuccess: false, showError: false }, { root: true });
+				await dispatch('machine/upload', { filename: Path.dwcSettingsFile, content: new Blob([defaults]), showProgress: false, showSuccess: false }, { root: true });
+			} catch (e) {
+				// handled before we get here
+			}
+
+			// Reload the web interface to finish
+			location.reload();
+		}
+	},
+	mutations: {
+		//luis
+		guardarEmail(state){
+			//console.log(state.boards[0].EmailAddress + " -Entra en guardar");
+			//console.log("-Entra en guardar" + store.state.machine.model.boards[0].EmailAddress);
+			store.state.machine.model.boards[0].EmailAddress = state.emailUsuario;
+			//store.state.uilnjection.context
+		},
+		setLastHostname(state, hostname) {
+			state.lastHostname = hostname;
+			setLocalSetting('lastHostname', hostname);
+		},
+
+		load(state, payload) {
+			const updateSettingsTime = (payload.ignoreFileTimestamps === undefined) && (payload.settingsSaveDelay === 2000);
+			const updateCacheTime = (payload.ignoreFileTimestamps === undefined) && (payload.settingsSaveDelay === 4000);
+			if (payload.language && i18n.locale !== payload.language) {
+				i18n.locale = payload.language;
+			}
+			if (payload.plugins) {
+				state.plugins = payload.plugins;
+				delete payload.plugins;
+			}
+			patch(state, payload, true);
+			if (updateSettingsTime) {
+				state.settingsSaveDelay = 500;
+			}
+			if (updateCacheTime) {
+				state.cacheSaveDelay = 1000;
+			}
+		},
+		update(state, payload) {
+			if (payload.language && i18n.locale !== payload.language) {
+				i18n.locale = payload.language;
+			}
+			if (payload.plugins) {
+				state.plugins = payload.plugins;
+				delete payload.plugins;
+			}
+			patch(state, payload, true);
+		},
+
+		dwcPluginLoaded(state, plugin) {
+			if (state.enabledPlugins.indexOf(plugin) === -1) {
+				state.enabledPlugins.push(plugin);
+			}
+		},
+		disableDwcPlugin(state, plugin) {
+			if (state.enabledPlugins.indexOf(plugin) !== -1) {
+				state.enabledPlugins = state.enabledPlugins.filter(item => item !== plugin);
+				return true;
+			}
+			return false;
+		},
+
+		registerPluginData(state, { plugin, key, defaultValue }) {
+			if (state.plugins[plugin] === undefined) {
+				Vue.set(state.plugins, plugin, { key: defaultValue });
+			}
+			if (!(key in state.plugins[plugin])) {
+				state.plugins[plugin][key] = defaultValue;
+			}
+		},
+		setPluginData(state, { plugin, key, value }) {
+			if (state.plugins[plugin] === undefined) {
+				state.plugins[plugin] = { key: value };
+			} else {
+				state.plugins[plugin][key] = value;
+			}
+		},
+		//gorka
+		toggleExtruderVisibility(state, index) {
+            const pos = state.displayedExtruders.indexOf(index);
+            if (pos !== -1) {
+                // Si el extrusor ya está en la lista, lo eliminamos
+                state.displayedExtruders.splice(pos, 1);
+            } else {
+                // Si no está, lo agregamos
+                state.displayedExtruders.push(index);
+            }
+        }
+	}
+}

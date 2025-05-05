@@ -1,0 +1,9 @@
+{
+  "id": "ToolsOffsetCfg",
+  "name": "Tools Offset Cfg",
+  "author": "Domotek",
+  "version": "auto",
+  "license": "GPL-3.0-or-later",
+  "homepage": "https://github.com/Duet3D/DSF-Plugins",
+  "dwcVersion": "auto"
+}

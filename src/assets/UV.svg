@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="1000" height="1000" viewBox="100 100 400 400">
+
+<g stroke="black" fill-opacity="1.0" fill="yellow">
+<path d="M480,300 L395,269 L395,331z"></path>
+<path d="M446,406 L395,331 L359,381z"></path>
+<path d="M356,471 L359,381 L300,400z"></path>
+<path d="M244,471 L300,400 L241,381z"></path>
+<path d="M154,406 L241,381 L205,331z"></path>
+<path d="M120,300 L205,331 L205,269z"></path>
+<path d="M154,194 L205,269 L241,219z"></path>
+<path d="M244,129 L241,219 L300,200z"></path>
+<path d="M356,129 L300,200 L359,219z"></path>
+<path d="M446,194 L359,219 L395,269z"></path>
+<path d="M480,300 L395,269 L395,331z"></path>
+<text x="215" y="350" font-weight="bold" font-size="120"><tspan fill="#0a21ad">UV</tspan></text>
+</g>
+</svg>

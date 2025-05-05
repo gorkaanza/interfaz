@@ -1,0 +1,808 @@
+<template>
+	<v-row class="templateSlotButtons">
+		<v-col cols="12">
+				<v-row class="pt-2">
+					<!-- TOOL1 -->
+					<v-card v-if="nameTools.length > 0" class=" rounded-xl col blue lighten-5 pa-0 mr-1 " elevation="5">
+						<v-card-text align="center" textcolor="black" class="blue lighten-5 pa-0 pt-1 pb-0">
+							<v-row class=" mt-0">
+								
+								<v-col cols=3 class="pr-0">	
+									<v-btn icon elevation="4" @click="reserve" class=" ">
+										<v-icon large color="red" v-if="heaterTools[1].state == 'fault'">mdi-close-circle-outline</v-icon>
+										<v-icon large color="teal" v-if="heaterTools[1].state == 'active'">mdi-power</v-icon>
+										<v-icon large color="warning" v-if="heaterTools[1].state == 'standby'">mdi-power-cycle</v-icon>
+										<v-icon large color="grey" v-if="heaterTools[1].state == 'off'">mdi-power-off</v-icon>
+									</v-btn>
+								</v-col> 
+								<v-col cols=6 class="pa-2 pb-3  ">
+									<v-btn style=" width:95%; " class="" color="black " text height="45px" elevation="2" @click="ChangeTool(0), camaClick = false">
+										<span ><strong>{{ $t('domotek.tools.t0') }}</strong></span>
+									</v-btn>			
+								</v-col>
+								<v-col cols=3 class="pl-0">
+								<v-btn icon elevation="4" @click="cambiarRuta('/Files/Calibracion')" >
+										<v-icon large > mdi-axis-arrow </v-icon>
+									</v-btn>
+								</v-col>
+							</v-row>
+						</v-card-text>
+						<v-divider class="mx-1"></v-divider>
+						<v-card-text align="center" class="clsDesTool blue lighten-5 pa-0 pt-2 pb-3" >
+							<v-row class=" ">
+								<v-col cols=12 class=" ">
+									<span ><strong>{{nameTools[0].name}}</strong></span>
+								</v-col> 
+							</v-row>
+							<v-card @click="(T0Code == 9)?keyboardScreenMix(0):keyboardScreen(0)" class="rounded-xl blue lighten-5 pa-0 pt-1 pb-0" elevation="5" >
+								<v-row class="pa-1 mt-0" v-if="nameTools[0].heaters.length > 0">
+									<v-col cols=6 class=" pa-1 ">
+										<span class="clsHeatersMultiH2" v-if="nameTools[0].heaters.length > 0">{{ nameHeaters.analog[1].name }}</span>
+									</v-col> 
+									<v-col cols=3 class=" pa-1 ">
+										<span class="clsHeatersMultiH1" v-if="nameTools[0].heaters.length > 0">{{heaterTools[1].current == -273.1 || heaterTools[1].current == -273.15 ? "--":heaterTools[1].current.toFixed(1)}}</span>
+									</v-col>
+									<v-col cols=3 class=" pa-1 ">
+										<span class="clsHeatersMultiH1" v-if="nameTools[0].heaters.length > 0"><strong>/ {{heaterTools[1].active}}</strong></span>
+									</v-col>
+								</v-row>
+								<v-row class="pa-1 mt-0" v-else>
+									<v-col cols=6 class=" pa-1 ">
+										<span class="clsHeatersMultiH2" > &nbsp; </span>
+									</v-col>
+									<v-col cols=3 class=" pa-1 ">
+										<span class="clsHeatersMultiH2" > &nbsp; </span>
+									</v-col> 
+									<v-col cols=3 class=" pa-1 ">
+										<span class="clsHeatersMultiH2" > &nbsp; </span>
+									</v-col> 
+								</v-row>    
+								<v-row class="pa-1 mt-0" v-if="nameTools[0].heaters.length > 1">
+									<v-col cols=6 class=" pa-1 ">
+										<span class="clsHeatersMultiH2" v-if="nameTools[0].heaters.length > 1">{{ nameHeaters.analog[11].name }}</span>
+									</v-col>
+									<v-col cols=3 class=" pa-1 ">
+										<span class="clsHeatersMultiH2" v-if="nameTools[0].heaters.length > 1">{{heaterTools[11].current == -273.1 || heaterTools[11].current == -273.15 ? "--":heaterTools[11].current.toFixed(1)}}</span>
+									</v-col> 
+									<v-col cols=3 class=" pa-1 ">
+										<span class="clsHeatersMultiH2" v-if="nameTools[0].heaters.length > 1"><strong>/ {{heaterTools[11].active}}</strong></span>
+									</v-col> 
+								</v-row>
+								<v-row class="pa-1 mt-0" v-else>
+									<v-col cols=6 class=" pa-1 ">
+										<span class="clsHeatersMultiH2" >&nbsp;  </span>
+									</v-col>
+									<v-col cols=3 class=" pa-1 ">
+										<span class="clsHeatersMultiH2" >&nbsp;  </span>
+									</v-col> 
+									<v-col cols=3 class=" pa-1 ">
+										<span class="clsHeatersMultiH2" >&nbsp;  </span>
+									</v-col> 
+								</v-row>    
+							</v-card>
+						</v-card-text>
+					</v-card>
+					<!-- TOOL2 -->
+					<v-card v-if="nameTools.length > 1" class=" rounded-xl col blue lighten-5 pa-0 mr-1" elevation="5">
+						<v-card-text align="center" textcolor="black" class="blue lighten-5 pa-0 pt-1 pb-0">
+							<v-row class=" mt-0">
+								<v-col cols=3 class="pr-0">	
+									<v-btn icon elevation="4" @click="reserve" class=" ">
+										<v-icon large color="red" v-if="heaterTools[2].state == 'fault'">mdi-close-circle-outline</v-icon>
+										<v-icon large color="teal" v-if="heaterTools[2].state == 'active'">mdi-power</v-icon>
+										<v-icon large color="warning" v-if="heaterTools[2].state == 'standby'">mdi-power-cycle</v-icon>
+										<v-icon large color="grey" v-if="heaterTools[2].state == 'off'">mdi-power-off</v-icon>
+									</v-btn>
+								</v-col> 
+								<v-col cols=6 class="pa-2 pb-3  ">
+									<v-btn style=" width:95%; " class="" color="black " text height="45px" elevation="2" @click="ChangeTool(1), camaClick = false">
+										<span ><strong>{{ $t('domotek.tools.t1') }}</strong></span>
+									</v-btn>			
+								</v-col>
+								<v-col cols=3 class="pl-0">
+								<v-btn icon elevation="4" @click="cambiarRuta('/Files/Calibracion')" >
+										<v-icon large > mdi-axis-arrow </v-icon>
+									</v-btn>
+								</v-col>
+							</v-row>
+						</v-card-text>
+						<v-divider class="mx-1"></v-divider>
+						<v-card-text align="center" class="clsDesTool blue lighten-5 pa-0 pt-2 pb-3" >
+							<v-row class=" ">
+								<v-col cols=12 class=" ">
+									<span ><strong>{{nameTools[1].name}}</strong></span>
+								</v-col> 
+							</v-row>
+							<v-card @click="keyboardScreen(1)" class="rounded-xl blue lighten-5 pa-0 pt-1 pb-0" elevation="5" >
+								<v-row class="pa-1 mt-0" v-if="nameTools[1].heaters.length > 0">
+									<v-col cols=6 class=" pa-1 ">
+										<span class="clsHeatersMultiH2" v-if="nameTools[1].heaters.length > 0">{{ nameHeaters.analog[2].name }}</span>
+									</v-col> 
+									<v-col cols=3 class=" pa-1 ">
+										<span class="clsHeatersMultiH1" v-if="nameTools[1].heaters.length > 0">{{heaterTools[2].current == -273.1 || heaterTools[2].current == -273.15 ? "--":heaterTools[2].current.toFixed(1)}}</span>
+									</v-col>
+									<v-col cols=3 class=" pa-1 ">
+										<span class="clsHeatersMultiH1" v-if="nameTools[1].heaters.length > 0"><strong>/ {{heaterTools[2].active}}</strong></span>
+									</v-col>
+								</v-row>
+								<v-row class="pa-1 mt-0" v-else>
+									<v-col cols=6 class=" pa-1 ">
+										<span class="clsHeatersMultiH2" > &nbsp; </span>
+									</v-col>
+									<v-col cols=3 class=" pa-1 ">
+										<span class="clsHeatersMultiH2" > &nbsp; </span>
+									</v-col> 
+									<v-col cols=3 class=" pa-1 ">
+										<span class="clsHeatersMultiH2" > &nbsp; </span>
+									</v-col> 
+								</v-row>    
+								<v-row class="pa-1 mt-0" v-if="nameTools[1].heaters.length > 1">
+									<v-col cols=6 class=" pa-1 ">
+										<span class="clsHeatersMultiH2" v-if="nameTools[1].heaters.length > 1">{{ nameHeaters.analog[12].name }}</span>
+									</v-col>
+									<v-col cols=3 class=" pa-1 ">
+										<span class="clsHeatersMultiH2" v-if="nameTools[1].heaters.length > 1">{{heaterTools[12].current == -273.1 || heaterTools[12].current == -273.15 ? "--":heaterTools[12].current.toFixed(1)}}</span>
+									</v-col> 
+									<v-col cols=3 class=" pa-1 ">
+										<span class="clsHeatersMultiH2" v-if="nameTools[1].heaters.length > 1"><strong>/ {{heaterTools[12].active}}</strong></span>
+									</v-col> 
+								</v-row>
+								<v-row class="pa-1 mt-0" v-else>
+									<v-col cols=6 class=" pa-1 ">
+										<span class="clsHeatersMultiH2" > &nbsp; </span>
+									</v-col>
+									<v-col cols=3 class=" pa-1 ">
+										<span class="clsHeatersMultiH2" > &nbsp; </span>
+									</v-col> 
+									<v-col cols=3 class=" pa-1 ">
+										<span class="clsHeatersMultiH2" > &nbsp; </span>
+									</v-col> 
+								</v-row>
+							</v-card>
+						</v-card-text>
+					</v-card>
+					<!-- TOOL3 -->
+					<v-card v-if="nameTools.length > 2" class=" rounded-xl col blue lighten-5 pa-0 mr-1" elevation="5">
+						<v-card-text align="center" textcolor="black" class="blue lighten-5 pa-0 pt-1 pb-0">
+							<v-row class=" mt-0">
+								<v-col cols=3 class="pr-0">	
+									<v-btn icon elevation="4" @click="reserve" class=" ">
+										<v-icon large color="red" v-if="heaterTools[3].state == 'fault'">mdi-close-circle-outline</v-icon>
+										<v-icon large color="teal" v-if="heaterTools[3].state == 'active'">mdi-power</v-icon>
+										<v-icon large color="warning" v-if="heaterTools[3].state == 'standby'">mdi-power-cycle</v-icon>
+										<v-icon large color="grey" v-if="heaterTools[3].state == 'off'">mdi-power-off</v-icon>
+									</v-btn>
+								</v-col> 
+								<v-col cols=6 class="pa-2 pb-3  ">
+									<v-btn style=" width:95%; " class="" color="black " text height="45px" elevation="2" @click="ChangeTool(2), camaClick = false">
+										<span ><strong>{{ $t('domotek.tools.t2') }}</strong></span>
+									</v-btn>			
+								</v-col>
+								<v-col cols=3 class="pl-0">
+								<v-btn icon elevation="4" @click="cambiarRuta('/Files/Calibracion')" >
+										<v-icon large > mdi-axis-arrow </v-icon>
+									</v-btn>
+								</v-col>
+							</v-row>
+						</v-card-text>
+						<v-divider class="mx-1"></v-divider>
+						<v-card-text align="center" class="clsDesTool blue lighten-5 pa-0 pt-2 pb-3" >
+							<v-row class=" ">
+								<v-col cols=12 class=" ">
+									<span ><strong>{{nameTools[2].name}}</strong></span>
+								</v-col> 
+							</v-row>
+							<v-card @click="keyboardScreen(2)" class="rounded-xl blue lighten-5 pa-0 pt-1 pb-0" elevation="5" >
+								<v-row class="pa-1 mt-0" v-if="nameTools[2].heaters.length > 0">
+									<v-col cols=6 class=" pa-1 ">
+										<span class="clsHeatersMultiH2" v-if="nameTools[2].heaters.length > 0">{{ nameHeaters.analog[3].name }}</span>
+									</v-col> 
+									<v-col cols=3 class=" pa-1 ">
+										<span class="clsHeatersMultiH1" v-if="nameTools[2].heaters.length > 0">{{heaterTools[3].current == -273.1 || heaterTools[3].current == -273.15 ? "--":heaterTools[3].current.toFixed(1)}}</span>
+									</v-col>
+									<v-col cols=3 class=" pa-1 ">
+										<span class="clsHeatersMultiH1" v-if="nameTools[2].heaters.length > 0"><strong>/ {{heaterTools[3].active}}</strong></span>
+									</v-col>
+								</v-row>
+								<v-row class="pa-1 mt-0" v-else>
+									<v-col cols=6 class=" pa-1 ">
+										<span class="clsHeatersMultiH2" > &nbsp; </span>
+									</v-col>
+									<v-col cols=3 class=" pa-1 ">
+										<span class="clsHeatersMultiH2" > &nbsp; </span>
+									</v-col> 
+									<v-col cols=3 class=" pa-1 ">
+										<span class="clsHeatersMultiH2" > &nbsp; </span>
+									</v-col> 
+								</v-row>    
+								<v-row class="pa-1 mt-0" v-if="nameTools[2].heaters.length > 1">
+									<v-col cols=6 class=" pa-1 ">
+										<span class="clsHeatersMultiH2" v-if="nameTools[2].heaters.length > 1">{{ nameHeaters.analog[13].name }}</span>
+									</v-col>
+									<v-col cols=3 class=" pa-1 ">
+										<span class="clsHeatersMultiH2" v-if="nameTools[2].heaters.length > 1">{{heaterTools[13].current == -273.1 || heaterTools[13].current == -273.15 ? "--":heaterTools[13].current.toFixed(1)}}</span>
+									</v-col> 
+									<v-col cols=3 class=" pa-1 ">
+										<span class="clsHeatersMultiH2" v-if="nameTools[2].heaters.length > 1"><strong>/ {{heaterTools[13].active}}</strong></span>
+									</v-col> 
+								</v-row>
+								<v-row class="pa-1 mt-0" v-else>
+									<v-col cols=6 class=" pa-1 ">
+										<span class="clsHeatersMultiH2" > &nbsp; </span>
+									</v-col>
+									<v-col cols=3 class=" pa-1 ">
+										<span class="clsHeatersMultiH2" > &nbsp; </span>
+									</v-col> 
+									<v-col cols=3 class=" pa-1 ">
+										<span class="clsHeatersMultiH2" > &nbsp; </span>
+									</v-col> 
+								</v-row>    
+							</v-card>
+						</v-card-text>
+					</v-card>
+					<!-- TOOL4 -->
+					<v-card v-if="nameTools.length > 3" class=" rounded-xl col blue lighten-5 pa-0 " elevation="5">
+						<v-card-text align="center" textcolor="black" class="blue lighten-5 pa-0 pt-1 pb-0">
+							<v-row class=" mt-0">
+								<v-col cols=3 class="pr-0">	
+									<v-btn icon elevation="4" @click="reserve" class=" ">
+										<v-icon large color="red" v-if="heaterTools[4].state == 'fault'">mdi-close-circle-outline</v-icon>
+										<v-icon large color="teal" v-if="heaterTools[4].state == 'active'">mdi-power</v-icon>
+										<v-icon large color="warning" v-if="heaterTools[4].state == 'standby'">mdi-power-cycle</v-icon>
+										<v-icon large color="grey" v-if="heaterTools[4].state == 'off'">mdi-power-off</v-icon>
+									</v-btn>
+								</v-col> 
+								<v-col cols=6 class="pa-2 pb-3  ">
+									<v-btn style=" width:95%; " class="" color="black " text height="45px" elevation="2" @click="ChangeTool(3), camaClick = false">
+										<span ><strong>{{ $t('domotek.tools.t3') }}</strong></span>
+									</v-btn>			
+								</v-col>
+								<v-col cols=3 class="pl-0">
+								<v-btn icon elevation="4" @click="cambiarRuta('/Files/Calibracion')" >
+										<v-icon large > mdi-axis-arrow </v-icon>
+									</v-btn>
+								</v-col>
+							</v-row>
+						</v-card-text>
+						<v-divider class="mx-1"></v-divider>
+						<v-card-text align="center" class="clsDesTool blue lighten-5 pa-0 pt-2 pb-3" >
+							<v-row class=" ">
+								<v-col cols=12 class=" ">
+									<span ><strong>{{nameTools[3].name}}</strong></span>
+								</v-col> 
+							</v-row>
+							<v-card @click="keyboardScreen(3)" class="rounded-xl blue lighten-5 pa-0 pt-1 pb-0" elevation="5" >
+								<v-row class="pa-1 mt-0" v-if="nameTools[3].heaters.length > 0">
+									<v-col cols=6 class=" pa-1 ">
+										<span class="clsHeatersMultiH2" v-if="nameTools[3].heaters.length > 0">{{ nameHeaters.analog[4].name }}</span>
+									</v-col> 
+									<v-col cols=3 class=" pa-1 ">
+										<span class="clsHeatersMultiH1" v-if="nameTools[3].heaters.length > 0">{{heaterTools[4].current == -273.1 || heaterTools[4].current == -273.15 ? "--":heaterTools[4].current.toFixed(1)}}</span>
+									</v-col>
+									<v-col cols=3 class=" pa-1 ">
+										<span class="clsHeatersMultiH1" v-if="nameTools[3].heaters.length > 0"><strong>/ {{heaterTools[4].active}}</strong></span>
+									</v-col>
+								</v-row>
+								<v-row class="pa-1 mt-0" v-else>
+									<v-col cols=6 class=" pa-1 ">
+										<span class="clsHeatersMultiH2" > &nbsp; </span>
+									</v-col>
+									<v-col cols=3 class=" pa-1 ">
+										<span class="clsHeatersMultiH2" > &nbsp; </span>
+									</v-col> 
+									<v-col cols=3 class=" pa-1 ">
+										<span class="clsHeatersMultiH2" > &nbsp; </span>
+									</v-col> 
+								</v-row>    
+								<v-row class="pa-1 mt-0" v-if="nameTools[3].heaters.length > 1">
+									<v-col cols=6 class=" pa-1 ">
+										<span class="clsHeatersMultiH2" v-if="nameTools[3].heaters.length > 1">{{ nameHeaters.analog[14].name }}</span>
+									</v-col>
+									<v-col cols=3 class=" pa-1 ">
+										<span class="clsHeatersMultiH2" v-if="nameTools[3].heaters.length > 1">{{heaterTools[14].current == -273.1 || heaterTools[14].current == -273.15 ? "--":heaterTools[14].current.toFixed(1)}}</span>
+									</v-col> 
+									<v-col cols=3 class=" pa-1 ">
+										<span class="clsHeatersMultiH2" v-if="nameTools[3].heaters.length > 1"><strong>/ {{heaterTools[14].active}}</strong></span>
+									</v-col> 
+								</v-row>
+								<v-row class="pa-1 mt-0" v-else>
+									<v-col cols=6 class=" pa-1 ">
+										<span class="clsHeatersMultiH2" > &nbsp; </span>
+									</v-col>
+									<v-col cols=3 class=" pa-1 ">
+										<span class="clsHeatersMultiH2" > &nbsp; </span>
+									</v-col> 
+									<v-col cols=3 class=" pa-1 ">
+										<span class="clsHeatersMultiH2" > &nbsp; </span>
+									</v-col> 
+								</v-row>    
+							</v-card>
+						</v-card-text>
+					</v-card>
+					<!-- <v-col align="center" v-if="nameTools.length > 1" class="pa-1"> 
+						<v-btn text block height="100px" @click="keyboardScreen(1)" elevation="1" class="blue lighten-5" rounded >
+							<v-row class="pa-1">
+								<v-col cols="12" align="center" class="pa-1">
+									<v-icon color="red" v-if="heaterTools[2].state == 'fault'">mdi-close-circle-outline</v-icon>
+									<v-icon color="teal" v-if="heaterTools[2].state == 'active'">mdi-power</v-icon>
+									<v-icon color="warning" v-if="heaterTools[2].state == 'standby'">mdi-power-cycle</v-icon>
+									<v-icon color="grey" v-if="heaterTools[2].state == 'off'">mdi-power-off</v-icon>
+									<h3 class="pl-10" style="display: inline;">{{ $t('domotek.tools.t1') }}</h3>														
+								</v-col>
+								<v-col cols="12" class="pa-0 pb-2">
+									<span>{{nameTools[1].name}}</span>											
+								</v-col>
+								<v-col cols="3" class="pa-0"/>
+								<v-col cols="6" class="pa-0 clsHeatersMulti">
+									<v-row class="pa-1" style="height:16px;">
+										<v-col cols="3" class="pa-0"/>
+										<v-col cols="3" class="pa-0">
+											<span class="clsHeatersMultiH1" v-if="nameTools[1].heaters.length > 0">{{heaterTools[2].current == -273.1 ? "--":heaterTools[2].current}}</span>
+										</v-col>
+										<v-col cols="3" class="pa-0">
+											<span class="clsHeatersMultiH1" v-if="nameTools[1].heaters.length > 0"><strong>/ {{heaterTools[2].active}}</strong></span>
+										</v-col>
+										<v-col cols="3" class="pa-0"/>
+									</v-row>
+									<v-row class="pa-1" style="height:16px;">
+										<v-col cols="3" class="pa-0"/>
+										<v-col cols="3" class="pa-0">
+											<span class="clsHeatersMultiH2" v-if="nameTools[1].heaters.length > 1">{{heaterTools[12].current == -273.1 ? "--":heaterTools[12].current}}</span>
+										</v-col>
+										<v-col cols="3" class="pa-0">
+											<span class="clsHeatersMultiH2" v-if="nameTools[1].heaters.length > 1"><strong>/ {{heaterTools[12].active}}</strong></span>
+										</v-col>
+										<v-col cols="3" class="pa-0"/>
+									</v-row>
+								</v-col>
+							</v-row>								
+						</v-btn>
+					</v-col>
+					
+					<v-col align="center" v-if="nameTools.length > 2" class="pa-1"> -- Tool 2
+						<v-btn text block height="100px" @click="keyboardScreen(2)" elevation="1" class="blue lighten-5" rounded>
+							<v-row class="pa-1">
+								<v-col cols="12" align="center" class="pa-1">
+									<v-icon color="red" v-if="heaterTools[3].state == 'fault'">mdi-close-circle-outline</v-icon>
+									<v-icon color="teal" v-if="heaterTools[3].state == 'active'">mdi-power</v-icon>
+									<v-icon color="warning" v-if="heaterTools[3].state == 'standby'">mdi-power-cycle</v-icon>
+									<v-icon color="grey" v-if="heaterTools[3].state == 'off'">mdi-power-off</v-icon>
+									<h3 class="pl-10" style="display: inline;">{{ $t('domotek.tools.t2') }}</h3>																											
+								</v-col>
+								<v-col cols="12" class="pa-0 pb-2">
+									<span>{{nameTools[2].name}}</span>											
+								</v-col>
+								<v-col cols="3" class="pa-0"/>
+								<v-col cols="6" class="pa-0 clsHeatersMulti">
+									<v-row class="pa-1" style="height:16px;">
+										<v-col cols="3" class="pa-0"/>
+										<v-col cols="3" class="pa-0">
+											<span class="clsHeatersMultiH1" v-if="nameTools[2].heaters.length > 0">{{heaterTools[3].current == -273.1 ? "--":heaterTools[3].current}}</span>
+										</v-col>
+										<v-col cols="3" class="pa-0">
+											<span class="clsHeatersMultiH1" v-if="nameTools[2].heaters.length > 0"><strong>/ {{heaterTools[3].active}}</strong></span>
+										</v-col>
+										<v-col cols="3" class="pa-0"/>
+									</v-row>
+									<v-row class="pa-1" style="height:16px;">
+										<v-col cols="3" class="pa-0"/>
+										<v-col cols="3" class="pa-0">
+											<span class="clsHeatersMultiH2" v-if="nameTools[2].heaters.length > 1">{{heaterTools[13].current == -273.1 ? "--":heaterTools[13].current}}</span>
+										</v-col>
+										<v-col cols="3" class="pa-0">
+											<span class="clsHeatersMultiH2" v-if="nameTools[2].heaters.length > 1"><strong>/ {{heaterTools[13].active}}</strong></span>
+										</v-col>
+										<v-col cols="3" class="pa-0"/>
+									</v-row>
+								</v-col>
+							</v-row>								
+						</v-btn>
+					</v-col>
+					
+					<v-col align="center" v-if="nameTools.length > 3" class="pa-1"> Tool 3
+						<v-btn text block height="100px" @click="keyboardScreen(3)" elevation="1" class="blue lighten-5" rounded>
+							<v-row class="pa-1">
+								<v-col cols="12" align="center" class="pa-1">
+									<v-icon color="red" v-if="heaterTools[4].state == 'fault'">mdi-close-circle-outline</v-icon>
+									<v-icon color="teal" v-if="heaterTools[4].state == 'active'">mdi-power</v-icon>
+									<v-icon color="warning" v-if="heaterTools[4].state == 'standby'">mdi-power-cycle</v-icon>
+									<v-icon color="grey" v-if="heaterTools[4].state == 'off'">mdi-power-off</v-icon>
+									<h3 class="pl-10" style="display: inline;">{{ $t('domotek.tools.t3') }}</h3>														
+								</v-col>
+								<v-col cols="12" class="pa-0 pb-2">
+									<span>{{nameTools[3].name}}</span>											
+								</v-col>
+								<v-col cols="3" class="pa-0"/>
+								<v-col cols="6" class="pa-0 clsHeatersMulti">
+									<v-row class="pa-1" style="height:16px;">
+										<v-col cols="3" class="pa-0"/>
+										<v-col cols="3" class="pa-0">
+											<span class="clsHeatersMultiH1" v-if="nameTools[3].heaters.length > 0">{{heaterTools[4].current == -273.1 ? "--":heaterTools[4].current}}</span>
+										</v-col>
+										<v-col cols="3" class="pa-0">
+											<span class="clsHeatersMultiH1" v-if="nameTools[3].heaters.length > 0"><strong>/ {{heaterTools[4].active}}</strong></span>
+										</v-col>
+										<v-col cols="3" class="pa-0"/>
+									</v-row>
+									<v-row class="pa-1" style="height:16px;">
+										<v-col cols="3" class="pa-0"/>
+										<v-col cols="3" class="pa-0">
+											<span class="clsHeatersMultiH2" v-if="nameTools[3].heaters.length > 1">{{heaterTools[14].current == -273.1 ? "--":heaterTools[14].current}}</span>
+										</v-col>
+										<v-col cols="3" class="pa-0">
+											<span class="clsHeatersMultiH2" v-if="nameTools[3].heaters.length > 1"><strong>/ {{heaterTools[14].active}}</strong></span>
+										</v-col>
+										<v-col cols="3" class="pa-0"/>
+									</v-row>
+								</v-col>
+							</v-row>								
+						</v-btn>
+					</v-col> -->
+					<v-col cols="12" align="center" class="pa-1"> <!-- Plataforma-->
+						<v-btn block text @click="keyboardScreen(4)" elevation="1" height="60" class="blue lighten-5" rounded>
+							<v-row>
+								<v-col cols="1" align="center">
+									<v-icon color="red" v-if="heaterTools[0].state == 'fault'">mdi-close-circle-outline</v-icon>
+									<v-icon color="teal" v-if="heaterTools[0].state == 'active'">mdi-power</v-icon>
+									<v-icon color="warning" v-if="heaterTools[0].state == 'standby'">mdi-power-cycle</v-icon>
+									<v-icon color="grey" v-if="heaterTools[0].state == 'off'">mdi-power-off</v-icon>
+								</v-col>
+								<v-col cols="3" align="center" justify="center">
+									<h3>{{ $t('domotek.tools.platform') }}</h3>
+								</v-col>
+								<v-col cols="4">
+									<span v-if="nameCama.analog.length > 0">{{ nameCama.analog[0].name }}</span>
+								</v-col>
+								<v-col cols="4">
+									<span>{{heaterTools[0].current == -273.1  || heaterTools[0].current == -273.15 ? "--":heaterTools[0].current.toFixed(1)}}</span> <strong>/ {{heaterTools[0].active}}</strong> 
+								</v-col>
+							</v-row>
+						</v-btn>
+					</v-col>
+				</v-row>
+			<!-- </v-card> -->
+		</v-col>
+		<v-col cols="12" class="pa-0 ma-0">
+			<!-- Mostrar dialogo para seleccionar temperatura -->
+			<v-dialog v-model="marcador">
+				<v-btn @click="marcador = false" x-large block class="blue lighten-3">
+					<!-- <v-icon x-large> mdi-close </v-icon> -->
+					<v-icon x-large>mdi-close</v-icon>
+				</v-btn>
+				<v-card class="blue lighten-5 mt-3 mb-3 mr-5">
+					<v-row class="ma-0">
+						<v-col class="ma-1" cols="12">
+							<v-row class="ma-0">
+								<v-col align="center" cols="12" class="ma-2 clsVcol">
+									<!-- <span>{{cadenaNum}}</span> -->
+									<v-row>
+										<v-col cols="5" class="mt-3 clsTools">
+											<v-btn class="clsvbtn1" width="80px" v-if="heaterTools[toolClickTemperature == 4 ? 0:toolClickTemperature +1].state == 'active'" @click="okNums()" rounded>
+												<code-btn width="80px" rounded class="red clscodebtn1" :code="toolClickTemperature == 4 ? `M140 S-273.15` : `G10 P${toolClickTemperature} S-273.15 R-273.15`">OFF</code-btn>
+											</v-btn>
+											<v-btn class="clsvbtn2" width="80px" v-if="heaterTools[toolClickTemperature == 4 ? 0:toolClickTemperature +1].state == 'standby'" @click="okNums()" rounded>
+												<code-btn width="80px" rounded class="red clscodebtn2" :code="toolClickTemperature == 4 ? `M140 S-273.15` : `G10 P${toolClickTemperature} S-273.15 R-273.15`">OFF</code-btn>
+											</v-btn>
+											<v-btn class="clsvbtn3" width="80px" v-if="heaterTools[toolClickTemperature == 4 ? 0:toolClickTemperature +1].state == 'off'" @click="okNums()" rounded>
+												<code-btn width="80px" rounded class="red clscodebtn3" :code="toolClickTemperature == 4 ? `M140 S${heaterTools[0].active}` : `G10 P${toolClickTemperature} S${heaterTools[this.toolClickTemperature +1].active} R${heaterTools[this.toolClickTemperature +1].active}`">heat</code-btn>
+											</v-btn>
+											<v-btn class="clsvbtn4"  width="80px" v-if="heaterTools[toolClickTemperature == 4 ? 0:toolClickTemperature +1].state == 'fault'" @click="okNums()" rounded>
+												<code-btn width="80px" rounded class="red clscodebtn4" :code="`M562 P${toolClickTemperature == 4 ? 0:toolClickTemperature +1}`">fix</code-btn>
+											</v-btn>
+										</v-col>
+										<v-col cols="2">
+											<v-text-field color="black" v-if="toolClickTemperature != null" :label="this.heaterTools[this.toolClickTemperature == 4 ? 0 : this.toolClickTemperature +1].active" :value="this.cadenaNum">{{cadenaNum}}</v-text-field>
+										</v-col>
+										<v-col cols="5" class="clsCama">
+											<v-row>
+												<v-col cols="2" align="center">
+													<v-icon color="red" v-if="heaterTools[toolClickTemperature == 4 ? 0: toolClickTemperature + 1].state == 'fault'">mdi-close-circle-outline</v-icon> 
+													<v-icon color="teal" v-if="heaterTools[toolClickTemperature == 4 ? 0: toolClickTemperature + 1].state == 'active'">mdi-power</v-icon>
+													<v-icon color="warning" v-if="heaterTools[toolClickTemperature == 4 ? 0: toolClickTemperature + 1].state == 'standby'">mdi-power-cycle</v-icon>
+													<v-icon color="grey" v-if="heaterTools[toolClickTemperature == 4 ? 0: toolClickTemperature + 1].state == 'off'">mdi-power-off</v-icon>
+												</v-col>
+												<v-col cols="10" align="left" v-if="toolClickTemperature != 4 && toolClickTemperature != null">
+													<v-row>
+														<v-col align="center">
+															{{ nameTools[toolClickTemperature].name }}
+
+														</v-col>
+														<v-col>
+															<span>max: {{heaterTools[toolClickTemperature == 4 ? 0: toolClickTemperature + 1].max}} </span>
+														</v-col>
+													</v-row>
+												</v-col>
+												<v-col cols="10" align="left" v-if="toolClickTemperature == 4">
+													<v-row>
+														<v-col align="center">
+															{{ nameCama.analog[0].name == "PLTF-REF" ? "PLTF-REF":"PLTF-HT" }}
+														</v-col>
+														<v-col>
+															<span>max: {{heaterTools[toolClickTemperature == 4 ? 0: toolClickTemperature + 1].max}} </span>
+														</v-col>
+													</v-row>
+												</v-col>
+												<v-col cols="2"></v-col>
+												<v-col cols="10" class="pa-0" align="left">
+													<v-row>
+														<v-col align="center">														
+															<span>{{heaterTools[toolClickTemperature == 4 ? 0: toolClickTemperature + 1].current == -273.1  || heaterTools[toolClickTemperature == 4 ? 0: toolClickTemperature + 1].current == -273.15? "--":heaterTools[toolClickTemperature == 4 ? 0: toolClickTemperature + 1].current.toFixed(1)}}</span> <strong>/ {{heaterTools[toolClickTemperature == 4 ? 0: toolClickTemperature + 1].active}}</strong>
+														</v-col>
+														<v-col>
+															<span>min: {{heaterTools[toolClickTemperature == 4 ? 0: toolClickTemperature + 1].min}} </span>
+														</v-col>
+													</v-row>
+												</v-col>
+											</v-row>
+										</v-col>
+									</v-row>
+								</v-col>
+								<v-col align="center" cols="12" class="pa-1">
+									<v-btn rounded height="50" width="170" class="teal lighten-4 ml-4 mr-4" @click="clickNums(7)">
+										<span>7</span>
+									</v-btn>
+									<v-btn rounded height="50" width="170" class="teal lighten-4 ml-4 mr-4" @click="clickNums(8)">
+										<span>8</span>
+									</v-btn>
+									<v-btn rounded height="50" width="170" class="teal lighten-4 ml-4 mr-4" @click="clickNums(9)">
+										<span>9</span>
+									</v-btn>
+								</v-col>
+								<v-col align="center" cols="12" class="pa-1">
+									<v-btn rounded height="50" width="170" class="teal lighten-4 ml-4 mr-4" @click="clickNums(4)">
+										<span>4</span>
+									</v-btn>
+									<v-btn rounded height="50" width="170" class="teal lighten-4 ml-4 mr-4" @click="clickNums(5)">
+										<span>5</span>
+									</v-btn>
+									<v-btn rounded height="50" width="170" class="teal lighten-4 ml-4 mr-4" @click="clickNums(6)">
+										<span>6</span>
+									</v-btn>
+								</v-col>
+								<v-col align="center" cols="12" class="pa-1">
+									<v-btn rounded height="50" width="170" class="teal lighten-4 ml-4 mr-4" @click="clickNums(1)">
+										<span>1</span>
+									</v-btn>
+									<v-btn rounded height="50" width="170" class="teal lighten-4 ml-4 mr-4" @click="clickNums(2)">
+										<span>2</span>
+									</v-btn>
+									<v-btn rounded height="50" width="170" class="teal lighten-4 ml-4 mr-4" @click="clickNums(3)">
+										<span>3</span>
+									</v-btn>
+								</v-col>
+								<v-col align="center" cols="12" class="pa-1 mb-5">
+									<v-btn rounded height="50" width="170" class="teal lighten-4 ml-4 mr-4" @click="deleteNums()">
+										<v-icon>mdi-arrow-left</v-icon>
+									</v-btn>
+									<v-btn rounded height="50" width="170" class="teal lighten-4 ml-4 mr-4" @click="clickNums(0)">
+										<span>0</span>
+									</v-btn>
+									<v-btn rounded height="50" width="170" class="teal lighten-4 ml-4 mr-4" @click="okNums()">
+										<code-btn rounded height="50" width="170" class="teal lighten-4 ml-4 mr-4" :code="toolClickTemperature == 4 ? `M140 S${parseInt(cadenaNum)} R${parseInt(cadenaNum)}` : `M104 S${parseInt(cadenaNum)} T${toolClickTemperature}`">
+											<span>OK</span>
+										</code-btn>
+									</v-btn>
+								</v-col>
+							</v-row>
+							</v-col>
+						<v-col cols="">
+							<!-- max: {{heaterTools[toolClickTemperature == 4 ? 0: toolClickTemperature + 1].max}} -->
+							<!-- <br> -->
+							<!-- min: -->
+						</v-col>
+					</v-row>
+				</v-card>
+			</v-dialog>
+			<v-dialog v-model="mixing">
+				<v-btn @click="mixing = false" x-large block class="blue lighten-3">
+					<!-- <v-icon x-large> mdi-close </v-icon> -->
+					<v-icon x-large>mdi-close</v-icon>
+				</v-btn>
+				<v-card class="blue lighten-5 mt-3 mb-3 mr-5">
+					<v-row class="ma-0">
+						<v-col class="ma-1" cols="12">
+							<v-row class="ma-0">
+								<v-col align="center" cols="12" class="ma-2 clsVcol">
+									<!-- <span>{{cadenaNum}}</span> -->
+
+									<span>MIXMIXMIX</span>
+									<v-row>
+										<v-col cols="5" class="mt-3 clsTools">
+											<v-btn class="clsvbtn1" width="80px" v-if="heaterTools[toolClickTemperature == 4 ? 0:toolClickTemperature +1].state == 'active'" @click="okNums()" rounded>
+												<code-btn width="80px" rounded class="red clscodebtn1" :code="toolClickTemperature == 4 ? `M140 S-273.15` : `G10 P${toolClickTemperature} S-273.15 R-273.15`">OFF</code-btn>
+											</v-btn>
+											<v-btn class="clsvbtn2" width="80px" v-if="heaterTools[toolClickTemperature == 4 ? 0:toolClickTemperature +1].state == 'standby'" @click="okNums()" rounded>
+												<code-btn width="80px" rounded class="red clscodebtn2" :code="toolClickTemperature == 4 ? `M140 S-273.15` : `G10 P${toolClickTemperature} S-273.15 R-273.15`">OFF</code-btn>
+											</v-btn>
+											<v-btn class="clsvbtn3" width="80px" v-if="heaterTools[toolClickTemperature == 4 ? 0:toolClickTemperature +1].state == 'off'" @click="okNums()" rounded>
+												<code-btn width="80px" rounded class="red clscodebtn3" :code="toolClickTemperature == 4 ? `M140 S${heaterTools[0].active}` : `G10 P${toolClickTemperature} S${heaterTools[this.toolClickTemperature +1].active} R${heaterTools[this.toolClickTemperature +1].active}`">heat</code-btn>
+											</v-btn>
+											<v-btn class="clsvbtn4"  width="80px" v-if="heaterTools[toolClickTemperature == 4 ? 0:toolClickTemperature +1].state == 'fault'" @click="okNums()" rounded>
+												<code-btn width="80px" rounded class="red clscodebtn4" :code="`M562 P${toolClickTemperature == 4 ? 0:toolClickTemperature +1}`">fix</code-btn>
+											</v-btn>
+										</v-col>
+										<v-col cols="2">
+											<v-text-field color="black" v-if="toolClickTemperature != null" :label="this.heaterTools[this.toolClickTemperature == 4 ? 0 : this.toolClickTemperature +1].active" :value="this.cadenaNum">{{cadenaNum}}</v-text-field>
+										</v-col>
+										<v-col cols="5" class="clsCama">
+											<v-row>
+												<v-col cols="2" align="center">
+													<v-icon color="red" v-if="heaterTools[toolClickTemperature == 4 ? 0: toolClickTemperature + 1].state == 'fault'">mdi-close-circle-outline</v-icon> 
+													<v-icon color="teal" v-if="heaterTools[toolClickTemperature == 4 ? 0: toolClickTemperature + 1].state == 'active'">mdi-power</v-icon>
+													<v-icon color="warning" v-if="heaterTools[toolClickTemperature == 4 ? 0: toolClickTemperature + 1].state == 'standby'">mdi-power-cycle</v-icon>
+													<v-icon color="grey" v-if="heaterTools[toolClickTemperature == 4 ? 0: toolClickTemperature + 1].state == 'off'">mdi-power-off</v-icon>
+												</v-col>
+												<v-col cols="10" align="left" v-if="toolClickTemperature != 4 && toolClickTemperature != null">
+													<v-row>
+														<v-col align="center">
+															{{ nameTools[toolClickTemperature].name }}
+
+														</v-col>
+														<v-col>
+															<span>max: {{heaterTools[toolClickTemperature == 4 ? 0: toolClickTemperature + 1].max}} </span>
+														</v-col>
+													</v-row>
+												</v-col>
+												<v-col cols="10" align="left" v-if="toolClickTemperature == 4">
+													<v-row>
+														<v-col align="center">
+															{{ nameCama.analog[0].name == "PLTF-REF" ? "PLTF-REF":"PLTF-HT" }}
+														</v-col>
+														<v-col>
+															<span>max: {{heaterTools[toolClickTemperature == 4 ? 0: toolClickTemperature + 1].max}} </span>
+														</v-col>
+													</v-row>
+												</v-col>
+												<v-col cols="2"></v-col>
+												<v-col cols="10" class="pa-0" align="left">
+													<v-row>
+														<v-col align="center">														
+															<span>{{heaterTools[toolClickTemperature == 4 ? 0: toolClickTemperature + 1].current == -273.1  || heaterTools[toolClickTemperature == 4 ? 0: toolClickTemperature + 1].current == -273.15? "--":heaterTools[toolClickTemperature == 4 ? 0: toolClickTemperature + 1].current.toFixed(1)}}</span> <strong>/ {{heaterTools[toolClickTemperature == 4 ? 0: toolClickTemperature + 1].active}}</strong>
+														</v-col>
+														<v-col>
+															<span>min: {{heaterTools[toolClickTemperature == 4 ? 0: toolClickTemperature + 1].min}} </span>
+														</v-col>
+													</v-row>
+												</v-col>
+											</v-row>
+										</v-col>
+									</v-row>
+								</v-col>
+								<v-col align="center" cols="12" class="pa-1">
+									<v-btn rounded height="50" width="170" class="teal lighten-4 ml-4 mr-4" @click="clickNums(7)">
+										<span>7</span>
+									</v-btn>
+									<v-btn rounded height="50" width="170" class="teal lighten-4 ml-4 mr-4" @click="clickNums(8)">
+										<span>8</span>
+									</v-btn>
+									<v-btn rounded height="50" width="170" class="teal lighten-4 ml-4 mr-4" @click="clickNums(9)">
+										<span>9</span>
+									</v-btn>
+								</v-col>
+								<v-col align="center" cols="12" class="pa-1">
+									<v-btn rounded height="50" width="170" class="teal lighten-4 ml-4 mr-4" @click="clickNums(4)">
+										<span>4</span>
+									</v-btn>
+									<v-btn rounded height="50" width="170" class="teal lighten-4 ml-4 mr-4" @click="clickNums(5)">
+										<span>5</span>
+									</v-btn>
+									<v-btn rounded height="50" width="170" class="teal lighten-4 ml-4 mr-4" @click="clickNums(6)">
+										<span>6</span>
+									</v-btn>
+								</v-col>
+								<v-col align="center" cols="12" class="pa-1">
+									<v-btn rounded height="50" width="170" class="teal lighten-4 ml-4 mr-4" @click="clickNums(1)">
+										<span>1</span>
+									</v-btn>
+									<v-btn rounded height="50" width="170" class="teal lighten-4 ml-4 mr-4" @click="clickNums(2)">
+										<span>2</span>
+									</v-btn>
+									<v-btn rounded height="50" width="170" class="teal lighten-4 ml-4 mr-4" @click="clickNums(3)">
+										<span>3</span>
+									</v-btn>
+								</v-col>
+								<v-col align="center" cols="12" class="pa-1 mb-5">
+									<v-btn rounded height="50" width="170" class="teal lighten-4 ml-4 mr-4" @click="deleteNums()">
+										<v-icon>mdi-arrow-left</v-icon>
+									</v-btn>
+									<v-btn rounded height="50" width="170" class="teal lighten-4 ml-4 mr-4" @click="clickNums(0)">
+										<span>0</span>
+									</v-btn>
+									<v-btn rounded height="50" width="170" class="teal lighten-4 ml-4 mr-4" @click="okNums()">
+										<code-btn rounded height="50" width="170" class="teal lighten-4 ml-4 mr-4" :code="toolClickTemperature == 4 ? `M140 S${parseInt(cadenaNum)} R${parseInt(cadenaNum)}` : `M104 S${parseInt(cadenaNum)} T${toolClickTemperature}`">
+											<span>OK</span>
+										</code-btn>
+									</v-btn>
+								</v-col>
+							</v-row>
+							</v-col>
+						<v-col cols="">
+							<!-- max: {{heaterTools[toolClickTemperature == 4 ? 0: toolClickTemperature + 1].max}} -->
+							<!-- <br> -->
+							<!-- min: -->
+						</v-col>
+					</v-row>
+				</v-card>
+			</v-dialog>
+		</v-col>
+	</v-row>
+</template>
+
+<script>
+'use strict'
+
+//import store from '../../store'
+import {  mapMutations, mapState } from 'vuex'
+import CodeBtn from './CodeBtn.vue'
+//import router from '../../routes';
+
+export default {
+  components: { CodeBtn },
+	data() {
+		return {
+			cadenaNum: "0",
+			numeros: null,
+			marcador: false,
+			mixing: false,
+			toolClickTemperature: null, 
+		}
+	},
+    computed: {
+        ...mapMutations(['cambiarMenu']),
+		...mapState({
+			nameCama: state => state.machine.model.sensors,
+			nameTools: state => state.machine.model.tools,
+			heaterTools: state => state.machine.model.heat.heaters,
+			nameHeaters: state => state.machine.model.sensors,
+		}),
+		...mapState('machine/model', {
+			boards: state => state.boards,
+		}),
+		T0Code: {
+			get() {
+				const valor_T0Code = this.$store.state.machine.model.global.T0;
+				return (valor_T0Code);
+			},
+			
+		},
+
+	},
+    methods: {
+        change(){
+			//router.push('Job/Status')
+            this.cambiarMenu;
+        },
+		clickNums(num){
+			if (this.cadenaNum == "0") {
+				this.cadenaNum = "";
+			}
+			this.cadenaNum +=  "" + num;
+		},
+		deleteNums(){
+			this.cadenaNum = this.cadenaNum.substring(0, this.cadenaNum.length - 1);
+			if (this.cadenaNum.length <= 0) {
+				this.cadenaNum = "0";
+			}
+		},
+		okNums(){
+			this.marcador = false;
+			this.mixing = false;
+			this.cadenaNum = "0";
+		},
+		keyboardScreen(toolTemperature){
+			this.toolClickTemperature = toolTemperature;
+			this.marcador = true;
+		},
+		keyboardScreenMix(toolTemperature){
+			this.toolClickTemperature = toolTemperature;
+			this.mixing = true;
+		},
+
+		cambiarRuta(ruta){
+			this.$router.push(ruta)
+		},
+		
+    }
+    
+}
+</script>
