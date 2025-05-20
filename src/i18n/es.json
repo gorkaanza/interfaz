@@ -151,7 +151,8 @@
       "caption": "Grafico de Temperaturas",
       "heater": "Heater {0}",
       "sensor": "Sensor {0}",
-      "noData": "Sin Datos"
+      "noData": "Sin Datos",
+      "save":"Guardar"
     }
   },
   "dialog": {

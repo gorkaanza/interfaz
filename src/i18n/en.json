@@ -151,7 +151,8 @@
       "caption": "Temperature Chart",
       "heater": "Heater {0}",
       "sensor": "Sensor {0}",
-      "noData": "No Data"
+      "noData": "No Data",
+      "save": "Save"
     }
   },
   "dialog": {

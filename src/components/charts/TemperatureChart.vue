@@ -30,7 +30,26 @@
 				{{ $t('chart.temperature.noData') }}
 			</v-alert>
 		</v-card-text>
+
+		<v-menu offset-y>
+			<template v-slot:activator="{ on, attrs }">
+				<v-btn color="primary" small dark v-bind="attrs" v-on="on">
+				<v-icon left>mdi-content-save</v-icon> {{ $t('chart.temperature.save') }}
+				<v-icon right>mdi-chevron-down</v-icon>
+				</v-btn>
+			</template>
+
+			<v-list>
+				<v-list-item @click="downloadChart">
+				<v-list-item-title>PNG</v-list-item-title>
+				</v-list-item>
+				<v-list-item @click="downloadCSV">
+				<v-list-item-title>CSV</v-list-item-title>
+				</v-list-item>
+			</v-list>
+		</v-menu>
 	</v-card>
+	
 </template>
 
 <script>
@@ -150,7 +169,79 @@ export default {
 			this.chart.config.options.scales.yAxes[0].gridLines.zeroLineColor = gridLineColor;
 
 			this.chart.update();
+		},
+		downloadChart() {
+			if (!this.chart) return;
+
+			// Crear un canvas temporal
+			const canvas = document.createElement('canvas');
+			const width = this.chart.width;
+			const height = this.chart.height;
+			canvas.width = width;
+			canvas.height = height;
+
+			const ctx = canvas.getContext('2d');
+
+			// Dibujar fondo blanco
+			ctx.fillStyle = '#ffffff';
+			ctx.fillRect(0, 0, width, height);
+
+			// Dibujar el gráfico actual encima
+			ctx.drawImage(this.chart.canvas, 0, 0);
+
+			// Crear enlace de descarga
+			const link = document.createElement('a');
+			link.href = canvas.toDataURL('image/png');
+			link.download = 'grafico-temperatura.png';
+			link.click();
+		},
+
+		downloadCSV() {
+			const machine = this.selectedMachine;
+			const dataset = tempSamples[machine];
+			if (!dataset || !dataset.times.length || !dataset.temps.length) return;
+
+			const headers = ['timestamp', ...dataset.temps.map(ds => `"${ds.label}"`)];
+			const rows = [];
+
+			const intervalMs = 15000; // 15 segundos
+			let lastTime = 0;
+
+			for (let i = 0; i < dataset.times.length; i++) {
+				const currentTime = new Date(dataset.times[i]).getTime();
+				if (currentTime - lastTime >= intervalMs) {
+					lastTime = currentTime;
+
+					const date = new Date(currentTime);
+					const dateStr = date.toLocaleDateString('es-ES');
+					const timeStr = date.toLocaleTimeString('es-ES', {
+					hour: '2-digit',
+					minute: '2-digit',
+					second: '2-digit',
+					hour12: false,
+					timeZone: 'Europe/Madrid'
+					});
+					const timestamp = `${dateStr} ${timeStr}`;
+
+					const values = dataset.temps.map(ds => {
+					const val = ds.data[i];
+					return isNaN(val) ? '' : val.toFixed(2);
+					});
+
+					rows.push([timestamp, ...values].join(','));
+				}
+			}maxSampleTime 
+
+			const csvContent = [headers.join(','), ...rows].join('\n');
+			const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+			const link = document.createElement('a');
+			link.href = URL.createObjectURL(blob);
+			link.setAttribute('download', 'temperaturas.csv');
+			document.body.appendChild(link);
+			link.click();
+			document.body.removeChild(link);
 		}
+
 	},
 	mounted() {
 		// Create new chart options. Don't use data for the following because it should not be reactive

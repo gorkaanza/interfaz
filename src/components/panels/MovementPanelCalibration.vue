@@ -438,6 +438,16 @@ export default {
 			// Hide dialogs when the connection is interrupted
 			this.showMeshEditDialog = false;
 			this.moveStepDialog.shown = false;
+		},
+		// Agregar watcher para el estado de homing
+		'move.axes': {
+			handler(newAxes) {
+				// Si todos los ejes están homed, deseleccionar cualquier tool activo
+				if (newAxes.every(axis => axis.homed)) {
+					this.sendCode('T-1');
+				}
+			},
+			deep: true
 		}
 	},
 	/* beforeMount(){
