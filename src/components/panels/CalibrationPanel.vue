@@ -61,7 +61,7 @@
 				<div class="bio-cal-cama-placa">
 					<span class="bio-cal-lado arriba">{{ $t('domotek.calibracion.back') }}</span>
 					<div v-for="e in esquinas" :key="e.id" class="bio-cal-esquina" :class="e.estado" :aria-label="e.descripcion">
-						<v-icon>{{ e.icono }}</v-icon>
+						<v-icon v-if="e.icono">{{ e.icono }}</v-icon>
 						<strong>{{ e.texto }}</strong>
 						<span>{{ e.unidad }}</span>
 					</div>
@@ -113,7 +113,7 @@
 				</div>
 				<div class="bio-cal-pos">
 					<span class="bio-tenue">{{ toolActiva >= 0 ? $t('domotek.calibracion.positionOf', [`T${toolActiva + 1}`]) : $t('domotek.desktop.position') }}</span>
-					<span v-for="e in ejesTool" :key="e.et">{{ e.et }} <strong :class="{ 'sin-home': !e.eje.homed }">{{ e.eje.letter === 'Z' ? $displayZ(e.eje.userPosition, false) : $display(e.eje.userPosition, 1) }}</strong><small v-if="e.real" class="bio-tenue"> ({{ e.real }})</small></span>
+					<span v-for="e in ejesTool" :key="e.et">{{ e.et }} <strong :class="{ 'sin-home': !e.eje.homed }">{{ e.eje.letter === 'Z' ? $displayZ(e.eje.userPosition, false) : $display(e.eje.userPosition, 1) }}</strong></span>
 					<div style="flex: 1"></div>
 					<template v-if="offsetZ !== null">
 						<span class="bio-tenue">{{ $t('domotek.calibracion.savedOffset') }}</span>
@@ -470,19 +470,29 @@ export default {
 					{ id: 1, nombre: this.$t('domotek.calibracion.frontLeft') },
 					{ id: 2, nombre: this.$t('domotek.calibracion.frontRight') }
 				];
-				return def.map(e => {
+				// Sin valor = no existe, no es número, o 0 vueltas sin sentido de giro (valores iniciales).
+				// La esquina de referencia nunca recibe número: si las demás ya tienen valor, se pinta en verde.
+				const datos = def.map(e => {
 					const pnt = this.g['calibrPnt' + e.id];
 					const val = this.g['calibrVal' + e.id];
 					const n = parseFloat(pnt);
-					const medido = pnt !== undefined && pnt !== null && pnt !== '' && !isNaN(n);
-					const estado = !medido ? 'sin' : ((val == 0 || Math.abs(n) <= 0.25) ? 'ok' : 'mal');
-					const icono = !medido ? 'mdi-minus' : (val == 0 ? 'mdi-check' : (val < 0 ? 'mdi-rotate-left' : 'mdi-rotate-right'));
-					return {
-						...e, estado, icono,
-						texto: medido ? this.$display(Math.abs(n), 2) : '—',
-						unidad: this.$t('domotek.calibracion.turns'),
-						descripcion: `${e.nombre}: ${medido ? this.$display(Math.abs(n), 2) : '—'} ${this.$t('domotek.calibracion.turns')}`
-					};
+					const conValor = pnt !== undefined && pnt !== null && pnt !== '' && !isNaN(n) && !(n === 0 && (!val || val == 0));
+					return { e, n, val, conValor };
+				});
+				const algunaMedida = datos.some(d => d.conValor);
+				return datos.map(({ e, n, val, conValor }) => {
+					let estado, icono, texto;
+					if (!algunaMedida) {
+						estado = 'sin'; icono = ''; texto = '—';
+					} else if (!conValor) {
+						estado = 'ok'; icono = 'mdi-check'; texto = this.$display(0, 2);
+					} else {
+						estado = (val == 0 || Math.abs(n) <= 0.25) ? 'ok' : 'mal';
+						icono = (val == 0) ? 'mdi-check' : (val < 0 ? 'mdi-rotate-left' : 'mdi-rotate-right');
+						texto = this.$display(Math.abs(n), 2);
+					}
+					const unidad = this.$t('domotek.calibracion.turns');
+					return { ...e, estado, icono, texto, unidad, descripcion: `${e.nombre}: ${texto} ${unidad}` };
 				});
 			},
 			hayMedida() { return this.esquinas.some(e => e.estado !== 'sin'); },
