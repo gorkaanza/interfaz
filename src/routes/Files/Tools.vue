@@ -1100,7 +1100,41 @@
 			</v-btn-toggle> -->
 			<v-divider></v-divider>
 		</v-col>
-		<v-col cols="12" v-show="this.toolClick" align="center">
+		<!-- domotek: elegir tool con el tema oscuro (pantalla completa) -->
+		<div v-if="temaBio && toolClick" class="bio-elegir">
+			<header class="bio-elegir-cab">
+				<button type="button" class="bio-volver" :aria-label="$t('domotek.tools.back')" @click="toolClick = false"><v-icon>mdi-chevron-left</v-icon></button>
+				<h1 class="bio-h1" style="flex: 1; margin: 0">{{ camaClick ? $t('domotek.tools.whichPlatform') : $t('domotek.tools.whichTool') }}</h1>
+				<div class="bio-segmentos" role="tablist">
+					<button v-for="t in bioTools" :key="t.i" type="button" role="tab" class="bio-seg" :class="{ activo: !camaClick && ClickToolAnterior === t.i }" :aria-selected="!camaClick && ClickToolAnterior === t.i" @click="bioElegirTab(t.i)">{{ $t('domotek.tools.T' + t.i + 'Mini') }}</button>
+					<button type="button" role="tab" class="bio-seg" :class="{ activo: camaClick }" :aria-selected="camaClick" @click="bioElegirTab(4)">{{ $t('domotek.tools.platformMini') }}</button>
+				</div>
+			</header>
+			<div v-if="!camaClick" class="bio-elegir-grid" role="radiogroup">
+				<button v-for="registro in filterPadresPorTool" :key="registro.idPadre + registro.idHijo + registro.titulo" type="button" role="radio"
+					class="bio-opcion" :class="{ actual: registro.idTool !== -1 && registro.idHijo === '', carpeta: registro.idTool === -1 && registro.idHijo !== '' }"
+					:aria-checked="registro.idTool !== -1 && registro.idHijo === ''"
+					@click="ChangeSelectedFam(registro.idTool, registro.idHijo)">
+					<v-icon>{{ bioIconoTool(registro) }}</v-icon>
+					<span v-html="replaceFilter(registro.titulo)"></span>
+				</button>
+			</div>
+			<div v-else class="bio-elegir-grid" role="radiogroup">
+				<button type="button" class="bio-opcion" @click="ChangeBed(0)"><v-icon>mdi-radiator</v-icon><span>PLTF-HP</span></button>
+				<button type="button" class="bio-opcion" @click="ChangeBed(1)"><v-icon>mdi-snowflake</v-icon><span>PLTF-REF</span></button>
+				<button v-if="MewCapable" type="button" class="bio-opcion" @click="ChangeBed(2)"><v-icon>mdi-grid</v-icon><span>PLTF-MEW</span></button>
+				<button v-if="DrumCapable" type="button" class="bio-opcion" @click="ChangeBed(3)"><v-icon>mdi-rotate-3d-variant</v-icon><span>DRUM-COLL</span></button>
+			</div>
+			<footer class="bio-elegir-pie">
+				<span class="bio-tenue" style="flex: 1">
+					{{ $t('domotek.tools.nowIn', [camaClick ? $t('domotek.tools.platform') : $t('domotek.tools.T' + ClickToolAnterior + 'Mini')]) }}
+					<strong style="color: #E8EDF1; font-weight: 500">{{ camaClick ? bioNombreCama : (bioTools[ClickToolAnterior] ? bioTools[ClickToolAnterior].nombre : '') }}</strong>
+				</span>
+				<button type="button" class="bio-btn-sec" @click="toolClick = false">{{ $t('domotek.tools.back') }}</button>
+			</footer>
+		</div>
+
+		<v-col cols="12" v-show="toolClick && !temaBio" align="center">
 			<v-btn-toggle v-model="numSelected" color="teal" mandatory>
 				<v-row class="vrcl1 blue lighten-4" style="width:80%">
 		<!-- DOMOTEK DOMOTEK DOMOTEK DOMOTEK DOMOTEK DOMOTEK DOMOTEK DOMOTEK DOMOTEK DOMOTEK DOMOTEK -->
@@ -1827,6 +1861,30 @@ export default {
 
 	},
 	methods: {
+		bioElegirTab(i) { // domotek: cambiar de posición sin cerrar la pantalla
+			if (i === 4) {
+				if (!this.camaClick || this.ClickToolAnterior !== 4) { this.camaClick = true; this.ChangeCama(4); }
+				this.toolClick = true;
+				return;
+			}
+			if (this.camaClick || this.ClickToolAnterior !== i) { this.camaClick = false; this.ChangeTool(i); }
+			this.toolClick = true;
+		},
+		bioIconoTool(r) { // domotek: icono para cada opción del árbol de tools
+			if (r.titulo === this.$t('domotek.toolNames.BACK')) { return 'mdi-arrow-left'; }
+			if (r.titulo === this.$t('domotek.toolNames.CHANGE')) { return 'mdi-swap-horizontal'; }
+			const k = (r.idHijo || r.idPadre || '').toUpperCase();
+			if (k.startsWith('EMPTY') || r.idTool === 0) { return 'mdi-close-circle-outline'; }
+			if (k.startsWith('SYR-HEAT')) { return 'mdi-thermometer'; }
+			if (k.startsWith('SYR-ES')) { return 'mdi-flash-outline'; }
+			if (k.startsWith('COAX')) { return 'mdi-circle-double'; }
+			if (k.startsWith('SYR')) { return 'mdi-needle'; }
+			if (k.startsWith('FIL')) { return 'mdi-printer-3d-nozzle-outline'; }
+			if (k.startsWith('UPE')) { return 'mdi-cube-outline'; }
+			if (k.startsWith('UV')) { return 'mdi-white-balance-sunny'; }
+			if (k.startsWith('AUTOCAL') || r.idTool === 15) { return 'mdi-axis-arrow'; }
+			return 'mdi-tools';
+		},
 		bioTemp(h) { // domotek
 			if (!h || h.current === undefined || h.current <= -273) { return '--'; }
 			return h.current.toFixed(1);

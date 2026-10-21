@@ -363,3 +363,28 @@ $bio-ambar:      #F5B52E;
 		.obj { color: $bio-calor; }
 	}
 }
+
+// Herramientas · elegir tool (pantalla completa sobre el contenido)
+.tema-bio {
+	.bio-elegir {
+		position: fixed; top: 0; right: 0; bottom: 0; left: 80px; z-index: 6;
+		background: $bio-fondo; padding: 14px 18px; box-sizing: border-box;
+		display: flex; flex-direction: column; gap: 12px;
+		button { font-family: inherit; color: inherit; border: none; cursor: pointer; }
+	}
+	.bio-elegir-cab { display: flex; align-items: center; gap: 12px; }
+	.bio-elegir-cab .bio-segmentos { background: $bio-sup; }
+	.bio-volver { width: 44px; height: 44px; border-radius: 12px; background: $bio-sup !important; display: flex; align-items: center; justify-content: center; .v-icon { color: $bio-texto !important; } }
+	.bio-elegir-grid { flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); grid-auto-rows: minmax(0, 150px); align-content: start; gap: 10px; }
+	.bio-opcion {
+		border-radius: 16px; border: 2px solid transparent !important; background: $bio-sup !important;
+		display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
+		font-size: 13px; font-weight: 500; padding: 8px; text-align: center; min-height: 110px;
+		.v-icon { font-size: 30px; color: $bio-texto !important; }
+		&.actual { border-color: $bio-acento !important; background: $bio-acento-bg !important; font-weight: 600; .v-icon { color: $bio-acento !important; } }
+		&.carpeta::after { content: '›'; color: $bio-tenue; font-size: 16px; line-height: 1; }
+		&:active { background: $bio-sup2 !important; }
+	}
+	.bio-elegir-pie { display: flex; align-items: center; gap: 12px; font-size: 13px; }
+	.bio-btn-sec { width: 150px; height: 52px; border-radius: 14px; background: $bio-sup !important; font-size: 15px; font-weight: 500; }
+}
