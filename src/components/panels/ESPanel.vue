@@ -619,8 +619,9 @@
 		</v-col>
 	</v-row>
 	<!-- diálogos compartidos por las dos vistas -->
-						<v-dialog v-model="dialogManualCoords" persistent max-width="380px">
-							<v-card>
+						<v-dialog v-model="dialogManualCoords" persistent :max-width="temaBio ? 760 : '380px'" :content-class="temaBio ? 'bio-teclado-dialogo' : ''">
+							<bio-teclado-valor v-if="temaBio" :abierto="dialogManualCoords" :titulo="$t('panel.ultraviolet.manualEditCoordsTittle')" icono="mdi-crosshairs-gps" color="acento" unidad="mm" :campos="[{ id: 'x', etiqueta: 'X', valor: manualX, error: manualXError }, { id: 'y', etiqueta: 'Y', valor: manualY, error: manualYError }]" :activo="activeManualInput" :rango="$t('domotek.keypad.coordRange', [minCoord, maxCoord])" :atajos="[{ valor: 'centro', texto: $t('domotek.varios.center', 'Centro') }]" @activar="id => activeManualInput = id" @tecla="handleKeyPress" @atajo="() => { manualX = String(Math.round(maxCoord / 2)); manualY = String(Math.round(maxCoord / 2)); manualXError = ''; manualYError = ''; }" @aceptar="confirmManualInput" @cancelar="cancelManualInput"></bio-teclado-valor>
+							<v-card v-else>
 								<v-card-title class="justify-center text-center">
 									<span class="headline">{{ $t('panel.ultraviolet.manualEditCoordsTittle') }}</span>
 								</v-card-title>
@@ -663,8 +664,9 @@
 								</v-card-actions>
 							</v-card>
 						</v-dialog>
-						<v-dialog v-model="dialogManualDrumRPM" persistent max-width="380px">
-							<v-card>
+						<v-dialog v-model="dialogManualDrumRPM" persistent :max-width="temaBio ? 760 : '380px'" :content-class="temaBio ? 'bio-teclado-dialogo' : ''">
+							<bio-teclado-valor v-if="temaBio" :abierto="dialogManualDrumRPM" :titulo="$t('domotek.proc.drumSpeed')" icono="mdi-reload" color="acento" :valor="manualDrumRPMInput" :unidad="$t('generic.rpm')" :error="manualDrumRPMError" :actual="drumRPM" permitido="0 – 4000" :rango="$t('domotek.keypad.rangeGeneric', [0, 4000, $t('generic.rpm')])" :decimales="false" :atajos="[500, 1000, 2000, 3000].map(v => ({ valor: v }))" @tecla="handleDrumRPMKeyPress" @atajo="v => { manualDrumRPMInput = String(v); validateDrumRPM(); }" @aceptar="confirmManualDrumRPM" @cancelar="cancelManualDrumRPM"></bio-teclado-valor>
+							<v-card v-else>
 								<v-card-title class="justify-center text-center">
 									<span class="headline">{{ $t('generic.rpm') }} </span>
 								</v-card-title>
@@ -704,8 +706,9 @@
 								</v-card-actions>
 							</v-card>
 						</v-dialog>
-						<v-dialog v-model="dialogManualXSpeed" persistent max-width="380px">
-							<v-card>
+						<v-dialog v-model="dialogManualXSpeed" persistent :max-width="temaBio ? 760 : '380px'" :content-class="temaBio ? 'bio-teclado-dialogo' : ''">
+							<bio-teclado-valor v-if="temaBio" :abierto="dialogManualXSpeed" :titulo="$t('panel.electrospinning.platformSpeedX')" icono="mdi-speedometer" color="azul" :valor="manualXSpeedInput" unidad="mm/s" :error="manualXSpeedError" :actual="FPlataformaXMms / 60" permitido="10 – 100 mm/s" :rango="$t('domotek.keypad.rangeGeneric', [10, 100, 'mm/s'])" @tecla="handleXSpeedKeyPress" @aceptar="confirmManualXSpeed" @cancelar="cancelManualXSpeed"></bio-teclado-valor>
+							<v-card v-else>
 								<v-card-title class="justify-center text-center">
 									<span class="headline">{{ $t('panel.electrospinning.platformSpeedX') }} </span>
 								</v-card-title>
@@ -745,8 +748,9 @@
 								</v-card-actions>
 							</v-card>
 						</v-dialog>
-						<v-dialog v-model="dialogManualXPoints" persistent max-width="380px">
-							<v-card>
+						<v-dialog v-model="dialogManualXPoints" persistent :max-width="temaBio ? 760 : '380px'" :content-class="temaBio ? 'bio-teclado-dialogo' : ''">
+							<bio-teclado-valor v-if="temaBio" :abierto="dialogManualXPoints" :titulo="$t('panel.electrospinning.editXPoints')" icono="mdi-arrow-expand-horizontal" color="lila" unidad="mm" :campos="[{ id: 'x1', etiqueta: 'X1', valor: manualX1PointInput, error: manualX1PointError }, { id: 'x2', etiqueta: 'X2', valor: manualX2PointInput, error: manualX2PointError }]" :activo="activeManualXPointsInput" :rango="$t('domotek.keypad.rangeGeneric', [0, 140, 'mm'])" @activar="id => activeManualXPointsInput = id" @tecla="handleXPointsKeyPress" @aceptar="confirmManualXPoints" @cancelar="cancelManualXPoints"></bio-teclado-valor>
+							<v-card v-else>
 								<v-card-title class="justify-center text-center">
 								<span class="headline">{{ $t('panel.electrospinning.editXPoints') }}</span>
 								</v-card-title>
@@ -820,8 +824,9 @@
 								</div>
 							</v-card>
 						</v-dialog>
-						<v-dialog v-model="dialogManualHeight" persistent max-width="380px">
-							<v-card>
+						<v-dialog v-model="dialogManualHeight" persistent :max-width="temaBio ? 760 : '380px'" :content-class="temaBio ? 'bio-teclado-dialogo' : ''">
+							<bio-teclado-valor v-if="temaBio" :abierto="dialogManualHeight" :titulo="$t('domotek.proc.height')" icono="mdi-arrow-up-down" color="acento" :valor="manualHeightInput" unidad="mm" :error="manualHeightError" :actual="alturaES" :permitido="`${minAlturaES} – ${maxAlturaES} mm`" :rango="$t('domotek.keypad.rangeGeneric', [minAlturaES, maxAlturaES, 'mm'])" :decimales="false" :atajos="[20, 50, 80, 100].filter(v => v >= minAlturaES && v <= maxAlturaES).map(v => ({ valor: v }))" @tecla="handleHeightKeyPress" @atajo="v => { manualHeightInput = String(v); validateHeight(); }" @aceptar="confirmManualHeight" @cancelar="cancelManualHeight"></bio-teclado-valor>
+							<v-card v-else>
 								<v-card-title class="justify-center text-center">
 									<span class="headline">{{ $t('domotek.varios.exposureheightMm') }} </span>
 								</v-card-title>
@@ -861,8 +866,9 @@
 								</v-card-actions>
 							</v-card>
 						</v-dialog>
-						<v-dialog v-model="dialogManualFlow" persistent max-width="380px">
-							<v-card>
+						<v-dialog v-model="dialogManualFlow" persistent :max-width="temaBio ? 760 : '380px'" :content-class="temaBio ? 'bio-teclado-dialogo' : ''">
+							<bio-teclado-valor v-if="temaBio" :abierto="dialogManualFlow" :titulo="$t('domotek.proc.flow')" icono="mdi-water-outline" color="azul" :valor="manualFlowInput" :unidad="$t('domotek.varios.mlMin')" :error="manualFlowError" :actual="$display(flowMlMin / 100, 2)" :permitido="`${minFlow} – ${maxFlow}`" :rango="$t('domotek.keypad.rangeGeneric', [minFlow, maxFlow, $t('domotek.varios.mlMin')])" :atajos="[0.1, 0.25, 0.5, 1].filter(v => v >= minFlow && v <= maxFlow).map(v => ({ valor: v, texto: $display(v, 2) }))" @tecla="handleFlowKeyPress" @atajo="v => { manualFlowInput = String(v); validateFlow(); }" @aceptar="confirmManualFlow" @cancelar="cancelManualFlow"></bio-teclado-valor>
+							<v-card v-else>
 								<v-card-title class="justify-center text-center">
 									<span class="headline">{{ $t('panel.electrospinning.flowInMlMin') }} </span>
 								</v-card-title>
@@ -902,8 +908,9 @@
 								</v-card-actions>
 							</v-card>
 						</v-dialog>
-						<v-dialog v-model="dialogManualTime" persistent max-width="380px">
-							<v-card>
+						<v-dialog v-model="dialogManualTime" persistent :max-width="temaBio ? 760 : '380px'" :content-class="temaBio ? 'bio-teclado-dialogo' : ''">
+							<bio-teclado-valor v-if="temaBio" :abierto="dialogManualTime" :titulo="$t('domotek.proc.exposure')" icono="mdi-timer-outline" color="lila" :valor="manualTimeInput" unidad="min" :error="manualTimeError" :actual="$display(exposureTimeSeconds / 60, 2)" permitido="0,1 – 120 min" :rango="$t('domotek.keypad.rangeGeneric', ['0,1', 120, 'min'])" :atajos="[0.5, 1, 2, 5].map(v => ({ valor: v, texto: $display(v, v % 1 ? 1 : 0) }))" @tecla="handleTimeKeyPress" @atajo="v => { manualTimeInput = String(v); validateTime(); }" @aceptar="confirmManualTime" @cancelar="cancelManualTime"></bio-teclado-valor>
+							<v-card v-else>
 								<v-card-title class="justify-center text-center">
 									<span class="headline">{{ $t('panel.electrospinning.timeInMinutes') }} </span>
 								</v-card-title>
@@ -943,8 +950,9 @@
 								</v-card-actions>
 							</v-card>
 						</v-dialog>
-						<v-dialog v-model="dialogManualLayers" persistent max-width="380px">
-							<v-card>
+						<v-dialog v-model="dialogManualLayers" persistent :max-width="temaBio ? 760 : '380px'" :content-class="temaBio ? 'bio-teclado-dialogo' : ''">
+							<bio-teclado-valor v-if="temaBio" :abierto="dialogManualLayers" :titulo="$t('domotek.varios.Layers')" icono="mdi-layers-outline" color="acento" :valor="manualLayersInput" :error="manualLayersError" :actual="cadenceAmountES" :permitido="`${Math.max(1, minCadenceAmountES)} – ${maxCadenceAmountES}`" :rango="$t('domotek.keypad.rangeGeneric', [Math.max(1, minCadenceAmountES), maxCadenceAmountES, $t('domotek.varios.layers')])" :decimales="false" :atajos="[1, 2, 3, 5].map(v => ({ valor: v }))" @tecla="handleLayersKeyPress" @atajo="v => { manualLayersInput = String(v); validateLayers(); }" @aceptar="confirmManualLayers" @cancelar="cancelManualLayers"></bio-teclado-valor>
+							<v-card v-else>
 								<v-card-title class="justify-center text-center">
 									<span class="headline">{{  $t('domotek.varios.Layers') }} </span>
 								</v-card-title>

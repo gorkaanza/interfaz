@@ -667,7 +667,7 @@ $bio-ambar:      #F5B52E;
 	.bio-proc-cab { height: 64px; flex: none; display: flex; align-items: center; gap: 12px; padding: 0 16px; background: $bio-rail; box-sizing: border-box; }
 	.bio-proc-titulo { font-size: 17px; font-weight: 600; white-space: nowrap; }
 	.bio-proc-cab .bio-cal-pasos button { padding: 0 11px; }
-	.bio-proc-cuerpo { flex: 1; min-height: 0; padding: 14px 22px 16px; box-sizing: border-box; display: flex; flex-direction: column; gap: 12px; }
+	.bio-proc-cuerpo { flex: 1; min-height: 0; padding: 12px 22px 14px; box-sizing: border-box; display: flex; flex-direction: column; gap: 10px; }
 	.bio-proc-h2 { margin: 0; font-size: 18px; font-weight: 600; display: flex; align-items: center; gap: 14px; }
 	.bio-proc-hv { display: inline-flex; align-items: center; gap: 4px; font-size: 13px; color: #F5B52E; font-weight: 600; }
 	.bio-proc-datos { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
@@ -675,9 +675,9 @@ $bio-ambar:      #F5B52E;
 	.bio-proc-datos span { font-size: 12px; color: $bio-tenue; }
 	.bio-proc-datos strong { font-size: 18px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; small { font-size: 13px; color: $bio-tenue; font-weight: 400; } }
 	.bio-proc-lista { background: $bio-sup; border-radius: 16px; padding: 4px 16px; }
-	.bio-proc-lista .fila { display: flex; align-items: center; gap: 12px; min-height: 44px; padding: 6px 0 6px 16px; border-top: 1px solid #2A3138; color: $bio-tenue; }
+	.bio-proc-lista .fila { display: flex; align-items: center; gap: 12px; min-height: 38px; padding: 4px 0 4px 16px; border-top: 1px solid #2A3138; color: $bio-tenue; }
 	.bio-proc-lista .fila > span:first-child { flex: 1; }
-	.bio-proc-lista .fila.cab { padding-left: 0; border-top: none; color: $bio-texto; min-height: 50px; }
+	.bio-proc-lista .fila.cab { padding-left: 0; border-top: none; color: $bio-texto; min-height: 46px; }
 	.bio-proc-lista .fila.cab small { display: block; font-size: 12px; color: $bio-tenue; }
 	.bio-proc-lista .fila.cab strong { font-weight: 500; font-size: 15px; }
 	.bio-proc-lista .fila.tenue { opacity: .55; }
@@ -754,4 +754,19 @@ $bio-ambar:      #F5B52E;
 	.bio-teclado-coords { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 	.bio-teclado-coords .bio-teclado-valor { border: 2px solid $bio-acento !important; text-align: left; color: $bio-texto; strong { font-size: 32px; } &.inactivo { border-color: #3A444D !important; } &.fuera { border-color: $bio-peligro !important; } }
 	.bio-teclado-num button:disabled { opacity: .35; }
+}
+.tema-bio .bio-proc-hv.uv { color: #B49CF2; }
+
+// Colores del teclado genérico (BioTecladoValor)
+.tema-bio {
+	.bio-teclado-icono.lila { background: #2B2540; .v-icon { color: #B49CF2 !important; } }
+	.bio-teclado-icono.azul { background: #1C2F3A; .v-icon { color: #6CB8E6 !important; } }
+	.bio-teclado-valor.lila { border-color: #B49CF2; } .bio-teclado-valor.azul { border-color: #6CB8E6; }
+	.bio-teclado-valor.lila.fuera, .bio-teclado-valor.azul.fuera { border-color: $bio-peligro; }
+	.bio-teclado-coords .bio-teclado-valor.lila { border-color: #B49CF2 !important; }
+	.bio-teclado-coords .bio-teclado-valor.azul { border-color: #6CB8E6 !important; }
+	.bio-teclado-coords .bio-teclado-valor.inactivo { border-color: #3A444D !important; }
+	.bio-teclado-atajos button.lila.activo { background: #2B2540 !important; color: #B49CF2 !important; }
+	.bio-teclado-atajos button.azul.activo { background: #1C2F3A !important; color: #6CB8E6 !important; }
+	.bio-teclado-ok.lila { background: #B49CF2 !important; } .bio-teclado-ok.azul { background: #6CB8E6 !important; }
 }

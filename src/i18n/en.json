@@ -1177,6 +1177,8 @@
   },
   "domotek": {
     "proc": {
+      "uvSettings": "Ultraviolet settings",
+      "power": "Power",
       "esSettings": "Electrospinning settings",
       "summary": "Summary",
       "pattern": "Pattern",
@@ -1210,6 +1212,7 @@
       "seeSummary": "See summary"
     },
     "keypad": {
+      "rangeGeneric": "Between {0} and {1} {2}",
       "currentValue": "Current value",
       "allowed": "Allowed",
       "newValue": "New value",

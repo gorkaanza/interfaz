@@ -1172,6 +1172,8 @@
   },
   "domotek": {
     "proc": {
+      "uvSettings": "Ajustes de ultravioleta",
+      "power": "Potencia",
       "esSettings": "Ajustes de electrospinning",
       "summary": "Resumen",
       "pattern": "Patrón",
@@ -1205,6 +1207,7 @@
       "seeSummary": "Ver resumen"
     },
     "keypad": {
+      "rangeGeneric": "Entre {0} y {1} {2}",
       "currentValue": "Valor actual",
       "allowed": "Permitido",
       "newValue": "Nuevo valor",
