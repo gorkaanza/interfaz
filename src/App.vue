@@ -85,8 +85,11 @@ textarea {
 
 <template>
 	<v-app :class="{ 'tema-bio': temaBio }">
-		<!-- domotek: menú lateral del modo escritorio -->
-		<v-navigation-drawer v-if="temaBio && escritorio" app permanent width="232px" class="bio-nav">
+		<!-- domotek: un único menú lateral para el tema oscuro (táctil: 80 px, escritorio: 232 px).
+		     Se usa un solo componente porque al cambiar entre dos v-navigation-drawer Vuetify
+		     podía quedarse con el ancho del anterior y dejar un hueco a la izquierda. -->
+		<v-navigation-drawer v-if="temaBio" app permanent :width="escritorio ? 232 : 80" :class="escritorio ? 'bio-nav' : 'bio-rail'">
+			<template v-if="escritorio">
 			<div class="bio-nav-logo"><span>domo</span><span class="bio-marca-bio">{{ modeloMaquina == 'HK' ? 'MAT' : 'BIO' }}</span></div>
 			<template v-for="grupo in navEscritorio">
 				<span :key="'g-' + grupo.id" class="bio-nav-grupo">{{ grupo.titulo }}</span>
@@ -97,16 +100,8 @@ textarea {
 			</template>
 			<div class="bio-rail-hueco"></div>
 			<button type="button" class="bio-nav-item" @click="cambiarModo('tactil')"><v-icon small>mdi-tablet</v-icon><span>{{ $t('domotek.desktop.touchMode') }}</span></button>
-		</v-navigation-drawer>
-		<v-app-bar v-if="temaBio && escritorio" app flat height="56" class="bio-topbar">
-			<span class="bio-maquina"><span>{{ bioNombre.domo }}</span><span class="bio-marca-bio">{{ bioNombre.marca }}</span><span class="bio-tenue" style="font-weight: 500">{{ bioNombre.resto }}</span></span>
-			<status-label v-if="status" class="ml-3"></status-label>
-			<v-spacer></v-spacer>
-			<div style="width: 240px"><emergency-btn></emergency-btn></div>
-		</v-app-bar>
-
-		<!-- domotek: barra lateral del tema oscuro (pantalla táctil) -->
-		<v-navigation-drawer v-else-if="temaBio" app permanent width="80px" class="bio-rail">
+			</template>
+			<template v-else>
 			<button v-for="item in railItems" :key="item.id" type="button" class="bio-rail-btn" :class="{ activo: railActivo === item.id }" :aria-label="item.label" @click="railClick(item)">
 				<svg v-if="item.id === 'job' && isPrinting" class="anillo" viewBox="0 0 48 48" aria-hidden="true">
 					<circle cx="24" cy="24" r="21" fill="none" stroke="#2A4A45" stroke-width="3"></circle>
@@ -118,8 +113,15 @@ textarea {
 			<button v-for="item in railItemsAbajo" :key="item.id" type="button" class="bio-rail-btn" :class="{ activo: railActivo === item.id }" :aria-label="item.label" @click="railClick(item)">
 				<v-icon large>{{ item.icon }}</v-icon>
 			</button>
+			</template>
 		</v-navigation-drawer>
-		<v-navigation-drawer v-else app permanent width="100px" class="blue lighten-4">
+		<v-app-bar v-if="temaBio && escritorio" app flat height="56" class="bio-topbar">
+			<span class="bio-maquina"><span>{{ bioNombre.domo }}</span><span class="bio-marca-bio">{{ bioNombre.marca }}</span><span class="bio-tenue" style="font-weight: 500">{{ bioNombre.resto }}</span></span>
+			<status-label v-if="status" class="ml-3"></status-label>
+			<v-spacer></v-spacer>
+			<div style="width: 240px"><emergency-btn></emergency-btn></div>
+		</v-app-bar>
+		<v-navigation-drawer v-if="!temaBio" app permanent width="100px" class="blue lighten-4">
 			<v-bottom-navigation color="teal" height="0" v-model="numMenuSelect">
 				<v-row >
 					<v-col cols="12" class="mb-0 pb-0">
