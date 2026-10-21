@@ -707,7 +707,52 @@
 							<!-- </v-card> -->
 						</v-col>
 						<v-col cols="12" class="pa-0 ma-0">
-							<v-dialog v-model="marcador">
+							<v-dialog v-model="marcador" :content-class="temaBio ? 'bio-teclado-dialogo' : ''" :max-width="temaBio ? 760 : undefined">
+								<!-- domotek: teclado de temperatura con el tema oscuro -->
+								<div v-if="temaBio" class="bio-teclado">
+									<section class="bio-teclado-izq">
+										<header class="bio-teclado-cab">
+											<span class="bio-teclado-icono" :class="{ hum: bioModoHum }"><v-icon>{{ bioModoHum ? 'mdi-water-percent' : 'mdi-thermometer' }}</v-icon></span>
+											<span class="bio-teclado-nombre">{{ bioTecladoNombre }}</span>
+											<button type="button" class="bio-teclado-cerrar" :aria-label="$t('generic.close')" @click="marcador = false"><v-icon>mdi-close</v-icon></button>
+										</header>
+										<div v-if="modoDialog === 'HUM'" class="bio-segmentos bio-teclado-modo" role="tablist">
+											<button type="button" role="tab" class="bio-seg" :class="{ activo: modoInput === 'TEMP' }" @click="switchToTemp()">{{ $t('domotek.varios.temp') }}</button>
+											<button type="button" role="tab" class="bio-seg" :class="{ activo: modoInput === 'HUM' }" @click="modoInput = 'HUM'">{{ $t('domotek.varios.RH') }}</button>
+										</div>
+										<div class="bio-teclado-datos">
+											<div><span>{{ $t('domotek.keypad.current') }}</span><strong>{{ bioTecladoActual }}</strong></div>
+											<div><span>{{ $t('domotek.keypad.currentTarget') }}</span><strong :class="{ apagado: !bioTecladoObjetivo }">{{ bioTecladoObjetivo || $t('domotek.keypad.off') }}</strong></div>
+										</div>
+										<div class="bio-teclado-valor" :class="{ hum: bioModoHum, fuera: bioFueraRango && !bioValorVacio }">
+											<span>{{ $t('domotek.keypad.newTarget') }}</span>
+											<strong>{{ bioValorVacio ? '—' : (bioModoHum ? humedad : cadenaNum) }}</strong><small>{{ bioModoHum ? '%' : '°C' }}</small>
+										</div>
+										<div class="bio-teclado-rango" :class="{ fuera: bioFueraRango && !bioValorVacio }">{{ bioTecladoRango }}</div>
+										<div class="bio-teclado-atajos">
+											<button v-for="p in bioAtajos" :key="p.valor" type="button" :class="{ activo: String(p.valor) === (bioModoHum ? humedad : cadenaNum), hum: bioModoHum }" @click="bioFijar(p.valor)">{{ p.texto }}</button>
+										</div>
+										<div style="flex: 1"></div>
+										<div class="bio-teclado-acciones">
+											<template v-if="bioModoHum">
+												<button type="button" class="bio-teclado-sec" :disabled="!miniclima_on" @click="stopHumedad()">{{ $t('domotek.keypad.turnOff') }}</button>
+												<button type="button" class="bio-teclado-ok hum" :disabled="bioFueraRango" @click="okHumedad()">{{ bioValorVacio ? $t('domotek.keypad.set') : $t('domotek.keypad.setHumidity', [humedad]) }}</button>
+											</template>
+											<template v-else>
+												<button v-if="bioHeaterTeclado && bioHeaterTeclado.state === 'fault'" type="button" class="bio-teclado-sec peligro" @click="handleFixButton()">{{ $t('domotek.keypad.resetFault') }}</button>
+												<button v-else type="button" class="bio-teclado-sec" :disabled="!bioHeaterTeclado || bioHeaterTeclado.state === 'off'" @click="handleOffButton()">{{ $t('domotek.keypad.turnOff') }}</button>
+												<button type="button" class="bio-teclado-ok" :disabled="bioFueraRango" @click="okNums()">{{ bioValorVacio ? $t('domotek.keypad.heat') : $t('domotek.keypad.heatTo', [cadenaNum]) }}</button>
+											</template>
+										</div>
+									</section>
+									<section class="bio-teclado-num" :aria-label="$t('domotek.keypad.keypad')">
+										<button v-for="n in [7, 8, 9, 4, 5, 6, 1, 2, 3]" :key="n" type="button" @click="bioTecla(n)">{{ n }}</button>
+										<button type="button" class="suave" :aria-label="$t('domotek.keypad.clear')" @click="bioFijar(0)">C</button>
+										<button type="button" @click="bioTecla(0)">0</button>
+										<button type="button" class="suave" :aria-label="$t('domotek.keypad.delete')" @click="bioModoHum ? deleteHumedad() : deleteNums()"><v-icon>mdi-backspace-outline</v-icon></button>
+									</section>
+								</div>
+								<template v-else>
 								<v-btn @click="marcador = false" x-large block class="blue lighten-3">
 									<v-icon x-large>mdi-close</v-icon>
 								</v-btn>
@@ -892,8 +937,12 @@
 									</v-row>
 
 									<!-- Dialog temperatura fuera de rango -->
+
+								</v-card>
+								</template>
+							</v-dialog>
 									<v-dialog v-model="showTemperatureOutOfRangeDialog" persistent width="480">
-										<v-card class="blue lighten-5 mt-3 mb-3 mr-5">
+										<v-card class="blue lighten-5">
 											<v-card-title><span class="headline">{{ $t('generic.warning') }}</span></v-card-title>
 											<v-card-text>{{ $t('domotek.varios.temp_out') }}</v-card-text>
 											<v-card-actions>
@@ -902,9 +951,6 @@
 											</v-card-actions>
 										</v-card>
 									</v-dialog>
-								</v-card>
-							</v-dialog>
-							<!-- Dialog miniclima activo -->
 							<v-dialog v-model="showMiniClimaWarning" persistent width="480">
 								<v-card class="blue lighten-5">
 									<v-card-title>
@@ -1478,6 +1524,58 @@ export default {
 			}
 			return out;
 		},
+		bioModoHum() { return this.modoDialog === 'HUM' && this.modoInput === 'HUM'; }, // domotek: teclado
+		bioIndiceTeclado() { const t = this.toolClickTemperature; return t == 4 ? 0 : (t == 20 ? 20 : t + 1); },
+		bioHeaterTeclado() { return this.heaterTools ? this.heaterTools[this.bioIndiceTeclado] : null; },
+		bioTecladoNombre() {
+			const t = this.toolClickTemperature;
+			if (t == 4) { return this.$t('domotek.tools.platform').replace(/^./, c => c.toUpperCase()) + (this.bioNombreCama ? ` · ${this.bioNombreCama}` : ''); }
+			if (t == 20) { return 'Chamber'; }
+			const nombre = this['T' + t + 'Name'];
+			return `T${t + 1}` + (nombre ? ` · ${nombre}` : '');
+		},
+		bioTecladoActual() {
+			if (this.bioModoHum) {
+				return (this.miniclima_rh !== undefined && this.miniclima_rh !== null && this.miniclima_rh !== '--') ? `${Number(this.miniclima_rh).toFixed(1)} %` : '—';
+			}
+			const v = this.bioTemp(this.bioHeaterTeclado);
+			return v === '--' ? '—' : `${v} °C`;
+		},
+		bioTecladoObjetivo() {
+			if (this.bioModoHum) { return (this.miniclima_on && this.miniclima_setPoint) ? `${this.miniclima_setPoint} %` : ''; }
+			const h = this.bioHeaterTeclado;
+			return (h && h.state !== 'off' && h.active) ? `${h.active} °C` : '';
+		},
+		bioRango() {
+			if (this.bioModoHum) { return { min: this.HUMIDITY_min, max: this.HUMIDITY_max }; }
+			if (!this.bioHeaterTeclado) { return { min: 0, max: 0 }; }
+			let min = 0, max = 0;
+			try { min = this.getMinValue(); max = this.getMaxValue(); } catch (e) { /* sin datos */ }
+			return { min, max };
+		},
+		bioValorVacio() { return (this.bioModoHum ? this.humedad : this.cadenaNum) === '0'; },
+		bioFueraRango() {
+			const v = parseInt(this.bioModoHum ? this.humedad : this.cadenaNum, 10);
+			return isNaN(v) || v < this.bioRango.min || v > this.bioRango.max;
+		},
+		bioTecladoRango() {
+			const { min, max } = this.bioRango;
+			if (this.bioModoHum) { return this.$t('domotek.keypad.rangeHum', [min, max]); }
+			const minTxt = (min === this.tempAmbiente) ? this.$t('domotek.keypad.ambient').toLowerCase() : `${Math.round(min)} °C`;
+			return this.$t('domotek.keypad.range', [minTxt, Math.round(max)]);
+		},
+		bioAtajos() {
+			const { min, max } = this.bioRango;
+			if (this.bioModoHum) {
+				return [40, 50, 60, 70, 80, 90].filter(v => v >= min && v <= max).slice(0, 4).map(v => ({ valor: v, texto: `${v} %` }));
+			}
+			const lista = [];
+			if (min === this.tempAmbiente) { lista.push({ valor: Math.round(min), texto: this.$t('domotek.keypad.ambient') }); }
+			[4, 25, 37, 45, 60, 80, 120, 180, 220].forEach(v => {
+				if (v >= min && v <= max && lista.length < 4 && !lista.some(p => p.valor === v)) { lista.push({ valor: v, texto: String(v) }); }
+			});
+			return lista;
+		},
 		bioChamberVisible() {
 			return (this.modeloMaquina != '2A') && (this.chamberMode == true) && !!(this.heaterTools && this.heaterTools[20]);
 		},
@@ -1884,6 +1982,15 @@ export default {
 			if (k.startsWith('UV')) { return 'mdi-white-balance-sunny'; }
 			if (k.startsWith('AUTOCAL') || r.idTool === 15) { return 'mdi-axis-arrow'; }
 			return 'mdi-tools';
+		},
+		bioTecla(n) { // domotek: teclado sin campo de texto
+			if (this.bioModoHum) { this.clickHumedad(n); return; }
+			if (this.cadenaNum === '0') { this.cadenaNum = ''; }
+			if (this.cadenaNum.length >= 3) { return; }
+			this.cadenaNum = `${this.cadenaNum}${n}`;
+		},
+		bioFijar(v) {
+			if (this.bioModoHum) { this.humedad = String(v); } else { this.cadenaNum = String(v); }
 		},
 		bioTemp(h) { // domotek
 			if (!h || h.current === undefined || h.current <= -273) { return '--'; }
@@ -2705,6 +2812,13 @@ export default {
 
 		handleKeyPress(event) {
 			const key = event.key;
+			if (this.temaBio) { // domotek: teclado físico con el tema oscuro (no hay campo de texto)
+				if (!this.marcador) { return; }
+				if (!isNaN(key) && key !== ' ' && key >= 0 && key <= 9) { this.bioTecla(parseInt(key, 10)); }
+				else if (key === 'Backspace') { if (this.bioModoHum) { this.deleteHumedad(); } else { this.deleteNums(); } }
+				else if (key === 'Enter') { if (this.bioModoHum) { this.okHumedad(); } else if (!this.bioFueraRango) { this.okNums(); } }
+				return;
+			}
 			if (this.marcador && this.modoInput === 'HUM') {
 				const key = event.key;
 				if (!isNaN(key) && key >= 0 && key <= 9) {

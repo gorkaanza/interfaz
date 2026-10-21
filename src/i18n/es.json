@@ -1171,6 +1171,24 @@
     }
   },
   "domotek": {
+    "keypad": {
+      "current": "Actual",
+      "currentTarget": "Objetivo actual",
+      "off": "Apagado",
+      "newTarget": "Nuevo objetivo",
+      "range": "Entre {0} y {1} °C",
+      "rangeHum": "Entre {0} y {1} %",
+      "ambient": "Ambiente",
+      "turnOff": "Apagar",
+      "heat": "Calentar",
+      "set": "Fijar",
+      "heatTo": "Calentar a {0} °C",
+      "setHumidity": "Fijar {0} %",
+      "resetFault": "Reiniciar fallo",
+      "keypad": "Teclado",
+      "clear": "Borrar",
+      "delete": "Borrar último"
+    },
     "desktop": {
       "chartLast10": "Temperaturas · últimos 10 min",
       "processes": "Procesos de este trabajo",

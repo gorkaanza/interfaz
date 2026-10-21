@@ -599,3 +599,55 @@ $bio-ambar:      #F5B52E;
 	.bio-cal-dialogo .v-card__actions { justify-content: flex-end; gap: 10px; }
 }
 .tema-bio.bio-escritorio .bio-cal-cuerpo { width: 100%; max-width: 1100px; margin: 0 auto; }
+
+// ---------------------------------------------------------------------------
+// Teclado de temperatura / humedad (Tools.vue · marcador)
+// ---------------------------------------------------------------------------
+.tema-bio {
+	.bio-teclado-dialogo { box-shadow: none !important; border-radius: 22px !important; overflow: visible; margin: 12px !important; max-height: calc(100vh - 24px) !important; }
+	.bio-teclado {
+		background: $bio-sup; border-radius: 22px; padding: 16px; box-sizing: border-box;
+		display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; height: min(440px, calc(100vh - 24px));
+		color: $bio-texto; font-size: 14px;
+		button { font-family: inherit; color: inherit; border: none; cursor: pointer; }
+		button:disabled { cursor: default; opacity: .45; }
+	}
+	.bio-teclado-izq { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+	.bio-teclado-cab { display: flex; align-items: center; gap: 12px; }
+	.bio-teclado-icono { width: 40px; height: 40px; border-radius: 12px; background: #3A2E1C; display: flex; align-items: center; justify-content: center; flex: none; .v-icon { color: $bio-calor !important; } &.hum { background: #1C2F3A; .v-icon { color: #6CB8E6 !important; } } }
+	.bio-teclado-nombre { flex: 1; min-width: 0; font-size: 17px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+	.bio-teclado-cerrar { width: 40px; height: 40px; border-radius: 12px; background: $bio-sup2 !important; display: flex; align-items: center; justify-content: center; flex: none; .v-icon { color: $bio-texto !important; } }
+	.bio-teclado-modo { align-self: flex-start; }
+	.bio-teclado-modo .bio-seg { height: 34px !important; }
+	.bio-teclado-datos { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+	.bio-teclado-datos > div { background: $bio-sup2; border-radius: 12px; padding: 8px 12px; display: flex; flex-direction: column; min-width: 0; }
+	.bio-teclado-datos span { font-size: 12px; color: $bio-tenue; }
+	.bio-teclado-datos strong { font-size: 20px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+	.bio-teclado-datos strong.apagado { color: $bio-tenue; }
+	.bio-teclado-valor {
+		display: flex; align-items: baseline; gap: 6px; padding: 8px 16px; border-radius: 14px; background: #14171A; border: 2px solid $bio-calor;
+		span { flex: 1; font-size: 13px; color: $bio-tenue; }
+		strong { font-size: 40px; font-weight: 600; line-height: 1; }
+		small { font-size: 16px; color: $bio-tenue; }
+		&.hum { border-color: #6CB8E6; }
+		&.fuera { border-color: $bio-peligro; }
+	}
+	.bio-teclado-rango { font-size: 12px; color: $bio-tenue; margin-top: -4px; &.fuera { color: $bio-peligro; } }
+	.bio-teclado-atajos { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+	.bio-teclado-atajos button {
+		height: 40px; border-radius: 12px; background: $bio-sup2 !important; font-size: 14px; padding: 0 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+		&.activo { background: #3A2E1C !important; color: $bio-calor !important; font-weight: 600; }
+		&.activo.hum { background: #1C2F3A !important; color: #6CB8E6 !important; }
+	}
+	.bio-teclado-acciones { display: grid; grid-template-columns: minmax(0, .75fr) minmax(0, 1fr); gap: 10px; }
+	.bio-teclado-sec { height: 50px; border-radius: 14px; background: $bio-sup2 !important; font-size: 15px; font-weight: 500; &.peligro { background: $bio-peligro-bg !important; color: $bio-peligro !important; } }
+	.bio-teclado-ok { height: 50px; border-radius: 14px; background: $bio-calor !important; color: $bio-rail !important; font-size: 15px; font-weight: 600; white-space: nowrap; &.hum { background: #6CB8E6 !important; } }
+	.bio-teclado-num { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: repeat(4, minmax(0, 1fr)); gap: 8px; }
+	.bio-teclado-num button {
+		border-radius: 14px; background: $bio-sup2 !important; font-size: 24px; font-weight: 500;
+		display: flex; align-items: center; justify-content: center;
+		.v-icon { color: $bio-texto !important; font-size: 26px; }
+		&.suave { background: #2C333B !important; font-size: 18px; }
+		&:active { background: $bio-acento-bg !important; }
+	}
+}
