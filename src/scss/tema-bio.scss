@@ -325,42 +325,78 @@ $bio-ambar:      #F5B52E;
 }
 
 // ---------------------------------------------------------------------------
-// Trabajos
+// Trabajos (pestañas Trabajo y Procesos)
 // ---------------------------------------------------------------------------
 .tema-bio {
 	.bio-job {
-		height: calc(100vh - 36px); min-height: 430px; box-sizing: border-box; padding-top: 8px;
-		display: flex; flex-direction: column; gap: 10px;
+		height: calc(100vh - 28px); min-height: 440px; box-sizing: border-box; padding-top: 4px;
+		display: flex; flex-direction: column; gap: 8px;
 		button { font-family: inherit; color: inherit; border: none; cursor: pointer; }
 	}
-	.bio-job-cab { background: $bio-sup; border-radius: 16px; padding: 12px 16px; display: flex; flex-direction: column; gap: 8px; }
-	.bio-job-fila { display: flex; align-items: center; gap: 10px; min-height: 44px; }
+	.bio-job-tabs { align-self: flex-start; background: $bio-sup; padding: 3px; }
+	.bio-job-tabs .bio-seg { height: 34px !important; padding: 0 16px !important; font-size: 13px; }
+	.bio-job-tab-n { display: inline-flex; align-items: center; justify-content: center; min-width: 18px; height: 18px; border-radius: 9px; margin-left: 6px; font-size: 11px; font-weight: 600; background: $bio-acento-bg; color: $bio-acento; }
+	.bio-seg.activo .bio-job-tab-n { background: $bio-rail; }
+
+	.bio-job-cab { background: $bio-sup; border-radius: 16px; padding: 10px 16px; display: flex; flex-direction: column; gap: 6px; }
+	.bio-job-fila { display: flex; align-items: center; gap: 10px; min-height: 36px; }
 	.bio-job-cab .bio-estado { background: $bio-sup2; font-size: 12px; font-weight: 600; padding: 4px 10px; }
 	.bio-job-cab .bio-estado.activo { background: $bio-acento-bg; color: $bio-acento; }
+	.bio-job-cab .bio-estado.pausa { background: #3A2E1C; color: $bio-calor; }
 	.bio-job-archivo { flex: 1; min-width: 0; font-size: 16px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-	.bio-job-pct { font-size: 24px; font-weight: 600; color: $bio-acento; }
-	.bio-btn-acento { height: 44px; padding: 0 16px; border-radius: 12px; background: $bio-acento !important; color: $bio-rail !important; font-size: 14px; font-weight: 600; }
+	.bio-job-pct { font-size: 24px; font-weight: 600; color: $bio-acento; line-height: 1; }
+	.bio-btn-acento { height: 36px; padding: 0 14px; border-radius: 10px; background: $bio-acento !important; color: $bio-rail !important; font-size: 13px; font-weight: 600; }
+	.v-btn.bio-btn-sec-peq { height: 36px !important; padding: 0 12px !important; border-radius: 10px !important; background: $bio-sup2 !important; color: $bio-texto !important; font-size: 13px; box-shadow: none !important; }
 	.bio-barra { height: 8px; border-radius: 4px; background: #2A3138; overflow: hidden; div { height: 100%; background: $bio-acento; border-radius: 4px; transition: width .4s; } }
-	.bio-job-datos { display: flex; gap: 18px; font-size: 13px; color: $bio-tenue; align-items: center; flex-wrap: wrap; strong { color: $bio-texto; font-weight: 500; } }
+	.bio-job-datos { display: flex; gap: 16px; font-size: 13px; color: $bio-tenue; align-items: center; white-space: nowrap; overflow: hidden; strong { color: $bio-texto; font-weight: 500; } }
 	.bio-aviso { display: inline-flex; align-items: center; gap: 4px; color: $bio-texto; font-weight: 600; }
-	.bio-job-grid { flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-auto-rows: minmax(0, 1fr); gap: 10px; &.cinco { grid-template-columns: repeat(5, minmax(0, 1fr)); } }
+
+	.bio-job-cuerpo { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) 236px; gap: 8px; }
+	.bio-job-vista { position: relative; background: $bio-sup; border-radius: 16px; min-height: 0; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+	.bio-job-vista-tabs { position: absolute; left: 8px; top: 8px; z-index: 1; padding: 3px; }
+	.bio-job-vista-tabs .bio-seg { height: 30px !important; min-width: 0 !important; padding: 0 12px !important; font-size: 12px; }
+	.bio-job-vista-tabs .bio-seg.activo { background: $bio-sup2 !important; color: $bio-texto !important; }
+	.bio-job-webcam { width: 100%; height: 100%; }
+	.bio-job-webcam .v-card__title { display: none; }
+	.bio-job-capas { position: absolute; inset: 44px 8px 8px; }
+	.bio-job-capas .v-card { background: transparent !important; }
+	.bio-job-chips { position: absolute; right: 8px; bottom: 8px; display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+	.bio-chip-proc { background: $bio-fondo; border-radius: 999px; padding: 4px 10px; font-size: 12px; }
+
+	.bio-job-controles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: repeat(3, minmax(0, 1fr)); gap: 8px; min-height: 0; }
 	.bio-tile, .v-btn.bio-tile {
-		height: auto !important; min-height: 0 !important; width: 100%; border-radius: 16px !important;
+		height: auto !important; min-height: 0 !important; width: 100%; border-radius: 14px !important;
 		background: $bio-sup !important; color: $bio-texto !important; box-shadow: none !important;
-		display: flex !important; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
-		font-size: 13px; font-weight: 500; text-align: center; padding: 8px !important; letter-spacing: 0;
-		.v-btn__content { flex-direction: column; gap: 8px; white-space: normal; }
-		.v-icon { font-size: 30px; }
+		display: flex !important; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+		font-size: 12px; font-weight: 500; text-align: center; padding: 6px !important; letter-spacing: 0;
+		.v-btn__content { flex-direction: column; gap: 4px; white-space: normal; }
+		.v-icon { font-size: 24px; }
 		.v-icon:not([style*="color"]) { color: $bio-texto !important; }
 		&:active { background: $bio-sup2 !important; }
 		&.peligro { background: $bio-peligro-bg !important; color: $bio-peligro !important; .v-icon { color: $bio-peligro !important; } }
-		&.v-btn--disabled { opacity: .45; }
+		&.v-btn--disabled, &:disabled { opacity: .45; }
+		&.valor { gap: 2px; .et { font-size: 11px; color: $bio-tenue; } .vl { font-size: 17px; font-weight: 600; } }
 	}
+	.v-btn.bio-tile:not(.peligro):not(.v-btn--disabled) { background: $bio-sup2 !important; }
+
+	.bio-job-procesos { flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: minmax(0, 1fr); gap: 8px; }
+	.bio-proc {
+		background: $bio-sup !important; border-radius: 16px; padding: 10px 16px;
+		display: grid; grid-template-columns: 40px minmax(0, 1fr); grid-template-rows: auto auto; column-gap: 12px; align-items: center; align-content: center; text-align: left;
+		.v-icon { grid-row: 1 / span 2; font-size: 32px; }
+		.v-icon:not([style*="color"]) { color: $bio-texto !important; }
+		.nom { font-size: 16px; font-weight: 600; }
+		.est { font-size: 13px; color: $bio-tenue; }
+		.est.on { color: $bio-acento; }
+		&:active { background: $bio-sup2 !important; }
+	}
+
 	.bio-job-temps {
 		display: flex; gap: 8px; font-size: 13px;
-		> span { flex: 1; min-width: 0; background: $bio-sup; border-radius: 10px; padding: 8px 8px; font-size: 12.5px; color: $bio-tenue; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+		> span { flex: 1; min-width: 0; background: $bio-sup; border-radius: 10px; padding: 8px 10px; color: $bio-tenue; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 		strong { color: $bio-texto; font-weight: 500; }
-		.obj { color: $bio-calor; }
+		.obj, .ud { color: $bio-calor; }
+		.ud { color: $bio-tenue; }
 	}
 }
 
@@ -427,4 +463,26 @@ $bio-ambar:      #F5B52E;
 	.bio-topbar.v-app-bar.v-toolbar.v-sheet { background: $bio-fondo !important; border-bottom: 1px solid $bio-sup !important; }
 	.bio-topbar .v-toolbar__content { padding: 0 24px; }
 	.bio-topbar .clsvbtn2 { height: 40px !important; }
+}
+
+// ---------------------------------------------------------------------------
+// Modo escritorio: más compacto y sin estirar las pantallas táctiles
+// ---------------------------------------------------------------------------
+.tema-bio.bio-escritorio {
+	.bio-nav .v-navigation-drawer__content { padding: 14px 10px; }
+	.bio-nav-logo { font-size: 19px; padding: 0 10px 8px; }
+	.bio-nav-grupo { padding: 12px 10px 4px; font-size: 10.5px; }
+	.bio-nav-item { height: 32px; font-size: 13px; gap: 9px; }
+	.bio-topbar .v-toolbar__content { padding: 0 20px; }
+	.bio-topbar .bio-maquina { font-size: 15px; }
+	.bio-topbar .bio-estado { font-size: 12px; padding: 4px 10px; }
+	.bio-topbar .clsvbtn2 { height: 34px !important; font-size: 13px; }
+
+	// Las pantallas táctiles se muestran a su tamaño, centradas, en vez de ocupar todo el monitor
+	.bio-inicio, .bio-tools, .bio-mov, .bio-job {
+		height: min(calc(100vh - 48px - 40px), 600px); min-height: 0;
+		width: 100%; max-width: 1040px; margin: 8px auto 0;
+	}
+	.bio-elegir { left: 232px; top: 48px; }
+	.bio-elegir .bio-elegir-grid { max-width: 1040px; }
 }

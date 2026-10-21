@@ -1301,6 +1301,18 @@
       "extrude": "EXTRUIR"
     },
     "jobs": {
+      "tabJob": "Trabajo",
+      "tabProcesses": "Procesos",
+      "layers": "Capas",
+      "zAdjust": "Ajuste Z",
+      "speed": "Velocidad",
+      "extrusion": "Extrusión",
+      "keepTemps": "Mantener temperaturas",
+      "notScheduled": "Sin programar · toca para configurar",
+      "noProcesses": "Esta máquina no tiene procesos activados",
+      "everyNLayers": "cada {0} capas",
+      "atEnd": "al terminar",
+      "scheduled": "programado",
       "noJob": "No hay ningún trabajo en curso",
       "chooseFile": "Elegir archivo",
       "layer": "Capa",

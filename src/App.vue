@@ -84,7 +84,7 @@ textarea {
 </style>
 
 <template>
-	<v-app :class="{ 'tema-bio': temaBio }">
+	<v-app :class="{ 'tema-bio': temaBio, 'bio-escritorio': temaBio && escritorio }">
 		<!-- domotek: un único menú lateral para el tema oscuro (táctil: 80 px, escritorio: 232 px).
 		     Se usa un solo componente porque al cambiar entre dos v-navigation-drawer Vuetify
 		     podía quedarse con el ancho del anterior y dejar un hueco a la izquierda. -->
@@ -115,7 +115,7 @@ textarea {
 			</button>
 			</template>
 		</v-navigation-drawer>
-		<v-app-bar v-if="temaBio && escritorio" app flat height="56" class="bio-topbar">
+		<v-app-bar v-if="temaBio && escritorio" app flat height="48" class="bio-topbar">
 			<span class="bio-maquina"><span>{{ bioNombre.domo }}</span><span class="bio-marca-bio">{{ bioNombre.marca }}</span><span class="bio-tenue" style="font-weight: 500">{{ bioNombre.resto }}</span></span>
 			<status-label v-if="status" class="ml-3"></status-label>
 			<v-spacer></v-spacer>

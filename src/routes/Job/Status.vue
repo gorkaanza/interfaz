@@ -69,48 +69,95 @@
 			</v-col>
 		</v-dialog>
 		
-		<!-- domotek: Trabajos con el tema oscuro -->
+		<!-- domotek: Trabajos con el tema oscuro: pestaña Trabajo y pestaña Procesos -->
 		<div v-if="temaBio" class="bio-job">
+			<div class="bio-job-tabs bio-segmentos" role="tablist">
+				<button type="button" role="tab" class="bio-seg" :class="{ activo: bioPestana === 'trabajo' }" :aria-selected="bioPestana === 'trabajo'" @click="bioPestana = 'trabajo'">{{ $t('domotek.jobs.tabJob') }}</button>
+				<button type="button" role="tab" class="bio-seg" :class="{ activo: bioPestana === 'procesos' }" :aria-selected="bioPestana === 'procesos'" @click="bioPestana = 'procesos'">
+					{{ $t('domotek.jobs.tabProcesses') }}<span v-if="bioProcesosActivos.length" class="bio-job-tab-n">{{ bioProcesosActivos.length }}</span>
+				</button>
+			</div>
+
 			<section class="bio-job-cab">
 				<div class="bio-job-fila">
-					<span class="bio-estado" :class="{ activo: bioImprimiendo }"><span class="bio-estado-punto" :style="{ background: bioPausado ? '#F2A65A' : (bioImprimiendo ? '#3CC9B0' : '#5A6670') }"></span>{{ bioEstadoTexto }}</span>
+					<span class="bio-estado" :class="{ activo: bioImprimiendo && !bioPausado, pausa: bioPausado }"><span class="bio-estado-punto" :style="{ background: bioPausado ? '#F2A65A' : (bioImprimiendo ? '#3CC9B0' : '#5A6670') }"></span>{{ bioEstadoTexto }}</span>
 					<span class="bio-job-archivo">{{ bioImprimiendo ? bioArchivo : $t('domotek.jobs.noJob') }}</span>
 					<span v-if="bioImprimiendo" class="bio-job-pct">{{ Math.round(jobProgress * 100) }} %</span>
-					<button v-else type="button" class="bio-btn-acento" @click="cambiarRuta('/Files/Jobs')">{{ $t('domotek.jobs.chooseFile') }}</button>
+					<template v-else>
+						<code-btn v-if="bioRepetirCode" class="bio-btn-sec-peq" :code="bioRepetirCode" no-wait><v-icon left small>mdi-restart</v-icon>{{ $t('domotek.jobs.repeat') }}</code-btn>
+						<button type="button" class="bio-btn-acento" @click="cambiarRuta('/Files/Jobs')">{{ $t('domotek.jobs.chooseFile') }}</button>
+					</template>
 				</div>
 				<div class="bio-barra" role="img" :aria-label="`${Math.round(jobProgress * 100)} %`"><div :style="{ width: (bioImprimiendo ? jobProgress * 100 : 0) + '%' }"></div></div>
-				<div v-if="bioImprimiendo" class="bio-job-datos">
-					<span v-if="job.file && job.file.numLayers">{{ $t('domotek.jobs.layer') }} <strong>{{ job.layer || 0 }} / {{ job.file.numLayers }}</strong></span>
-					<span>{{ $t('domotek.jobs.elapsed') }} <strong>{{ $displayTime(job.duration) }}</strong></span>
-					<span v-if="bioQueda !== null">{{ $t('domotek.jobs.remaining') }} <strong>{{ $displayTime(bioQueda) }}</strong></span>
+				<div class="bio-job-datos">
+					<span>{{ $t('domotek.jobs.layer') }} <strong>{{ bioImprimiendo && job.file && job.file.numLayers ? `${job.layer || 0} / ${job.file.numLayers}` : '—' }}</strong></span>
+					<span>{{ $t('domotek.jobs.elapsed') }} <strong>{{ bioImprimiendo ? $displayTime(job.duration) : '—' }}</strong></span>
+					<span>{{ $t('domotek.jobs.remaining') }} <strong>{{ bioImprimiendo && bioQueda !== null ? $displayTime(bioQueda) : '—' }}</strong></span>
 					<div style="flex: 1"></div>
 					<span v-if="bioHV" class="bio-aviso"><v-icon small color="#F5B52E">mdi-flash</v-icon>{{ $t('panel.jobControl.warninghv') }}</span>
 					<span v-if="bioUV" class="bio-aviso"><v-icon small color="#B49CF2">mdi-flash</v-icon>{{ $t('panel.jobControl.warninguv') }}</span>
+					<span>Tool <strong>{{ bioToolActual }}</strong></span>
 				</div>
 			</section>
 
-			<section class="bio-job-grid" :class="{ cinco: bioImprimiendo }">
-				<code-btn v-if="bioImprimiendo" class="bio-tile" :code="bioPausado ? 'M24' : 'M25'" :disabled="!bioImprimiendo" no-wait>
-					<v-icon>{{ bioPausado ? 'mdi-play' : 'mdi-pause' }}</v-icon><span>{{ bioPausado ? $t('domotek.jobs.resume') : $t('domotek.jobs.pause') }}</span>
-				</code-btn>
-				<code-btn v-if="bioImprimiendo" class="bio-tile peligro" :code="bioCancelCode" :disabled="!bioPausado" no-wait>
-					<v-icon>mdi-stop</v-icon><span>{{ $t('domotek.jobs.cancel') }}</span>
-				</code-btn>
-				<code-btn v-if="!bioImprimiendo && bioRepetirCode" class="bio-tile" :code="bioRepetirCode" no-wait>
-					<v-icon>mdi-restart</v-icon><span>{{ $t('domotek.jobs.repeat') }}</span>
-				</code-btn>
-				<button type="button" class="bio-tile" @click="DialogBabyStep = true"><v-icon>mdi-format-vertical-align-center</v-icon><span>{{ $t('panel.babystepping.caption') }}</span></button>
-				<button type="button" class="bio-tile" @click="DialogSpeed = true"><v-icon>mdi-speedometer</v-icon><span>{{ $t('panel.speedFactor.caption') }}</span></button>
-				<button type="button" class="bio-tile" @click="DialogExtrusion = true"><v-icon>mdi-texture-box</v-icon><span>{{ $t('panel.extrusionFactors.caption') }}</span></button>
-				<button type="button" class="bio-tile" @click="cambiarRuta('/Files/Jobs')"><v-icon>mdi-folder-outline</v-icon><span class="bio-cap">{{ $t('domotek.jobs.jobs') }}</span></button>
-				<button v-if="ESCapable" type="button" class="bio-tile" @click="MuestraES"><v-icon color="#F2D35A">mdi-flash-outline</v-icon><span>{{ $t('domotek.jobs.electrospinning') }}</span></button>
-				<button v-if="UVCapable" type="button" class="bio-tile" @click="MuestraUV"><v-icon color="#B49CF2">mdi-white-balance-sunny</v-icon><span>{{ $t('domotek.jobs.ultraviolet') }}</span></button>
-				<button v-if="EMDCapable" type="button" class="bio-tile" @click="MuestraEMD"><v-icon color="#3CC9B0">mdi-water-outline</v-icon><span>{{ $t('domotek.jobs.EMD') }}</span></button>
-				<button v-if="TMCapable" type="button" class="bio-tile" @click="DialogTmp = true"><v-icon color="#F2A65A">mdi-thermometer</v-icon><span>{{ $t('domotek.jobs.temperatures') }}</span></button>
+			<!-- Pestaña Trabajo -->
+			<div v-show="bioPestana === 'trabajo'" class="bio-job-cuerpo">
+				<section class="bio-job-vista">
+					<div class="bio-job-vista-tabs bio-segmentos" role="tablist">
+						<button type="button" role="tab" class="bio-seg" :class="{ activo: bioVista === 'webcam' }" @click="bioVista = 'webcam'">Webcam</button>
+						<button type="button" role="tab" class="bio-seg" :class="{ activo: bioVista === 'capas' }" @click="bioVista = 'capas'">{{ $t('domotek.jobs.layers') }}</button>
+					</div>
+					<template v-if="bioVista === 'webcam'">
+						<webcam-panel v-if="bioWebcam" class="bio-job-webcam"></webcam-panel>
+						<v-icon v-else size="56" color="#3A444D">mdi-camera-outline</v-icon>
+					</template>
+					<div v-else class="bio-job-capas"><layer-chart></layer-chart></div>
+					<div class="bio-job-chips">
+						<span v-for="p in bioProcesosActivos" :key="p.id" class="bio-chip-proc" :style="{ color: p.color }">{{ p.texto }}</span>
+					</div>
+				</section>
+
+				<section class="bio-job-controles">
+					<code-btn class="bio-tile" :code="bioPausado ? 'M24' : 'M25'" :disabled="!bioImprimiendo" no-wait>
+						<v-icon>{{ bioPausado ? 'mdi-play' : 'mdi-pause' }}</v-icon><span>{{ bioPausado ? $t('domotek.jobs.resume') : $t('domotek.jobs.pause') }}</span>
+					</code-btn>
+					<code-btn class="bio-tile peligro" :code="bioCancelCode" :disabled="!bioPausado" no-wait>
+						<v-icon>mdi-stop</v-icon><span>{{ $t('domotek.jobs.cancel') }}</span>
+					</code-btn>
+					<button type="button" class="bio-tile valor" @click="DialogBabyStep = true"><span class="et">{{ $t('domotek.jobs.zAdjust') }}</span><span class="vl">{{ bioBabystep }}</span></button>
+					<button type="button" class="bio-tile valor" @click="DialogSpeed = true"><span class="et">{{ $t('domotek.jobs.speed') }}</span><span class="vl">{{ bioVelocidad }} %</span></button>
+					<button type="button" class="bio-tile valor" @click="DialogExtrusion = true"><span class="et">{{ $t('domotek.jobs.extrusion') }}</span><span class="vl">{{ bioExtrusion }} %</span></button>
+					<button type="button" class="bio-tile" :disabled="!TMCapable" @click="DialogTmp = true"><v-icon color="#F2A65A">mdi-thermometer-lines</v-icon><span>{{ $t('domotek.jobs.keepTemps') }}</span></button>
+				</section>
+			</div>
+
+			<!-- Pestaña Procesos -->
+			<section v-show="bioPestana === 'procesos'" class="bio-job-procesos">
+				<button v-if="ESCapable" type="button" class="bio-proc" @click="MuestraES">
+					<v-icon color="#F2D35A">mdi-flash-outline</v-icon>
+					<span class="nom">{{ $t('domotek.jobs.electrospinning') }}</span>
+					<span class="est" :class="{ on: bioProc.ES }">{{ bioProc.ES || $t('domotek.jobs.notScheduled') }}</span>
+				</button>
+				<button v-if="UVCapable" type="button" class="bio-proc" @click="MuestraUV">
+					<v-icon color="#B49CF2">mdi-white-balance-sunny</v-icon>
+					<span class="nom">{{ $t('domotek.jobs.ultraviolet') }}</span>
+					<span class="est" :class="{ on: bioProc.UV }">{{ bioProc.UV || $t('domotek.jobs.notScheduled') }}</span>
+				</button>
+				<button v-if="EMDCapable" type="button" class="bio-proc" @click="MuestraEMD">
+					<v-icon color="#3CC9B0">mdi-water-outline</v-icon>
+					<span class="nom">{{ $t('domotek.jobs.EMD') }}</span>
+					<span class="est" :class="{ on: bioProc.EMD }">{{ bioProc.EMD || $t('domotek.jobs.notScheduled') }}</span>
+				</button>
+				<button v-if="CLCapable" type="button" class="bio-proc" @click="DialogClean = true">
+					<v-icon>mdi-brush-variant</v-icon>
+					<span class="nom">{{ $t('domotek.jobs.clean') }}</span>
+					<span class="est" :class="{ on: bioProc.CL }">{{ bioProc.CL || $t('domotek.jobs.notScheduled') }}</span>
+				</button>
+				<div v-if="!ESCapable && !UVCapable && !EMDCapable && !CLCapable" class="bio-tenue" style="grid-column: 1 / -1; text-align: center; align-self: center">{{ $t('domotek.jobs.noProcesses') }}</div>
 			</section>
 
 			<section class="bio-job-temps">
-				<span v-for="t in bioTemps" :key="t.et"><span>{{ t.et }}</span> <strong>{{ t.vl === null ? '—' : `${t.vl} °C` }}</strong><span v-if="t.obj" class="obj"> / {{ t.obj }}</span></span>
+				<span v-for="t in bioTemps" :key="t.et"><span class="bio-cap">{{ t.et }}</span> <strong>{{ t.vl === null ? '—' : `${t.vl}` }}</strong><span v-if="t.obj" class="obj"> / {{ t.obj }}</span> <span class="ud">{{ t.ud || '°C' }}</span></span>
 			</section>
 		</div>
 
@@ -330,7 +377,9 @@ export default {
 			DialogUltraviolet: false,
 			DialogClean: false,
 			DialogTmp: false,
-			DialogEMD: false
+			DialogEMD: false,
+			bioPestana: 'trabajo', // domotek
+			bioVista: 'webcam'
 		}
 	},
 
@@ -382,13 +431,58 @@ export default {
 			const idx = (this.$store.state.machine.model.global.MachineModel === '2A') ? [9, 10] : [9, 10, 11, 12];
 			return idx.some(i => g[i] && g[i].pwm > 0);
 		},
-		bioTemps() {
+		bioToolActual() {
+			const g = this.$store.state.machine.model.global || {};
+			for (let i = 0; i < 4; i++) {
+				if (g['T' + i + 'Activo']) { return `T${i + 1} · ${g['T' + i + 'Name'] || ''}`; }
+			}
+			return '—';
+		},
+		bioBabystep() {
+			const ax = this.$store.state.machine.model.move.axes;
+			const v = (ax && ax.length >= 3) ? ax[2].babystep : 0;
+			return (v > 0 ? '+' : '') + (v || 0).toFixed(2);
+		},
+		bioVelocidad() { return Math.round((this.$store.state.machine.model.move.speedFactor || 1) * 100); },
+		bioExtrusion() {
+			const e = this.$store.state.machine.model.move.extruders || [];
+			return e.length ? Math.round((e[0].factor || 1) * 100) : 100;
+		},
+		bioWebcam() {
+			const w = this.$store.state.settings.webcam;
+			return !!(w && w.url);
+		},
+		bioProc() { // domotek: resumen de los procesos automáticos programados
+			const g = this.$store.state.machine.model.global || {};
+			const texto = (id) => {
+				if (!g['enable' + id]) { return ''; }
+				if (g['cadenceEnable' + id]) { return this.$t('domotek.jobs.everyNLayers', [g['cadenceAmount' + id] || 1]); }
+				if (g['aplicarFin' + id]) { return this.$t('domotek.jobs.atEnd'); }
+				return this.$t('domotek.jobs.scheduled');
+			};
+			return { ES: texto('ES'), UV: texto('UV'), EMD: texto('EMD'), CL: texto('CL') };
+		},
+		bioProcesosActivos() {
+			const lista = [
+				{ id: 'UV', nombre: 'UV', color: '#B49CF2', ok: this.UVCapable },
+				{ id: 'ES', nombre: 'ES', color: '#F2D35A', ok: this.ESCapable },
+				{ id: 'EMD', nombre: 'EMD', color: '#3CC9B0', ok: this.EMDCapable },
+				{ id: 'CL', nombre: this.$t('domotek.jobs.clean'), color: '#E8EDF1', ok: this.CLCapable }
+			];
+			return lista.filter(p => p.ok && this.bioProc[p.id]).map(p => ({ ...p, texto: `${p.nombre} ${this.bioProc[p.id].toLowerCase()}` }));
+		},
+		bioTemps() { // domotek: tool activa (o T1), plataforma, chamber y humedad
 			const h = this.heaterTools || [];
+			const g = this.$store.state.machine.model.global || {};
 			const val = x => (!x || x.current === undefined || x.current <= -273) ? null : x.current.toFixed(1);
 			const obj = x => (x && x.state === 'active' && x.active) ? x.active : null;
-			const out = [{ et: this.$t('domotek.tools.platformMini'), vl: val(h[0]), obj: obj(h[0]) }];
-			const n = (this.nameTools || []).length;
-			for (let i = 0; i < n && i < 4; i++) { out.push({ et: `T${i + 1}`, vl: val(h[i + 1]), obj: obj(h[i + 1]) }); }
+			let t = 0;
+			for (let i = 0; i < 4; i++) { if (g['T' + i + 'Activo']) { t = i; break; } }
+			const out = [];
+			if ((this.nameTools || []).length) { out.push({ et: `T${t + 1}`, vl: val(h[t + 1]), obj: obj(h[t + 1]) }); }
+			out.push({ et: this.$t('domotek.tools.platform'), vl: val(h[0]), obj: obj(h[0]) });
+			if (h[20] && g.ChamberMode) { out.push({ et: 'Chamber', vl: val(h[20]), obj: obj(h[20]) }); }
+			if (g.miniclima_rh !== undefined && g.miniclima_rh !== null) { out.push({ et: this.$t('domotek.tools.humidity'), vl: Number(g.miniclima_rh).toFixed(0), obj: null, ud: '%' }); }
 			return out;
 		},
 

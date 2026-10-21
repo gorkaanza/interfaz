@@ -1307,6 +1307,18 @@
       "extrude": "EXTRUDE"
     },
     "jobs": {
+      "tabJob": "Job",
+      "tabProcesses": "Processes",
+      "layers": "Layers",
+      "zAdjust": "Z adjust",
+      "speed": "Speed",
+      "extrusion": "Extrusion",
+      "keepTemps": "Hold temperatures",
+      "notScheduled": "Not scheduled · tap to set up",
+      "noProcesses": "This machine has no processes enabled",
+      "everyNLayers": "every {0} layers",
+      "atEnd": "at the end",
+      "scheduled": "scheduled",
       "noJob": "No job in progress",
       "chooseFile": "Choose file",
       "layer": "Layer",

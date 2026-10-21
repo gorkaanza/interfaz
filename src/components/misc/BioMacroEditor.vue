@@ -1,16 +1,16 @@
 <style lang="scss">
 // domotek: editor de macros del modo escritorio (tema oscuro)
 .bio-editor {
-	height: calc(100vh - 56px - 32px);
+	height: calc(100vh - 48px - 32px);
 	display: grid;
-	grid-template-columns: 300px minmax(0, 1fr);
-	gap: 16px;
-	font-size: 14px;
+	grid-template-columns: 260px minmax(0, 1fr);
+	gap: 12px;
+	font-size: 13px;
 
 	button { font-family: inherit; color: inherit; border: none; cursor: pointer; background: none; }
 }
 .bio-arbol {
-	background: #1E2328; border-radius: 16px; padding: 14px; min-height: 0;
+	background: #1E2328; border-radius: 12px; padding: 12px; min-height: 0;
 	display: flex; flex-direction: column; gap: 8px;
 }
 .bio-arbol-busca { display: flex; gap: 8px; }
@@ -31,7 +31,7 @@
 .bio-arbol-lista { flex: 1; overflow-y: auto; min-height: 0; margin: 0 -6px; }
 .bio-nodo {
 	display: flex; align-items: center; gap: 6px; width: 100%; text-align: left;
-	height: 32px; padding: 0 8px; border-radius: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+	height: 28px; padding: 0 8px; border-radius: 7px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 	.v-icon { font-size: 18px; color: #9AA5AF !important; }
 	&:hover { background: #262C33; }
 	&.abierto { background: #1F3B37; color: #3CC9B0; .v-icon { color: #3CC9B0 !important; } }
@@ -41,14 +41,14 @@
 .bio-arbol-pie.arrastrando { border-color: #3CC9B0; color: #3CC9B0; }
 
 .bio-edit {
-	background: #1E2328; border-radius: 16px; min-height: 0; overflow: hidden;
+	background: #1E2328; border-radius: 12px; min-height: 0; overflow: hidden;
 	display: flex; flex-direction: column;
 }
 .bio-edit-cab { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-bottom: 1px solid #262C33; }
 .bio-edit-archivo { font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .bio-edit-sucio { font-size: 12px; color: #F2A65A; white-space: nowrap; }
 .bio-edit-btn {
-	height: 36px; padding: 0 14px; border-radius: 10px !important; background: #262C33 !important; font-size: 13px; font-weight: 500;
+	height: 32px; padding: 0 12px; border-radius: 8px !important; background: #262C33 !important; font-size: 12.5px; font-weight: 500;
 	display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; text-decoration: none; color: #E8EDF1 !important;
 	.v-icon { font-size: 18px; color: inherit !important; }
 	&.acento { background: #3CC9B0 !important; color: #0E1013 !important; font-weight: 600; }
@@ -62,7 +62,7 @@
 // Tema de CodeMirror a juego
 .cm-s-bio.CodeMirror {
 	background: #181C20; color: #E8EDF1;
-	font-family: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 13.5px; line-height: 1.55;
+	font-family: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 13px; line-height: 1.5;
 	.CodeMirror-gutters { background: #181C20; border-right: 1px solid #262C33; }
 	.CodeMirror-linenumber { color: #5A6670; }
 	.CodeMirror-cursor { border-left-color: #3CC9B0; }
