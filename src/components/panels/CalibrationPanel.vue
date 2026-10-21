@@ -113,7 +113,7 @@
 				</div>
 				<div class="bio-cal-pos">
 					<span class="bio-tenue">{{ toolActiva >= 0 ? $t('domotek.calibracion.positionOf', [`T${toolActiva + 1}`]) : $t('domotek.desktop.position') }}</span>
-					<span v-for="(eje, i) in ejesVisibles" :key="i">{{ etiquetaEje(i, eje) }} <strong :class="{ 'sin-home': !eje.homed }">{{ eje.letter === 'Z' ? $displayZ(eje.userPosition, false) : $display(eje.userPosition, 1) }}</strong></span>
+					<span v-for="e in ejesTool" :key="e.et">{{ e.et }} <strong :class="{ 'sin-home': !e.eje.homed }">{{ e.eje.letter === 'Z' ? $displayZ(e.eje.userPosition, false) : $display(e.eje.userPosition, 1) }}</strong><small v-if="e.real" class="bio-tenue"> ({{ e.real }})</small></span>
 					<div style="flex: 1"></div>
 					<template v-if="offsetZ !== null">
 						<span class="bio-tenue">{{ $t('domotek.calibracion.savedOffset') }}</span>
@@ -488,6 +488,19 @@ export default {
 			hayMedida() { return this.esquinas.some(e => e.estado !== 'sin'); },
 			porAjustar() { return this.esquinas.filter(e => e.estado === 'mal').map(e => e.nombre); },
 			ejesVisibles() { return (this.$store.state.machine.model.move.axes || []).filter(a => a.visible); },
+			ejesTool() { // domotek: en 4A solo X, Y y Z de la tool activa (Y1..Y4; Z1 para T1-T2, Z2 para T3-T4)
+				const ejes = this.ejesVisibles;
+				const t = this.toolActiva;
+				if (this.modeloMaquina === '4A' && t >= 0 && ejes.length >= 7) {
+					const y = [1, 3, 4, 5][t], z = [2, 2, 6, 6][t];
+					return [
+						{ et: 'X', eje: ejes[0], real: '' },
+						{ et: 'Y', eje: ejes[y], real: `Y${t + 1}` },
+						{ et: 'Z', eje: ejes[z], real: t < 2 ? 'Z1' : 'Z2' }
+					];
+				}
+				return ejes.map((eje, i) => ({ et: this.etiquetaEje(i, eje), eje, real: '' }));
+			},
 			todosHomed() {
 				const a = this.$store.state.machine.model.move.axes || [];
 				const n = (this.modeloMaquina === '2A') ? 4 : 7;
