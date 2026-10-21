@@ -84,9 +84,9 @@ textarea {
 </style>
 
 <template>
-	<v-app :class="{ 'tema-bio': darkTheme }">
+	<v-app :class="{ 'tema-bio': temaBio }">
 		<!-- domotek: barra lateral del tema oscuro -->
-		<v-navigation-drawer v-if="darkTheme" app permanent width="80px" class="bio-rail">
+		<v-navigation-drawer v-if="temaBio" app permanent width="80px" class="bio-rail">
 			<button v-for="item in railItems" :key="item.id" type="button" class="bio-rail-btn" :class="{ activo: railActivo === item.id }" :aria-label="item.label" @click="railClick(item)">
 				<svg v-if="item.id === 'job' && isPrinting" class="anillo" viewBox="0 0 48 48" aria-hidden="true">
 					<circle cx="24" cy="24" r="21" fill="none" stroke="#2A4A45" stroke-width="3"></circle>
@@ -301,6 +301,7 @@ export default {
 			status: state => state.machine.model.state.status,
 
 			darkTheme: state => state.settings.darkTheme,
+			temaBio: state => state.settings.temaBio, // domotek
 			webcam: state => state.settings.webcam,
 			machineMode: state => state.machine.model.state.machineMode,
 			bottomNavigation: state => state.settings.bottomNavigation,
@@ -489,7 +490,7 @@ export default {
 
 		// Attempt to load the settings
 		this.load();
-		this.$vuetify.theme.dark = this.darkTheme; // domotek
+		this.$vuetify.theme.dark = this.temaBio || this.darkTheme; // domotek
 
 		// Validate navigation
 		Vue.prototype.$vuetify = this.$vuetify;
@@ -516,7 +517,10 @@ export default {
 			}
 		},
 		darkTheme(to) {
-			this.$vuetify.theme.dark = to;
+			this.$vuetify.theme.dark = to || this.temaBio;
+		},
+		temaBio(to) { // domotek
+			this.$vuetify.theme.dark = to || this.darkTheme;
 		},
 		status(to, from) {
 			if (to === StatusType.disconnected || from === StatusType.disconnected) {

@@ -11,7 +11,7 @@
 		<v-card-text>
 			<v-row :dense="$vuetify.breakpoint.mobile">
 				<v-col cols="12" sm="6">
-					<v-switch v-model="darkTheme" :label="$t('panel.settingsAppearance.darkTheme')" hide-details></v-switch>
+					<v-switch v-model="temaBio" :label="$t('panel.settingsAppearance.darkTheme')" hide-details></v-switch>
 				</v-col>
 				<v-col cols="12" sm="6"></v-col>
 				<v-col cols="12" sm="6">
@@ -48,6 +48,10 @@ export default {
 		darkTheme: {
 			get() { return this.settings.darkTheme; },
 			set(value) { this.update({ darkTheme: value }); }
+		},
+		temaBio: {
+			get() { return this.settings.temaBio; },
+			set(value) { this.update({ temaBio: value }); }
 		},
 		settingsStorageLocal: {
 			get() { return this.settings.settingsStorageLocal; },

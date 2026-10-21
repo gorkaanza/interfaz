@@ -36,7 +36,8 @@ export default {
 		language: 'en',
 		lastHostname: location.host,
 
-		darkTheme: true, // domotek: tema oscuro domoBIO por defecto
+		darkTheme: false,
+		temaBio: true, // domotek: tema oscuro domoBIO (clave nueva para que no la pise el darkTheme guardado en la placa)
 		useBinaryPrefix: true,
 		disableAutoComplete: false,
         dashboardMode: DashboardMode.default,
