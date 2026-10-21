@@ -740,3 +740,18 @@ $bio-ambar:      #F5B52E;
 	.bio-proc-contador button.valor { width: auto; min-width: 80px; background: transparent !important; font-size: 13px; color: $bio-tenue; strong { font-size: 20px; color: $bio-texto; margin-right: 4px; } }
 }
 .tema-bio.bio-escritorio .bio-proc-cuerpo { width: 100%; max-width: 1100px; margin: 0 auto; }
+
+// Variante en verde del teclado (parámetros del solenoide y coordenadas)
+.tema-bio {
+	.bio-teclado-icono.acento { background: $bio-acento-bg; .v-icon { color: $bio-acento !important; } }
+	.bio-teclado-valor.acento { border-color: $bio-acento; }
+	.bio-teclado-valor.acento.fuera { border-color: $bio-peligro; }
+	.bio-teclado-valor.apagado { border-color: #3A444D; strong { font-size: 28px; color: $bio-tenue; } }
+	.bio-teclado-atajos button.acento.activo { background: $bio-acento-bg !important; color: $bio-acento !important; }
+	.bio-teclado-ok.acento { background: $bio-acento !important; }
+	.bio-teclado-datos strong.peq { font-size: 16px; padding-top: 4px; small { color: $bio-tenue; font-size: 13px; } }
+	.bio-teclado-fila-switch { display: flex; align-items: center; justify-content: space-between; background: $bio-sup2; border-radius: 12px; padding: 6px 12px; font-size: 14px; }
+	.bio-teclado-coords { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+	.bio-teclado-coords .bio-teclado-valor { border: 2px solid $bio-acento !important; text-align: left; color: $bio-texto; strong { font-size: 32px; } &.inactivo { border-color: #3A444D !important; } &.fuera { border-color: $bio-peligro !important; } }
+	.bio-teclado-num button:disabled { opacity: .35; }
+}

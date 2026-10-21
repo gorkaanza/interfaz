@@ -1205,6 +1205,13 @@
       "seeSummary": "Ver resumen"
     },
     "keypad": {
+      "currentValue": "Valor actual",
+      "allowed": "Permitido",
+      "newValue": "Nuevo valor",
+      "heatingOffHint": "Calentado apagado: la gota se calcula a 25 °C",
+      "apply": "Aplicar",
+      "applyValue": "Aplicar {0}",
+      "coordRange": "Entre {0} y {1} mm · toca X o Y para elegir cuál escribir",
       "current": "Actual",
       "currentTarget": "Objetivo actual",
       "off": "Apagado",

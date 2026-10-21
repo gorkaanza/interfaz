@@ -302,8 +302,48 @@
 		</v-dialog>
 
 		<!-- ===================== DIÁLOGO NUMÉRICO GENÉRICO ===================== -->
-		<v-dialog v-model="dialogParam" persistent max-width="380px">
-			<v-card v-if="editingParam">
+		<v-dialog v-model="dialogParam" persistent :max-width="temaBio ? 760 : '380px'" :content-class="temaBio ? 'bio-teclado-dialogo' : ''">
+			<!-- domotek: teclado con el diseño nuevo -->
+			<div v-if="temaBio && editingParam" class="bio-teclado">
+				<section class="bio-teclado-izq">
+					<header class="bio-teclado-cab">
+						<span class="bio-teclado-icono" :class="editingParam.key === 'tempEMD' ? '' : 'acento'"><v-icon>{{ editingParam.icon }}</v-icon></span>
+						<span class="bio-teclado-nombre">{{ $t(editingParam.label) }}</span>
+						<button type="button" class="bio-teclado-cerrar" :aria-label="$t('generic.cancel')" @click="dialogParam = false"><v-icon>mdi-close</v-icon></button>
+					</header>
+					<div v-if="editingParam.key === 'tempEMD'" class="bio-teclado-fila-switch">
+						<span>{{ $t('panel.emd.heating') }}</span>
+						<button type="button" class="interruptor" :class="{ on: tempEnableEMD }" role="switch" :aria-checked="tempEnableEMD" @click="tempEnableEMD = !tempEnableEMD"><i></i></button>
+					</div>
+					<div class="bio-teclado-datos">
+						<div><span>{{ $t('domotek.keypad.currentValue') }}</span><strong>{{ bioValorActual }}</strong></div>
+						<div><span>{{ $t('domotek.keypad.allowed') }}</span><strong class="peq">{{ editingParam.min }} – {{ editingParam.max }}<small v-if="editingParam.unit"> {{ editingParam.unit }}</small></strong></div>
+					</div>
+					<div class="bio-teclado-valor acento" :class="{ fuera: !!paramError && paramInput !== '', apagado: tempOffEditing }">
+						<span>{{ $t('domotek.keypad.newValue') }}</span>
+						<strong>{{ tempOffEditing ? $t('domotek.keypad.off') : (paramInput === '' ? '—' : paramInput) }}</strong><small v-if="editingParam.unit && !tempOffEditing">{{ editingParam.unit }}</small>
+					</div>
+					<div class="bio-teclado-rango" :class="{ fuera: !!paramError && paramInput !== '' }">{{ tempOffEditing ? $t('domotek.keypad.heatingOffHint') : (paramError && paramInput !== '' ? paramError : rangoTexto(editingParam)) }}</div>
+					<div v-if="bioAtajosParam.length && !tempOffEditing" class="bio-teclado-atajos">
+						<button v-for="v in bioAtajosParam" :key="v" type="button" class="acento" :class="{ activo: String(v) === paramInput }" @click="paramInput = String(v), bioReemplazar = true">{{ v }}</button>
+					</div>
+					<div style="flex: 1"></div>
+					<div class="bio-teclado-acciones">
+						<button type="button" class="bio-teclado-sec" @click="dialogParam = false">{{ $t('generic.cancel') }}</button>
+						<button type="button" class="bio-teclado-ok acento" :disabled="!tempOffEditing && (!!paramError || paramInput === '')" @click="confirmParam">
+							{{ tempOffEditing ? $t('generic.ok') : (paramInput === '' ? $t('domotek.keypad.apply') : $t('domotek.keypad.applyValue', [paramInput + (editingParam.unit ? ' ' + editingParam.unit : '')])) }}
+						</button>
+					</div>
+				</section>
+				<section class="bio-teclado-num" :aria-label="$t('domotek.keypad.keypad')">
+					<button v-for="n in ['7', '8', '9', '4', '5', '6', '1', '2', '3']" :key="n" type="button" :disabled="tempOffEditing" @click="handleParamKeyPress(n)">{{ n }}</button>
+					<button v-if="editingParam.decimals > 0" type="button" :disabled="tempOffEditing" @click="handleParamKeyPress('.')">,</button>
+					<button v-else type="button" class="suave" :aria-label="$t('domotek.keypad.clear')" @click="handleParamKeyPress('CLEAR')">C</button>
+					<button type="button" :disabled="tempOffEditing" @click="handleParamKeyPress('0')">0</button>
+					<button type="button" class="suave" :disabled="tempOffEditing" :aria-label="$t('domotek.keypad.delete')" @click="handleParamKeyPress('DEL')" @contextmenu.prevent="handleParamKeyPress('CLEAR')"><v-icon>mdi-backspace-outline</v-icon></button>
+				</section>
+			</div>
+			<v-card v-else-if="editingParam">
 				<v-card-title class="justify-center text-center" :class="{ 'pb-0': editingParam.key === 'tempEMD' }">
 					<span class="headline">{{ $t(editingParam.label) }}<span v-if="editingParam.unit"> ({{ editingParam.unit }})</span></span>
 					<!-- Solo para la temperatura: activar o no el calentado -->
@@ -338,8 +378,39 @@
 		</v-dialog>
 
 		<!-- ===================== DIÁLOGO COORDENADAS ===================== -->
-		<v-dialog v-model="dialogManualCoords" persistent max-width="380px">
-			<v-card>
+		<v-dialog v-model="dialogManualCoords" persistent :max-width="temaBio ? 760 : '380px'" :content-class="temaBio ? 'bio-teclado-dialogo' : ''">
+			<!-- domotek: coordenadas con el diseño nuevo -->
+			<div v-if="temaBio" class="bio-teclado">
+				<section class="bio-teclado-izq">
+					<header class="bio-teclado-cab">
+						<span class="bio-teclado-icono acento"><v-icon>mdi-crosshairs-gps</v-icon></span>
+						<span class="bio-teclado-nombre">{{ $t('panel.ultraviolet.manualEditCoordsTittle') }}</span>
+						<button type="button" class="bio-teclado-cerrar" :aria-label="$t('generic.cancel')" @click="dialogManualCoords = false"><v-icon>mdi-close</v-icon></button>
+					</header>
+					<div class="bio-teclado-coords">
+						<button v-for="eje in ['x', 'y']" :key="eje" type="button" class="bio-teclado-valor acento" :class="{ inactivo: activeManualInput !== eje, fuera: !!(eje === 'x' ? manualXError : manualYError) }" @click="activeManualInput = eje">
+							<span>{{ eje.toUpperCase() }}</span>
+							<strong>{{ (eje === 'x' ? manualX : manualY) === '' ? '—' : (eje === 'x' ? manualX : manualY) }}</strong><small>mm</small>
+						</button>
+					</div>
+					<div class="bio-teclado-rango" :class="{ fuera: !!(manualXError || manualYError) }">{{ manualXError || manualYError || $t('domotek.keypad.coordRange', [minCoord, maxCoord]) }}</div>
+					<div class="bio-teclado-atajos">
+						<button type="button" class="acento" @click="manualX = String(Math.round(maxCoord / 2)); manualY = String(Math.round(maxCoord / 2)); manualXError = ''; manualYError = ''">{{ $t('domotek.varios.center', 'Centro') }}</button>
+					</div>
+					<div style="flex: 1"></div>
+					<div class="bio-teclado-acciones">
+						<button type="button" class="bio-teclado-sec" @click="dialogManualCoords = false">{{ $t('generic.cancel') }}</button>
+						<button type="button" class="bio-teclado-ok acento" :disabled="!!manualXError || !!manualYError || manualX === '' || manualY === ''" @click="confirmManualInput">{{ $t('domotek.keypad.apply') }}</button>
+					</div>
+				</section>
+				<section class="bio-teclado-num" :aria-label="$t('domotek.keypad.keypad')">
+					<button v-for="n in ['7', '8', '9', '4', '5', '6', '1', '2', '3']" :key="n" type="button" @click="handleCoordKeyPress(n)">{{ n }}</button>
+					<button type="button" @click="handleCoordKeyPress('.')">,</button>
+					<button type="button" @click="handleCoordKeyPress('0')">0</button>
+					<button type="button" class="suave" :aria-label="$t('domotek.keypad.delete')" @click="handleCoordKeyPress('DEL')"><v-icon>mdi-backspace-outline</v-icon></button>
+				</section>
+			</div>
+			<v-card v-else>
 				<v-card-title class="justify-center text-center">
 					<span class="headline">{{ $t('panel.ultraviolet.manualEditCoordsTittle') }}</span>
 				</v-card-title>
@@ -456,6 +527,7 @@ export default {
 	data() {
 		return {
 			pasos: 'S',
+			bioReemplazar: false,
 			params: EMD_PARAMS,
 
 			dialogConfirm: false,
@@ -531,6 +603,24 @@ export default {
 			},
 		},
 
+		temaBio() { return this.$store.state.settings.temaBio; }, // domotek
+		bioValorActual() {
+			const p = this.editingParam;
+			if (!p) { return '—'; }
+			if (p.key === 'tempEMD' && !this.tempEnableEMD) { return this.$t('domotek.keypad.off'); }
+			const v = this.g(p.key);
+			if (v === undefined || v === null || v === '') { return '—'; }
+			return `${Number(v).toFixed(p.decimals)}${p.unit ? ' ' + p.unit : ''}`;
+		},
+		bioAtajosParam() { // valores típicos de cada parámetro, solo los que caben en su rango
+			const p = this.editingParam;
+			if (!p) { return []; }
+			const tipicos = {
+				volDropEMD: [50, 100, 200, 500], viscEMD: [10, 100, 1000, 10000], nDropsEMD: [1, 10, 50, 100],
+				tempEMD: [25, 30, 37, 45], cadenceAmountEMD: [1, 2, 3, 5], calibDropsEMD: [50, 100, 200, 500], alturaEMD: [5, 10, 20, 50]
+			}[p.key] || [];
+			return tipicos.filter(v => v >= p.min && v <= p.max);
+		},
 		// Editando la temperatura con el calentado apagado: no hace falta valor
 		tempOffEditing() {
 			return !!this.editingParam && this.editingParam.key === 'tempEMD' && !this.tempEnableEMD;
@@ -649,10 +739,13 @@ export default {
 			const v = this.g(p.key);
 			this.paramInput = v === undefined || v === null ? '' : String(v);
 			this.paramError = '';
+			this.bioReemplazar = true; // domotek: la primera tecla sustituye el valor actual
 			this.dialogParam = true;
 		},
 		handleParamKeyPress(key) {
 			let val = this.paramInput;
+			if (this.bioReemplazar && key !== 'DEL') { val = ''; }
+			this.bioReemplazar = false;
 			if (key === 'CLEAR') val = '';
 			else if (key === 'DEL') val = val.slice(0, -1);
 			else {
@@ -874,6 +967,7 @@ export default {
 		handleCoordKeyPress(key) {
 			const field = this.activeManualInput === 'x' ? 'manualX' : 'manualY';
 			let val = this[field];
+			if (val === '0' && key !== '.' && key !== 'DEL' && key !== 'CLEAR') { val = ''; } // domotek
 			if (key === 'CLEAR') val = '';
 			else if (key === 'DEL') val = val.slice(0, -1);
 			else {

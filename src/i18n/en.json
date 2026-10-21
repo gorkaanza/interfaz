@@ -1210,6 +1210,13 @@
       "seeSummary": "See summary"
     },
     "keypad": {
+      "currentValue": "Current value",
+      "allowed": "Allowed",
+      "newValue": "New value",
+      "heatingOffHint": "Heating is off: the drop is calculated at 25 °C",
+      "apply": "Apply",
+      "applyValue": "Apply {0}",
+      "coordRange": "Between {0} and {1} mm · tap X or Y to choose which one to type",
       "current": "Current",
       "currentTarget": "Current target",
       "off": "Off",
