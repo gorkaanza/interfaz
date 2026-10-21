@@ -1172,6 +1172,8 @@
   },
   "domotek": {
     "home": {
+      "doorOpen": "Puerta abierta",
+      "doorClosed": "Puerta cerrada",
       "slicer": "Fileteador"
     },
     "tools": {
@@ -1238,6 +1240,8 @@
       "leveling":"Nivelando..."
     },
     "movePanel": {
+      "toolToMove": "Tool que se mueve",
+      "stepSize": "Distancia por pulsación",
       "disableSteppers": "MOTOR OFF",
       "extrude": "EXTRUIR"
     },

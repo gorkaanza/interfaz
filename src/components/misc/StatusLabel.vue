@@ -5,7 +5,10 @@ span {
 </style>
 
 <template>
-	<span class="px-2 subtitle-2" :class="statusClass">
+	<span v-if="temaBio" class="bio-estado">
+		<span class="bio-estado-punto" :style="{ background: statusDot }"></span>{{ statusText }}
+	</span>
+	<span v-else class="px-2 subtitle-2" :class="statusClass">
 		{{ statusText }}
 	</span>
 </template>
@@ -20,7 +23,16 @@ import { MachineMode, StatusType } from '../../store/machine/modelEnums.js'
 export default {
 	computed: {
 		...mapState('machine/model', ['state']),
-		...mapState('settings', ['darkTheme']),
+		...mapState('settings', ['darkTheme', 'temaBio']),
+		statusDot() { // domotek: color del punto con el tema oscuro
+			switch (this.state.status) {
+				case StatusType.idle: return '#3CC9B0';
+				case StatusType.processing: case StatusType.simulating: return '#3CC9B0';
+				case StatusType.busy: case StatusType.changingTool: case StatusType.starting: case StatusType.updating: return '#6CB8E6';
+				case StatusType.pausing: case StatusType.paused: case StatusType.resuming: return '#F2A65A';
+				default: return '#F08A83';
+			}
+		},
 		statusText() {
 			let type = this.state.status;
 			if (!this.state.status) {

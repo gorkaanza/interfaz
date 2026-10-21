@@ -232,3 +232,94 @@ $bio-ambar:      #F5B52E;
 		&:disabled { opacity: .5; }
 	}
 }
+
+// ---------------------------------------------------------------------------
+// Inicio
+// ---------------------------------------------------------------------------
+.tema-bio {
+	.bio-estado {
+		display: inline-flex; align-items: center; gap: 8px; background: $bio-sup; border-radius: 999px;
+		padding: 6px 14px; font-size: 14px; font-weight: 500; white-space: nowrap;
+	}
+	.bio-estado-punto { width: 8px; height: 8px; border-radius: 50%; flex: none; }
+
+	.bio-inicio {
+		height: calc(100vh - 24px); min-height: 440px; box-sizing: border-box; padding: 16px 6px 0;
+		display: flex; flex-direction: column; gap: 12px;
+	}
+	.bio-inicio-cab { display: flex; align-items: center; gap: 12px; min-width: 0; }
+	.bio-maquina { font-size: 18px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+	.bio-marca-bio { color: $bio-ambar; }
+	.bio-inicio-marca { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; min-height: 0; }
+	.bio-inicio-logo { width: 96px; height: 96px; object-fit: contain; background: #fff; border-radius: 50%; }
+	.bio-inicio-nombre { font-size: 52px; font-weight: 700; letter-spacing: -1px; line-height: 1; }
+	.bio-temps { display: grid; gap: 8px; }
+	.bio-temp {
+		background: $bio-sup; border-radius: 14px; padding: 10px 12px; min-width: 0;
+		.et { font-size: 12px; color: $bio-tenue; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+		.vl { font-size: 20px; font-weight: 500; white-space: nowrap; }
+		.vl.vacio { color: $bio-tenue; }
+	}
+}
+
+// ---------------------------------------------------------------------------
+// Movimiento
+// ---------------------------------------------------------------------------
+.tema-bio {
+	.bio-mov {
+		height: calc(100vh - 36px); min-height: 430px; box-sizing: border-box; padding-top: 8px;
+		display: flex; flex-direction: column; gap: 10px;
+		button { font-family: inherit; color: inherit; border: none; cursor: pointer; }
+	}
+	.bio-pos {
+		background: $bio-sup; border-radius: 14px; padding: 8px 8px 8px 14px;
+		display: flex; align-items: center; gap: 6px;
+	}
+	.bio-pos-eje {
+		flex: 1; min-width: 0;
+		.et { font-size: 11px; color: $bio-tenue; }
+		.vl { font-size: 16px; font-weight: 500; white-space: nowrap; }
+		.vl.sin-home { color: $bio-calor; }
+	}
+	.v-btn.bio-home {
+		height: 44px !important; padding: 0 16px !important; border-radius: 12px !important;
+		background: $bio-calor !important; color: $bio-rail !important; font-size: 14px; font-weight: 600;
+		.v-icon { color: $bio-rail !important; }
+		&.ok { background: $bio-sup2 !important; color: $bio-texto !important; .v-icon { color: $bio-acento !important; } }
+	}
+	.bio-mandos { flex: 1; display: grid; grid-template-columns: minmax(0, 1fr) 96px; gap: 10px; min-height: 0; }
+	.bio-cruz {
+		background: $bio-sup; border-radius: 16px; padding: 10px; box-sizing: border-box;
+		display: grid; grid-template-columns: 76px minmax(0, 1fr) 76px; grid-template-rows: 64px minmax(0, 1fr) 64px; gap: 8px;
+	}
+	.bio-cruz-centro { display: flex; align-items: center; justify-content: center; }
+	.v-btn.bio-flecha {
+		height: 100% !important; width: 100% !important; min-width: 0 !important; border-radius: 14px !important;
+		background: $bio-sup2 !important; color: $bio-texto !important; font-size: 14px; font-weight: 600;
+		.v-btn__content { gap: 8px; }
+		&.col .v-btn__content { flex-direction: column; gap: 2px; }
+		.v-icon { font-size: 26px; }
+		&:active { background: $bio-acento-bg !important; }
+	}
+	.bio-z {
+		background: $bio-sup; border-radius: 16px; padding: 10px; box-sizing: border-box;
+		display: flex; flex-direction: column; gap: 8px;
+		.v-btn.bio-flecha { flex: 1; height: auto !important; }
+		> span { text-align: center; font-size: 14px; font-weight: 600; }
+	}
+	.bio-segmentos { display: flex; align-items: center; background: $bio-fondo; border-radius: 12px; padding: 4px; gap: 4px; }
+	.bio-seg, .v-btn.bio-seg {
+		height: 44px !important; min-width: 52px !important; padding: 0 10px !important; border-radius: 9px !important;
+		background: transparent !important; color: $bio-texto !important; font-size: 14px; box-shadow: none !important;
+		&.activo { background: $bio-acento !important; color: $bio-rail !important; font-weight: 600; }
+	}
+	.bio-mov-abajo { display: flex; gap: 10px; align-items: stretch; min-height: 60px; }
+	.bio-pasos { background: $bio-sup; border-radius: 14px; }
+	.bio-mm { font-size: 13px; padding: 0 8px 0 4px; }
+	.bio-accion {
+		width: 96px; border-radius: 14px; background: $bio-sup !important; font-size: 12px; font-weight: 500;
+		display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+		.v-icon { color: $bio-texto !important; }
+		&:active { background: $bio-sup2 !important; }
+	}
+}

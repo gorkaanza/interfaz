@@ -165,7 +165,30 @@ textarea {
 
 			<v-divider v-show="!hideGlobalContainer || $vuetify.breakpoint.mdAndUp"></v-divider>
 
-			<template v-if="mostrarHome">
+			<!-- domotek: Inicio con el tema oscuro -->
+			<div v-if="mostrarHome && temaBio" class="bio-inicio px-4">
+				<header class="bio-inicio-cab">
+					<span class="bio-maquina"><span>{{ bioNombre.domo }}</span><span class="bio-marca-bio">{{ bioNombre.marca }}</span><span class="bio-tenue" style="font-weight: 500">{{ bioNombre.resto }}</span></span>
+					<status-label v-if="status"></status-label>
+					<div style="flex: 1"></div>
+					<span v-if="bioPuerta !== null" class="bio-tenue" style="font-size: 14px">
+						<v-icon small class="mr-1" :color="bioPuerta ? '#3CC9B0' : '#9AA5AF'">{{ bioPuerta ? 'mdi-door-open' : 'mdi-door-closed' }}</v-icon>{{ bioPuerta ? $t('domotek.home.doorOpen') : $t('domotek.home.doorClosed') }}
+					</span>
+				</header>
+				<section class="bio-inicio-marca">
+					<img v-if="modeloMaquina != 'HK'" src="@/assets/domoBIO_icono.png" alt="" class="bio-inicio-logo">
+					<div class="bio-inicio-nombre"><span>domo</span><span class="bio-marca-bio">{{ modeloMaquina == 'HK' ? 'MAT' : 'BIO' }}</span></div>
+					<div class="bio-tenue" style="font-size: 15px">Providing bioprinting solutions</div>
+				</section>
+				<section class="bio-temps" :style="{ gridTemplateColumns: `repeat(${bioTemps.length}, minmax(0, 1fr))` }">
+					<div v-for="t in bioTemps" :key="t.et" class="bio-temp">
+						<div class="et"><span class="bio-cap">{{ t.et }}</span></div>
+						<div class="vl" :class="{ vacio: t.vl === null }">{{ t.vl === null ? '—' : `${t.vl} °C` }}</div>
+					</div>
+				</section>
+			</div>
+
+			<template v-if="mostrarHome && !temaBio">
 					<v-row align="end">
 						<v-col cols="4" align="center" justify="center" class="mt-5">
 							<v-toolbar-title>
@@ -336,6 +359,27 @@ export default {
 				return flag;
 			};
 			return Routes.some(route => checkRoute(route));
+		},
+		bioNombre() { // domotek: nombre de la máquina separado para colorear "BIO"
+			const n = this.name || '';
+			const m = n.match(/^(domo)(BIO|MAT)(.*)$/i);
+			return m ? { domo: 'domo', marca: m[2].toUpperCase(), resto: m[3] } : { domo: n, marca: '', resto: '' };
+		},
+		bioPuerta() {
+			try {
+				const v = this.$store.state.machine.model.global.doorStateOpen;
+				return (v === undefined || v === null) ? null : !!v;
+			} catch (e) { return null; }
+		},
+		bioTemps() { // domotek: plataforma + una casilla por tool
+			const h = this.heaterTools || [];
+			const val = x => (!x || x.current === undefined || x.current <= -273) ? null : x.current.toFixed(1);
+			const out = [{ et: this.$t('domotek.tools.platform'), vl: val(h[0]) }];
+			const n = (this.nameTools || []).length;
+			for (let i = 0; i < n && i < 4; i++) {
+				out.push({ et: `T${i + 1}`, vl: val(h[i + 1]) });
+			}
+			return out;
 		},
 		isPrinting() {
 			return isPrinting(this.status);

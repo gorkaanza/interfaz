@@ -1177,6 +1177,8 @@
   },
   "domotek": {
     "home": {
+      "doorOpen": "Door open",
+      "doorClosed": "Door closed",
       "slicer": "SLICER"
     },
     "tools": {
@@ -1244,6 +1246,8 @@
       "leveling": "Leveling..."
     },
     "movePanel": {
+      "toolToMove": "Tool to move",
+      "stepSize": "Distance per press",
       "disableSteppers": "MOTOR OFF",
       "extrude": "EXTRUDE"
     },
