@@ -1252,6 +1252,18 @@
       "extrude": "EXTRUDE"
     },
     "jobs": {
+      "noJob": "No job in progress",
+      "chooseFile": "Choose file",
+      "layer": "Layer",
+      "elapsed": "Elapsed",
+      "remaining": "Remaining",
+      "pause": "Pause",
+      "resume": "Resume",
+      "cancel": "Cancel",
+      "repeat": "Repeat last",
+      "paused": "Paused",
+      "printing": "Printing",
+      "idle": "Idle",
       "jobs": "JOBS",
       "electrospinning": "ElectroSpinning",
       "ultraviolet": "Ultraviolet",

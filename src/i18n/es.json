@@ -1246,6 +1246,18 @@
       "extrude": "EXTRUIR"
     },
     "jobs": {
+      "noJob": "No hay ningún trabajo en curso",
+      "chooseFile": "Elegir archivo",
+      "layer": "Capa",
+      "elapsed": "Transcurrido",
+      "remaining": "Quedan",
+      "pause": "Pausar",
+      "resume": "Reanudar",
+      "cancel": "Cancelar",
+      "repeat": "Repetir último",
+      "paused": "En pausa",
+      "printing": "Imprimiendo",
+      "idle": "Sin trabajo",
       "jobs": "TRABAJOS",
       "electrospinning": "ElectroSpinning",
       "ultraviolet": "Ultravioleta",
