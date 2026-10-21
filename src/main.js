@@ -3,6 +3,9 @@
 import Vue from 'vue'
 import Vuetify from 'vuetify/lib/framework'
 import '@mdi/font/css/materialdesignicons.css'
+import '@fontsource/ibm-plex-sans/400.css'
+import '@fontsource/ibm-plex-sans/500.css'
+import '@fontsource/ibm-plex-sans/600.css'
 import './components'
 
 import App from './App.vue'
@@ -24,6 +27,20 @@ export default new Vue({
 	vuetify: new Vuetify({
 		icons: {
 			iconfont: 'mdiSvg',
+		},
+		theme: {
+			themes: {
+				// domotek: paleta del tema oscuro domoBIO
+				dark: {
+					primary: '#3CC9B0',
+					secondary: '#262C33',
+					accent: '#3CC9B0',
+					success: '#3CC9B0',
+					info: '#6CB8E6',
+					warning: '#F2A65A',
+					error: '#C93C35'
+				}
+			}
 		},
 		lang: { t: (key, ...params) => i18n.t(key, params) }
 	})

@@ -1,4 +1,6 @@
-<style>
+<style lang="scss">
+@import "./scss/tema-bio.scss";
+
 #title:not(:hover) {
 	color: inherit;
 }
@@ -82,8 +84,22 @@ textarea {
 </style>
 
 <template>
-	<v-app>
-		<v-navigation-drawer app permanent width="100px" class="blue lighten-4">
+	<v-app :class="{ 'tema-bio': darkTheme }">
+		<!-- domotek: barra lateral del tema oscuro -->
+		<v-navigation-drawer v-if="darkTheme" app permanent width="80px" class="bio-rail">
+			<button v-for="item in railItems" :key="item.id" type="button" class="bio-rail-btn" :class="{ activo: railActivo === item.id }" :aria-label="item.label" @click="railClick(item)">
+				<svg v-if="item.id === 'job' && isPrinting" class="anillo" viewBox="0 0 48 48" aria-hidden="true">
+					<circle cx="24" cy="24" r="21" fill="none" stroke="#2A4A45" stroke-width="3"></circle>
+					<circle cx="24" cy="24" r="21" fill="none" stroke="#3CC9B0" stroke-width="3" stroke-linecap="round" :stroke-dasharray="`${(jobProgress || 0) * 131.9} 131.9`" transform="rotate(-90 24 24)"></circle>
+				</svg>
+				<v-icon large>{{ item.icon }}</v-icon>
+			</button>
+			<div class="bio-rail-hueco"></div>
+			<button v-for="item in railItemsAbajo" :key="item.id" type="button" class="bio-rail-btn" :class="{ activo: railActivo === item.id }" :aria-label="item.label" @click="railClick(item)">
+				<v-icon large>{{ item.icon }}</v-icon>
+			</button>
+		</v-navigation-drawer>
+		<v-navigation-drawer v-else app permanent width="100px" class="blue lighten-4">
 			<v-bottom-navigation color="teal" height="0" v-model="numMenuSelect">
 				<v-row >
 					<v-col cols="12" class="mb-0 pb-0">
@@ -320,6 +336,30 @@ export default {
 			};
 			return Routes.some(route => checkRoute(route));
 		},
+		isPrinting() {
+			return isPrinting(this.status);
+		},
+		railItems() {
+			return [
+				{ id: 'home', icon: 'mdi-home-variant-outline', label: 'Inicio' },
+				{ id: 'tools', icon: 'mdi-tools', label: 'Herramientas', ruta: '/Files/tools' },
+				{ id: 'job', icon: 'mdi-play', label: 'Trabajos', ruta: '/Job/Status' },
+				{ id: 'move', icon: 'mdi-arrow-all', label: 'Movimiento', ruta: '/' }
+			];
+		},
+		railItemsAbajo() {
+			const items = [{ id: 'settings', icon: 'mdi-cog-outline', label: 'Ajustes', ruta: '/Settings/General' }];
+			if (this.$store.state.nivelUsuario >= 3) {
+				items.push({ id: 'machine', icon: 'mdi-cogs', label: 'Máquina', ruta: '/Settings/Machine' });
+			}
+			return items;
+		},
+		railActivo() {
+			if (this.mostrarHome) { return 'home'; }
+			const path = (this.$route.path || '').toLowerCase();
+			const item = this.railItems.concat(this.railItemsAbajo).find(i => i.ruta && i.ruta.toLowerCase() === path);
+			return item ? item.id : null;
+		},
 		isFFForUnset() {
 			if (this.dashboardMode === DashboardMode.default) {
 				return !this.machineMode || this.machineMode === MachineMode.fff;
@@ -405,6 +445,14 @@ export default {
 
 			return reemplazo;
 		},
+		railClick(item) { // domotek: barra lateral del tema oscuro
+			if (item.id === 'home') {
+				this.mostrarHome = true;
+			} else {
+				this.cambiarRuta(item.ruta);
+				this.mostrarHome = false;
+			}
+		},
 		cambiarRuta(ruta){  // domotek
 			if (this.$route.path !== ruta){
 				console.log("Cambio de Ruta"); //domotek
@@ -441,6 +489,7 @@ export default {
 
 		// Attempt to load the settings
 		this.load();
+		this.$vuetify.theme.dark = this.darkTheme; // domotek
 
 		// Validate navigation
 		Vue.prototype.$vuetify = this.$vuetify;

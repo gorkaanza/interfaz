@@ -36,7 +36,7 @@ export default {
 		language: 'en',
 		lastHostname: location.host,
 
-		darkTheme: false,
+		darkTheme: true, // domotek: tema oscuro domoBIO por defecto
 		useBinaryPrefix: true,
 		disableAutoComplete: false,
         dashboardMode: DashboardMode.default,

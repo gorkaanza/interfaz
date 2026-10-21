@@ -1,0 +1,154 @@
+// ---------------------------------------------------------------------------
+// Tema oscuro domoBIO
+// Se activa cuando <v-app> tiene la clase .tema-bio (Ajustes > Apariencia >
+// Tema oscuro). Recolorea los paneles existentes sin tocar su lógica: las
+// clases "blue lighten-*" y "teal" que usan los paneles se traducen aquí a
+// la paleta nueva.
+// ---------------------------------------------------------------------------
+
+$bio-fondo:      #14171A; // fondo general
+$bio-rail:       #0E1013; // barra lateral y cabeceras
+$bio-sup:        #1E2328; // tarjetas
+$bio-sup2:       #262C33; // botones y tarjetas internas
+$bio-borde:      #2F363E;
+$bio-texto:      #E8EDF1;
+$bio-tenue:      #9AA5AF;
+$bio-acento:     #3CC9B0;
+$bio-acento-bg:  #1F3B37;
+$bio-calor:      #F2A65A;
+$bio-peligro:    #F08A83;
+$bio-peligro-bg: #3A1D1C;
+$bio-ambar:      #F5B52E;
+
+.tema-bio {
+	--bio-fondo: #{$bio-fondo};
+	--bio-rail: #{$bio-rail};
+	--bio-sup: #{$bio-sup};
+	--bio-sup2: #{$bio-sup2};
+	--bio-borde: #{$bio-borde};
+	--bio-texto: #{$bio-texto};
+	--bio-tenue: #{$bio-tenue};
+	--bio-acento: #{$bio-acento};
+	--bio-acento-bg: #{$bio-acento-bg};
+	--bio-calor: #{$bio-calor};
+
+	font-family: 'IBM Plex Sans', 'Roboto', system-ui, sans-serif !important;
+	font-variant-numeric: tabular-nums;
+	background: $bio-fondo !important;
+	color: $bio-texto;
+
+	.v-application--wrap { background: $bio-fondo; }
+
+	// Tipografía: Vuetify fija Roboto en varias clases
+	.text-h1, .text-h2, .text-h3, .text-h4, .text-h5, .text-h6,
+	.text-subtitle-1, .text-subtitle-2, .text-body-1, .text-body-2,
+	.text-caption, .text-button, .text-overline, .v-btn, .headline, .title {
+		font-family: inherit !important;
+	}
+	.v-btn { text-transform: none; letter-spacing: 0; font-weight: 500; }
+
+	// --- Superficies: mapa de las clases antiguas -------------------------
+	.blue.lighten-4 { background-color: $bio-fondo !important; border-color: $bio-fondo !important; }
+	.blue.lighten-5 { background-color: $bio-sup !important;   border-color: $bio-sup !important; }
+	.blue.lighten-3 { background-color: $bio-sup2 !important;  border-color: $bio-sup2 !important; }
+	.blue.lighten-2, .blue.lighten-1 { background-color: $bio-sup2 !important; }
+	.grey.darken-3, .grey.darken-4 { background-color: $bio-sup !important; }
+	.grey.darken-2, .blue.darken-3, .blue.darken-2 { background-color: $bio-sup2 !important; }
+	.blue--text { color: $bio-acento !important; caret-color: $bio-acento !important; }
+
+	.teal { background-color: $bio-acento !important; border-color: $bio-acento !important; color: $bio-rail !important; }
+	.teal .v-icon, .teal .v-btn__content { color: $bio-rail !important; }
+	.teal--text { color: $bio-acento !important; }
+
+	// Textos con color en línea pensados para fondo claro
+	// (Vue serializa los estilos en línea como rgb(), así que se cubren ambas formas)
+	[style*="0a21ad"], [style*="1565C0"], [style*="1565c0"],
+	[style*="rgb(10, 33, 173)"], [style*="rgb(21, 101, 192)"] { color: $bio-texto !important; }
+	[style*="ffb812"], [style*="rgb(255, 184, 18)"] { color: $bio-ambar !important; }
+	[style*="e2f1fc"], [style*="E3F2FD"], [style*="e3f2fd"], [style*="F5F5F5"],
+	[style*="rgb(226, 241, 252)"], [style*="rgb(227, 242, 253)"], [style*="rgb(245, 245, 245)"] {
+		background-color: $bio-sup2 !important;
+		color: $bio-texto !important;
+	}
+	.v-btn.blue.lighten-5, .v-btn.blue.lighten-4, .v-btn.blue.lighten-3 { color: $bio-texto !important; }
+	.v-icon.theme--dark { color: $bio-texto; }
+	.black--text { color: $bio-texto !important; caret-color: $bio-texto !important; }
+
+	// --- Tarjetas -----------------------------------------------------------
+	.v-card.theme--dark, .v-sheet.theme--dark:not(.v-btn) {
+		background-color: $bio-sup;
+		color: $bio-texto;
+	}
+	.v-card { border-radius: 16px !important; box-shadow: none !important; }
+	.v-card .v-card { background-color: $bio-sup2; }
+	.v-card.rounded-xl { border-radius: 16px !important; }
+	#global-container .v-card.theme--dark { background-color: $bio-sup !important; }
+	.v-divider.theme--dark { border-color: $bio-borde !important; }
+
+	// --- Botones --------------------------------------------------------------
+	.v-btn:not(.v-btn--text):not(.v-btn--icon):not(.v-btn--outlined).theme--dark {
+		background-color: $bio-sup2;
+		box-shadow: none !important;
+	}
+	.v-btn:not(.v-btn--round):not(.v-btn--fab) { border-radius: 12px; }
+	.v-btn--outlined.theme--dark {
+		background-color: $bio-sup2 !important;
+		border: 1px solid $bio-borde !important;
+		color: $bio-texto !important;
+	}
+	.v-btn--outlined.theme--dark .v-icon { color: inherit; }
+	.v-btn.primary, .v-btn.success { color: $bio-rail !important; }
+	.v-btn.primary .v-icon, .v-btn.success .v-icon { color: $bio-rail !important; }
+	.v-btn.error { background-color: $bio-peligro-bg !important; color: $bio-peligro !important; }
+	.v-btn.error .v-icon { color: $bio-peligro !important; }
+	.v-btn.v-btn--disabled.theme--dark { background-color: rgba(38, 44, 51, .5) !important; }
+	.v-btn-toggle.theme--dark { background: $bio-fondo; border-radius: 12px; }
+	.v-btn-toggle > .v-btn.v-btn--active { background-color: $bio-acento !important; color: $bio-rail !important; }
+	.v-btn-toggle > .v-btn.v-btn--active .v-icon { color: $bio-rail !important; }
+
+	// --- Diálogos -------------------------------------------------------------
+	.v-dialog > .v-card, .v-dialog > .v-sheet { background-color: $bio-sup !important; border: 1px solid $bio-borde; }
+	.v-overlay__scrim { background-color: #000 !important; }
+
+	// --- Stepper (ES / UV / EMD) --------------------------------------------
+	.v-stepper.theme--dark { background: $bio-fondo !important; box-shadow: none !important; }
+	.v-stepper__header { background: $bio-rail; box-shadow: none !important; border-radius: 14px; }
+	.v-stepper__step__step { background-color: $bio-sup2 !important; color: $bio-tenue !important; }
+	.v-stepper__step--active .v-stepper__step__step,
+	.v-stepper__step--complete .v-stepper__step__step { background-color: $bio-acento !important; color: $bio-rail !important; }
+	.v-stepper__items, .v-stepper__content { background: transparent; }
+
+	// --- Tablas, listas, campos ------------------------------------------
+	.v-data-table.theme--dark, .v-list.theme--dark { background-color: $bio-sup; }
+	.v-data-table.theme--dark tbody tr:hover:not(.v-data-table__expanded__content) { background: $bio-sup2 !important; }
+	.v-data-table.theme--dark th { color: $bio-tenue !important; }
+	.v-text-field--outlined.theme--dark fieldset { border-color: $bio-borde; }
+	.v-input--switch .v-input--switch__track { opacity: .5; }
+	.v-tabs.theme--dark > .v-tabs-bar { background: $bio-rail; }
+	.v-chip.theme--dark { background: $bio-sup2; }
+	.v-label, .v-select__selection, .v-input input, .v-input textarea { color: $bio-texto !important; }
+	.v-input .v-label { color: $bio-tenue !important; }
+	.v-text-field > .v-input__control > .v-input__slot:before { border-color: $bio-borde !important; }
+
+	// Colores semánticos de iconos
+	.v-icon.teal--text, .v-icon.success--text { color: $bio-acento !important; }
+	.v-icon.warning--text, .v-icon.orange--text { color: $bio-calor !important; }
+
+	// --- Barra lateral nueva -------------------------------------------------
+	.bio-rail {
+		background: $bio-rail !important;
+		border: none !important;
+		.v-navigation-drawer__border { display: none; }
+		.v-navigation-drawer__content { display: flex; flex-direction: column; align-items: center; padding: 16px 0; gap: 8px; }
+	}
+	.bio-rail-btn {
+		width: 56px; height: 56px; border-radius: 14px; border: none; cursor: pointer;
+		background: transparent; color: $bio-tenue;
+		display: flex; align-items: center; justify-content: center; position: relative;
+		.v-icon { color: inherit !important; }
+		&:hover { background: $bio-sup; }
+		&.activo { background: $bio-acento-bg; color: $bio-acento; }
+		.anillo { position: absolute; inset: 4px; pointer-events: none; }
+	}
+	.bio-rail-hueco { flex: 1; }
+}

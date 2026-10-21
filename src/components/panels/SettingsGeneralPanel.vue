@@ -11,6 +11,10 @@
 		<v-card-text>
 			<v-row :dense="$vuetify.breakpoint.mobile">
 				<v-col cols="12" sm="6">
+					<v-switch v-model="darkTheme" :label="$t('panel.settingsAppearance.darkTheme')" hide-details></v-switch>
+				</v-col>
+				<v-col cols="12" sm="6"></v-col>
+				<v-col cols="12" sm="6">
 					<v-switch v-model="settingsStorageLocal" :label="$t('panel.settingsGeneral.settingsStorageLocal')" :disabled="!supportsLocalStorage" hide-details></v-switch>
 				</v-col>
 				<v-col cols="12" sm="6">
