@@ -85,8 +85,28 @@ textarea {
 
 <template>
 	<v-app :class="{ 'tema-bio': temaBio }">
-		<!-- domotek: barra lateral del tema oscuro -->
-		<v-navigation-drawer v-if="temaBio" app permanent width="80px" class="bio-rail">
+		<!-- domotek: menú lateral del modo escritorio -->
+		<v-navigation-drawer v-if="temaBio && escritorio" app permanent width="232px" class="bio-nav">
+			<div class="bio-nav-logo"><span>domo</span><span class="bio-marca-bio">{{ modeloMaquina == 'HK' ? 'MAT' : 'BIO' }}</span></div>
+			<template v-for="grupo in navEscritorio">
+				<span :key="'g-' + grupo.id" class="bio-nav-grupo">{{ grupo.titulo }}</span>
+				<button v-for="item in grupo.items" :key="item.id" type="button" class="bio-nav-item" :class="{ activo: railActivo === item.id }" @click="railClick(item)">
+					<v-icon small>{{ item.icon }}</v-icon><span>{{ item.label }}</span>
+					<span v-if="item.id === 'job' && isPrinting" class="bio-nav-pct">{{ Math.round((jobProgress || 0) * 100) }} %</span>
+				</button>
+			</template>
+			<div class="bio-rail-hueco"></div>
+			<button type="button" class="bio-nav-item" @click="cambiarModo('tactil')"><v-icon small>mdi-tablet</v-icon><span>{{ $t('domotek.desktop.touchMode') }}</span></button>
+		</v-navigation-drawer>
+		<v-app-bar v-if="temaBio && escritorio" app flat height="56" class="bio-topbar">
+			<span class="bio-maquina"><span>{{ bioNombre.domo }}</span><span class="bio-marca-bio">{{ bioNombre.marca }}</span><span class="bio-tenue" style="font-weight: 500">{{ bioNombre.resto }}</span></span>
+			<status-label v-if="status" class="ml-3"></status-label>
+			<v-spacer></v-spacer>
+			<div style="width: 240px"><emergency-btn></emergency-btn></div>
+		</v-app-bar>
+
+		<!-- domotek: barra lateral del tema oscuro (pantalla táctil) -->
+		<v-navigation-drawer v-else-if="temaBio" app permanent width="80px" class="bio-rail">
 			<button v-for="item in railItems" :key="item.id" type="button" class="bio-rail-btn" :class="{ activo: railActivo === item.id }" :aria-label="item.label" @click="railClick(item)">
 				<svg v-if="item.id === 'job' && isPrinting" class="anillo" viewBox="0 0 48 48" aria-hidden="true">
 					<circle cx="24" cy="24" r="21" fill="none" stroke="#2A4A45" stroke-width="3"></circle>
@@ -134,7 +154,7 @@ textarea {
 
 		<v-main id="content" class="blue lighten-4 mb-0 pb-0">
 			<v-scroll-y-transition>
-				<v-container v-show="!hideGlobalContainer || $vuetify.breakpoint.lgAndUp" id="global-container" fluid>
+				<v-container v-show="(!hideGlobalContainer || $vuetify.breakpoint.lgAndUp) && !(temaBio && escritorio)" id="global-container" fluid>
 					<v-row>
 						<v-col cols="9">
 							<code-input class="mx-3 hidden-sm-and-down"></code-input>
@@ -165,8 +185,12 @@ textarea {
 
 			<v-divider v-show="!hideGlobalContainer || $vuetify.breakpoint.mdAndUp"></v-divider>
 
+			<!-- domotek: panel de control del modo escritorio -->
+			<div v-if="mostrarHome && temaBio && escritorio" class="pa-4">
+				<bio-escritorio-panel></bio-escritorio-panel>
+			</div>
 			<!-- domotek: Inicio con el tema oscuro -->
-			<div v-if="mostrarHome && temaBio" class="bio-inicio px-4">
+			<div v-else-if="mostrarHome && temaBio" class="bio-inicio px-4">
 				<header class="bio-inicio-cab">
 					<span class="bio-maquina"><span>{{ bioNombre.domo }}</span><span class="bio-marca-bio">{{ bioNombre.marca }}</span><span class="bio-tenue" style="font-weight: 500">{{ bioNombre.resto }}</span></span>
 					<status-label v-if="status"></status-label>
@@ -308,6 +332,7 @@ import PositionPanel from './components/panels/PositionPanel.vue'
 
 import { MachineMode } from './store/machine/modelEnums.js';
 import { DashboardMode } from './store/settings.js'
+import { esEscritorio, forzarModo } from './utils/modoPantalla.js'
 
 
 export default {
@@ -399,10 +424,36 @@ export default {
 			}
 			return items;
 		},
+		escritorio() { return esEscritorio(); }, // domotek
+		navEscritorio() { // domotek: menú del modo escritorio
+			const nivel = this.$store.state.nivelUsuario || 0;
+			const t = k => this.$t('domotek.desktop.nav.' + k);
+			const archivos = [{ id: 'files-jobs', icon: 'mdi-file-document-outline', label: t('jobs'), ruta: '/Files/Jobs' }];
+			if (nivel >= 2) {
+				archivos.push({ id: 'files-macros', icon: 'mdi-code-braces', label: t('macros'), ruta: '/Files/Macros' });
+				archivos.push({ id: 'files-system', icon: 'mdi-cog-box', label: t('system'), ruta: '/Files/System' });
+			}
+			const ajustes = [{ id: 'settings', icon: 'mdi-cog-outline', label: t('settings'), ruta: '/Settings/General' }];
+			if (nivel >= 3) { ajustes.push({ id: 'machine', icon: 'mdi-cogs', label: t('machine'), ruta: '/Settings/Machine' }); }
+			return [
+				{ id: 'control', titulo: t('control'), items: [
+					{ id: 'home', icon: 'mdi-view-dashboard-outline', label: t('dashboard') },
+					{ id: 'tools', icon: 'mdi-tools', label: t('tools'), ruta: '/Files/tools' },
+					{ id: 'move', icon: 'mdi-arrow-all', label: t('move'), ruta: '/' },
+					{ id: 'console', icon: 'mdi-console', label: t('console'), ruta: '/Console' }
+				] },
+				{ id: 'trabajo', titulo: t('work'), items: [
+					{ id: 'job', icon: 'mdi-play-circle-outline', label: t('status'), ruta: '/Job/Status' }
+				] },
+				{ id: 'archivos', titulo: t('files'), items: archivos },
+				{ id: 'ajustes', titulo: t('settingsGroup'), items: ajustes }
+			];
+		},
 		railActivo() {
 			if (this.mostrarHome) { return 'home'; }
 			const path = (this.$route.path || '').toLowerCase();
-			const item = this.railItems.concat(this.railItemsAbajo).find(i => i.ruta && i.ruta.toLowerCase() === path);
+			const todos = this.railItems.concat(this.railItemsAbajo).concat(...this.navEscritorio.map(g => g.items));
+			const item = todos.find(i => i.ruta && i.ruta.toLowerCase() === path);
 			return item ? item.id : null;
 		},
 		isFFForUnset() {
@@ -489,6 +540,9 @@ export default {
 			reemplazo=reemplazo.replace("domobio", domoBIO);
 
 			return reemplazo;
+		},
+		cambiarModo(modo) { // domotek
+			forzarModo(modo);
 		},
 		railClick(item) { // domotek: barra lateral del tema oscuro
 			if (item.id === 'home') {

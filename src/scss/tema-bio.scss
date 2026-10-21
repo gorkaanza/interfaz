@@ -388,3 +388,43 @@ $bio-ambar:      #F5B52E;
 	.bio-elegir-pie { display: flex; align-items: center; gap: 12px; font-size: 13px; }
 	.bio-btn-sec { width: 150px; height: 52px; border-radius: 14px; background: $bio-sup !important; font-size: 15px; font-weight: 500; }
 }
+
+// Diálogos y paneles: botones de teclado y colores semánticos
+.tema-bio {
+	.v-dialog .v-btn.blue.lighten-4, .v-dialog .v-btn.blue.lighten-5 { background-color: $bio-sup2 !important; }
+	.v-dialog .v-btn.blue.lighten-4:active { background-color: $bio-acento-bg !important; }
+	.v-btn.red.lighten-3, .v-btn.red.lighten-2, .v-btn.red.lighten-1, .v-btn.red {
+		background-color: $bio-peligro-bg !important; color: $bio-peligro !important;
+		.v-icon { color: $bio-peligro !important; }
+	}
+	.v-btn.green.lighten-3, .v-btn.green.lighten-2, .v-btn.green.lighten-1, .v-btn.green {
+		background-color: $bio-acento-bg !important; color: $bio-acento !important;
+		.v-icon { color: $bio-acento !important; }
+	}
+	// icono "salir" de los paneles (SVG oscuro pensado para fondo claro)
+	.v-image__image[style*="exit-2860"], .v-image__image[style*="exit."] { filter: brightness(0) invert(.85); }
+}
+
+// ---------------------------------------------------------------------------
+// Modo escritorio: menú lateral y barra superior
+// ---------------------------------------------------------------------------
+.tema-bio {
+	.bio-nav {
+		background: $bio-rail !important; border: none !important;
+		.v-navigation-drawer__border { display: none; }
+		.v-navigation-drawer__content { display: flex; flex-direction: column; padding: 18px 12px; gap: 2px; }
+	}
+	.bio-nav-logo { font-size: 22px; font-weight: 700; padding: 0 10px 14px; letter-spacing: -.3px; }
+	.bio-nav-grupo { font-size: 11px; font-weight: 600; letter-spacing: .08em; color: #5A6670; padding: 14px 10px 6px; text-transform: uppercase; }
+	.bio-nav-item {
+		display: flex; align-items: center; gap: 10px; height: 38px; padding: 0 10px; border-radius: 10px;
+		border: none; background: transparent; color: $bio-tenue; font-family: inherit; font-size: 14px; text-align: left; cursor: pointer;
+		.v-icon { color: inherit !important; }
+		&:hover { background: $bio-sup; color: $bio-texto; }
+		&.activo { background: $bio-acento-bg; color: $bio-acento; font-weight: 500; }
+	}
+	.bio-nav-pct { margin-left: auto; font-size: 12px; color: $bio-acento; }
+	.bio-topbar.v-app-bar.v-toolbar.v-sheet { background: $bio-fondo !important; border-bottom: 1px solid $bio-sup !important; }
+	.bio-topbar .v-toolbar__content { padding: 0 24px; }
+	.bio-topbar .clsvbtn2 { height: 40px !important; }
+}
