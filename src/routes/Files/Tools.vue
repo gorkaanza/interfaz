@@ -1561,8 +1561,7 @@ export default {
 		bioTecladoRango() {
 			const { min, max } = this.bioRango;
 			if (this.bioModoHum) { return this.$t('domotek.keypad.rangeHum', [min, max]); }
-			const minTxt = (min === this.tempAmbiente) ? this.$t('domotek.keypad.ambient').toLowerCase() : `${Math.round(min)} °C`;
-			return this.$t('domotek.keypad.range', [minTxt, Math.round(max)]);
+			return this.$t('domotek.keypad.range', [`${Math.round(min)} °C`, Math.round(max)]);
 		},
 		bioAtajos() {
 			const { min, max } = this.bioRango;
@@ -1570,7 +1569,6 @@ export default {
 				return [40, 50, 60, 70, 80, 90].filter(v => v >= min && v <= max).slice(0, 4).map(v => ({ valor: v, texto: `${v} %` }));
 			}
 			const lista = [];
-			if (min === this.tempAmbiente) { lista.push({ valor: Math.round(min), texto: this.$t('domotek.keypad.ambient') }); }
 			[4, 25, 37, 45, 60, 80, 120, 180, 220].forEach(v => {
 				if (v >= min && v <= max && lista.length < 4 && !lista.some(p => p.valor === v)) { lista.push({ valor: v, texto: String(v) }); }
 			});

@@ -41,7 +41,192 @@
 </style>
 
 <template>
-	<v-row class="mb-0 pb-0"  > 
+<div class="es-raiz">
+	<!-- domotek: electrospinning con el tema oscuro -->
+	<div v-if="temaBio" class="bio-pp">
+		<header class="bio-proc-cab">
+			<button type="button" class="bio-volver" :aria-label="$t('domotek.tools.back')" @click="closeDialog"><v-icon>mdi-chevron-left</v-icon></button>
+			<v-icon color="#F2D35A">mdi-flash-outline</v-icon>
+			<span class="bio-proc-titulo">{{ $t('domotek.jobs.electrospinning') }}</span>
+			<div style="flex: 1"></div>
+			<ol class="bio-cal-pasos">
+				<li v-for="p in bioPasos" :key="p.id"><button type="button" :class="{ activo: pasos === p.id }" :aria-current="pasos === p.id ? 'step' : null" @click="CambiaStep(p.id)">{{ p.texto }}</button></li>
+			</ol>
+		</header>
+
+		<!-- Resumen -->
+		<main v-show="pasos === 'S'" class="bio-proc-cuerpo">
+			<h2 class="bio-proc-h2">{{ $t('domotek.proc.esSettings') }}
+				<span v-if="hvProbe" class="bio-proc-hv"><v-icon small color="#F5B52E">mdi-flash</v-icon>{{ $t('panel.jobControl.warninghv') }}</span>
+			</h2>
+			<div class="bio-proc-datos">
+				<div><span>{{ $t('domotek.proc.pattern') }}</span><strong>{{ bioNombrePatron }}<small v-if="patronES == 3 && esPointsCount > 1"> ({{ esPointsCount }})</small></strong></div>
+				<div><span>{{ $t('domotek.proc.height') }}</span><strong>{{ alturaES }}<small> mm</small></strong></div>
+				<div><span>{{ $t('domotek.proc.flow') }}</span><strong>{{ $display(flowMlMin / 100, 2) }}<small> {{ $t('domotek.varios.mlMin') }}</small></strong></div>
+				<div><span>{{ $t('domotek.proc.time') }}</span><strong>{{ $display(exposureTimeSeconds / 60, 2) }}<small> min</small></strong></div>
+			</div>
+			<div class="bio-proc-lista">
+				<div class="fila cab"><span>{{ $t('panel.electrospinning.autoEsMode') }}</span><span class="pildora" :class="{ on: enableES }">{{ enableES ? $t('domotek.proc.on') : $t('domotek.proc.off') }}</span></div>
+				<div class="fila" :class="{ tenue: !enableES }"><span>{{ $t('domotek.varios.applyEvery') }} {{ cadenceAmountES }} {{ $t('domotek.varios.layers') }}</span><span>{{ cadenceEnableES ? $t('domotek.varios.yes') : $t('domotek.varios.no') }}</span></div>
+				<div class="fila" :class="{ tenue: !enableES }"><span>{{ $t('panel.electrospinning.applyWhen') }}</span><span>{{ aplicarFinES ? $t('domotek.varios.yes') : $t('domotek.varios.no') }}</span></div>
+			</div>
+			<div class="bio-proc-avisos">
+				<span v-if="ChamberMode" :class="{ off: enableDoorDetection }"><v-icon small>{{ enableDoorDetection ? 'mdi-lock-open-variant-outline' : 'mdi-lock-outline' }}</v-icon>{{ enableDoorDetection ? $t('domotek.varios.door_interlock_disabled') : $t('domotek.varios.door_interlock_enabled') }}</span>
+				<span v-if="enableCL && cadenceEnableCL"><v-icon small>mdi-brush-variant</v-icon>{{ $t('panel.electrospinning.cleanDuringES') }}</span>
+			</div>
+			<div style="flex: 1"></div>
+			<footer class="bio-cal-pie">
+				<button type="button" class="bio-cal-sec" @click="CambiaStep('1')"><span class="bio-cap">{{ $t('domotek.varios.change') }}</span></button>
+				<button type="button" class="bio-cal-sec listo" @click="StartSaveSettings()"><span class="bio-cap">{{ $t('domotek.varios.save') }}</span></button>
+				<button v-if="isprinting == 'idle' || isprinting == 'paused'" type="button" class="bio-cal-principal ancho" @click="StartElectrospinning()">{{ $t('domotek.proc.run') }}</button>
+				<button v-else type="button" class="bio-cal-principal ancho aviso" @click="StartElectrospinningPausing()">{{ $t('domotek.proc.pauseAndRun') }}</button>
+			</footer>
+		</main>
+
+		<!-- 1 · Patrón -->
+		<main v-show="pasos === '1'" class="bio-proc-cuerpo">
+			<h2 class="bio-proc-h2">{{ $t('domotek.proc.pattern') }}</h2>
+			<div class="bio-proc-patrones">
+				<button v-for="pt in bioPatrones" :key="pt.id" type="button" class="bio-proc-patron" :class="{ activo: patronES === pt.id }" :aria-pressed="patronES === pt.id" @click="patronES = pt.id, ChangeSelectedPatt(pt.id)">
+					<span class="icono" v-html="pt.svg"></span>
+					<strong>{{ pt.nombre }}</strong>
+					<span>{{ pt.desc }}</span>
+				</button>
+			</div>
+			<div style="flex: 1"></div>
+			<footer class="bio-cal-pie">
+				<button type="button" class="bio-cal-sec" @click="CambiaStep('S')">{{ $t('domotek.tools.back') }}</button>
+				<button type="button" class="bio-cal-principal ancho" @click="handleContinue">{{ $t('domotek.calibracion.continue') }}</button>
+			</footer>
+		</main>
+
+		<!-- 1.5 · Puntos -->
+		<main v-if="patronES === 3" v-show="pasos === '1.5'" class="bio-proc-cuerpo">
+			<div class="bio-proc-canvas-zona">
+				<div class="bio-proc-lateral">
+					<span class="bio-tenue"><strong class="bio-blanco">{{ customPoints.length }}</strong> {{ $t('domotek.proc.points') }}</span>
+					<div class="bio-proc-puntos">
+						<div v-for="(pt, i) in customPoints" :key="i" class="bio-proc-punto" :class="{ editando: i === editingPointIndex }">
+							<span class="n">{{ i + 1 }}</span>
+							<span class="xy">{{ $display(pt.x, 1) }} · {{ $display(pt.y, 1) }}</span>
+							<button type="button" :aria-label="$t('domotek.proc.edit')" @click="editPoint(i)"><v-icon small>mdi-pencil-outline</v-icon></button>
+							<button type="button" class="borrar" :aria-label="$t('domotek.proc.remove')" @click="removePoint(i)"><v-icon small>mdi-close</v-icon></button>
+						</div>
+						<span v-if="!customPoints.length" class="bio-tenue">{{ $t('domotek.proc.noPoints') }}</span>
+					</div>
+				</div>
+				<div class="bio-proc-lienzo">
+					<canvas ref="gridCanvas" :width="canvasSizePx" :height="canvasSizePx" @click="handleCanvasClick"></canvas>
+					<span>{{ $t('domotek.proc.tapToAdd') }} · {{ gridRealSizeMm }} × {{ gridRealSizeMm }} mm</span>
+				</div>
+				<div class="bio-proc-acciones">
+					<button type="button" @click="centerPoint">{{ $t('domotek.varios.center', 'Centro') }}</button>
+					<button type="button" @click="openManualCoordsDialog">{{ $t('domotek.varios.manual', 'Manual') }}</button>
+					<button type="button" :disabled="!customPoints.length" @click="undoLastPoint">{{ $t('panel.ultraviolet.undoStroke') }}</button>
+					<button type="button" class="peligro" :disabled="!customPoints.length" @click="clearPoints">{{ $t('domotek.proc.clearAll') }}</button>
+				</div>
+			</div>
+			<footer class="bio-cal-pie">
+				<button type="button" class="bio-cal-sec" @click="CambiaStep('1')">{{ $t('domotek.tools.back') }}</button>
+				<button type="button" class="bio-cal-principal ancho" :disabled="!isPointSelected" @click="CambiaStep('2')">{{ $t('domotek.calibracion.continue') }}</button>
+			</footer>
+		</main>
+
+		<!-- 1.5 · Drum -->
+		<main v-if="patronES === 2" v-show="pasos === '1.5'" class="bio-proc-cuerpo">
+			<h2 class="bio-proc-h2">{{ $t('panel.electrospinning.electrospinningDrumParams') }}</h2>
+			<div class="bio-proc-valores">
+				<button type="button" @click="openDrumRPMDialog"><span class="ic verde"><v-icon>mdi-reload</v-icon></span><span>{{ $t('domotek.proc.drumSpeed') }}</span><strong>{{ drumRPM }}<small> {{ $t('generic.rpm') }}</small></strong></button>
+				<button type="button" @click="openXSpeedDialog"><span class="ic azul"><v-icon>mdi-speedometer</v-icon></span><span>{{ $t('panel.electrospinning.platformSpeedX') }}</span><strong>{{ FPlataformaXMms / 60 }}<small> mm/s</small></strong></button>
+				<button type="button" @click="openXPointsDialog"><span class="ic lila"><v-icon>mdi-arrow-expand-horizontal</v-icon></span><span>X1 / X2</span><strong>{{ X1PointValue }} / {{ X2PointValue }}<small> mm</small></strong></button>
+			</div>
+			<p class="bio-tenue bio-proc-nota">{{ $t('domotek.proc.tapToChange') }}</p>
+			<div style="flex: 1"></div>
+			<footer class="bio-cal-pie">
+				<button type="button" class="bio-cal-sec" @click="CambiaStep('1')">{{ $t('domotek.tools.back') }}</button>
+				<button type="button" class="bio-cal-principal ancho" @click="CambiaStep('2')">{{ $t('domotek.calibracion.continue') }}</button>
+			</footer>
+		</main>
+
+		<!-- 1.5 · Trazo libre -->
+		<main v-if="patronES === 4" v-show="pasos === '1.5'" class="bio-proc-cuerpo">
+			<div class="bio-proc-canvas-zona">
+				<div class="bio-proc-lateral">
+					<span class="bio-tenue"><strong class="bio-blanco">{{ strokes.length }}</strong> {{ $tc('domotek.proc.strokes', strokes.length) }}</span>
+					<div class="bio-proc-puntos">
+						<template v-for="(st, i) in strokes">
+							<button v-if="isClosedStroke(st)" :key="i" type="button" class="bio-proc-relleno" @click="toggleStrokeFill(i)">
+								<span class="n">{{ i + 1 }}</span><span>{{ $t('panel.electrospinning.fillArea') }}</span>
+								<span class="interruptor" :class="{ on: strokeFill[i] }"><i></i></span>
+							</button>
+						</template>
+					</div>
+					<span class="bio-tenue bio-proc-ayuda">{{ $t('panel.electrospinning.electrospinningDrawPathHelp') }}</span>
+				</div>
+				<div class="bio-proc-lienzo">
+					<canvas ref="freehandCanvas" :width="canvasSizePx" :height="canvasSizePx"
+						@pointerdown="handleFreehandPointerDown" @pointermove="handleFreehandPointerMove"
+						@pointerup="handleFreehandPointerUp" @pointerleave="handleFreehandPointerUp" style="touch-action: none;"></canvas>
+					<span>{{ gridRealSizeMm }} × {{ gridRealSizeMm }} mm</span>
+				</div>
+				<div class="bio-proc-acciones">
+					<button type="button" @click="openFreehandBig"><v-icon small>mdi-arrow-expand-all</v-icon>{{ $t('domotek.proc.enlarge') }}</button>
+					<button type="button" :disabled="!strokes.length" @click="undoLastFreehandStroke">{{ $t('panel.ultraviolet.undoStroke') }}</button>
+					<button type="button" class="peligro" :disabled="!strokes.length" @click="clearFreehandPath">{{ $t('domotek.proc.clearAll') }}</button>
+				</div>
+			</div>
+			<footer class="bio-cal-pie">
+				<button type="button" class="bio-cal-sec" @click="CambiaStep('1')">{{ $t('domotek.tools.back') }}</button>
+				<button type="button" class="bio-cal-principal ancho" :disabled="!strokes.length" @click="confirmFreehandPath">{{ $t('domotek.calibracion.continue') }}</button>
+			</footer>
+		</main>
+
+		<!-- 2 · Parámetros -->
+		<main v-show="pasos === '2'" class="bio-proc-cuerpo">
+			<h2 class="bio-proc-h2">{{ $t('domotek.proc.params') }}</h2>
+			<div class="bio-proc-valores">
+				<button type="button" @click="openHeightDialog"><span class="ic verde"><v-icon>mdi-arrow-up-down</v-icon></span><span>{{ $t('domotek.proc.height') }}</span><strong>{{ alturaES }}<small> mm</small></strong></button>
+				<button type="button" @click="openFlowDialog"><span class="ic azul"><v-icon>mdi-water-outline</v-icon></span><span>{{ $t('domotek.proc.flow') }}</span><strong>{{ $display(flowMlMin / 100, 2) }}<small> {{ $t('domotek.varios.mlMin') }}</small></strong></button>
+				<button type="button" @click="openTimeDialog"><span class="ic lila"><v-icon>mdi-timer-outline</v-icon></span><span>{{ $t('domotek.proc.exposure') }}</span><strong>{{ $display(exposureTimeSeconds / 60, 2) }}<small> min</small></strong></button>
+			</div>
+			<p class="bio-tenue bio-proc-nota">{{ $t('domotek.proc.tapToChange') }}</p>
+			<div style="flex: 1"></div>
+			<footer class="bio-cal-pie">
+				<button type="button" class="bio-cal-sec" @click="handleBack">{{ $t('domotek.tools.back') }}</button>
+				<button type="button" class="bio-cal-principal ancho" @click="CambiaStep('3')">{{ $t('domotek.calibracion.continue') }}</button>
+			</footer>
+		</main>
+
+		<!-- 3 · Auto -->
+		<main v-show="pasos === '3'" class="bio-proc-cuerpo">
+			<h2 class="bio-proc-h2">{{ $t('domotek.proc.autoMode') }}</h2>
+			<div class="bio-proc-lista">
+				<div class="fila cab">
+					<span><strong>{{ $t('panel.electrospinning.autoEsMode') }}</strong><small>{{ $t('domotek.proc.appliesDuringPrint') }}</small></span>
+					<button type="button" class="interruptor" :class="{ on: enableES }" role="switch" :aria-checked="!!enableES" @click="enableES = !enableES"><i></i></button>
+				</div>
+				<div class="fila" :class="{ tenue: !enableES }">
+					<span>{{ $t('domotek.varios.applyEvery') }}</span>
+					<div class="bio-proc-contador">
+						<button type="button" :disabled="!enableES || cadenceAmountES <= Math.max(1, minCadenceAmountES)" @click="cadenceAmountES = cadenceAmountES - 1">−</button>
+						<button type="button" class="valor" :disabled="!enableES" @click="openLayersDialog"><strong>{{ cadenceAmountES }}</strong> {{ $t('domotek.varios.layers') }}</button>
+						<button type="button" :disabled="!enableES || cadenceAmountES >= maxCadenceAmountES" @click="cadenceAmountES = cadenceAmountES + 1">+</button>
+					</div>
+					<button type="button" class="interruptor" :class="{ on: cadenceEnableES }" role="switch" :aria-checked="!!cadenceEnableES" :disabled="!enableES" @click="cadenceEnableES = !cadenceEnableES"><i></i></button>
+				</div>
+				<div class="fila" :class="{ tenue: !enableES }">
+					<span>{{ $t('panel.electrospinning.applyWhen') }}</span>
+					<button type="button" class="interruptor" :class="{ on: aplicarFinES }" role="switch" :aria-checked="!!aplicarFinES" :disabled="!enableES" @click="aplicarFinES = !aplicarFinES"><i></i></button>
+				</div>
+			</div>
+			<div style="flex: 1"></div>
+			<footer class="bio-cal-pie">
+				<button type="button" class="bio-cal-sec" @click="CambiaStep('2')">{{ $t('domotek.tools.back') }}</button>
+				<button type="button" class="bio-cal-principal ancho" @click="CambiaStep('S')">{{ $t('domotek.proc.seeSummary') }}</button>
+			</footer>
+		</main>
+	</div>
+	<v-row v-else class="mb-0 pb-0"  > 
 		<v-col cols="12" align="center" class="py-0">
 			<v-stepper v-model="pasos" class="blue lighten-5 panelStepper"  >
 				<v-stepper-header class="Stephead">
@@ -252,6 +437,188 @@
 						</v-card>
 						
 						<!-- DIÁLOGO PARA ENTRADA MANUAL DE COORDENADAS -->
+					</v-stepper-content>
+
+					<!-- Si el patron seleccionado es drum collector mostrar este step -->
+					<v-stepper-content step="1.5" v-if="patronES === 2">
+						<v-card class="mb-0 blue lighten-4" :height="panelCardPx">
+							<v-card outlined class="blue lighten-4" :height="panelCardPx - 100">
+								<p style="font-size: 1.3rem; font-weight:bold;" class="mt-2  text-center">{{ $t('panel.electrospinning.electrospinningDrumParams') }}</p>
+								<v-row justify="center" style="height:60px;">
+									<v-col cols="12" md="8" align="center">
+										<v-btn x-large outlined color="#1976d2" @click="openDrumRPMDialog" >								
+											<v-icon left>mdi-reload</v-icon>											
+											<span class="title font-weight-bold mr-2">{{ drumRPM }}</span>										
+											<span class="subtitle-1">{{ $t('generic.rpm') }}</span>
+										</v-btn>
+									</v-col>
+								</v-row>
+								<v-row justify="center" style="height:60px;">
+									<v-col cols="12" md="8" align="center">
+										<v-btn x-large outlined color="#1976d2" @click="openXSpeedDialog" >
+											<v-icon left>mdi-speedometer</v-icon>
+											<span class="title font-weight-bold mr-2">{{ (FPlataformaXMms/60)}}</span>
+											<span class="subtitle-1">{{ $t('panel.settingsAppearance.unitMmSpeed') }}</span>
+										</v-btn>
+									</v-col>
+								</v-row>
+								<v-row justify="center" style="height:60px;">
+									<v-col cols="12" md="8" align="center">
+										<v-btn x-large outlined color="#1976d2" @click="openXPointsDialog">
+											<v-icon left>mdi-map-marker</v-icon>
+											<span class="title font-weight-bold mr-2">{{ X1PointValue }} / {{ X2PointValue }}</span>
+											<span class="subtitle-1">X1 / X2</span>
+										</v-btn>
+									</v-col>
+								</v-row>
+							</v-card>
+							<v-btn class="btnContinue mt-10 mr-5" color="primary" @click="CambiaStep('1')"> <v-icon dark left> mdi-arrow-left-bold-outline </v-icon> {{ $t('domotek.toolNames.BACK') }}</v-btn>
+							<v-btn class="btnContinue mt-10" 	 color="primary" @click="CambiaStep('2')"> {{ $t('domotek.toolNames.CONTINUE') }} <v-icon dark right> mdi-arrow-right-bold-outline </v-icon></v-btn>
+						</v-card>
+					</v-stepper-content>
+
+					<!-- STEP 1.5 → Trazo libre FREEHAND (solo si patronES === 4) -->
+					<v-stepper-content step="1.5" v-if="patronES === 4">
+						<v-card class="mb-0 blue lighten-5" :height="panelCardPx">
+							<v-card outlined class="blue lighten-4 d-flex flex-column" :height="panelCardPx - 20">
+
+								<p style="font-size: 1.3rem; font-weight:bold;" class="mt-2 mb-2 text-center"> {{ $t('panel.electrospinning.electrospinningDrawPath') }} </p>
+								<p class="text-center mb-2" style="font-size: 0.85rem;"> {{ $t('panel.electrospinning.electrospinningDrawPathHelp') }} </p>
+
+								<v-card-text class="pa-1 my-auto">
+									<div style="position: relative; display: inline-grid; grid-template-columns: 150px auto 150px; align-items: center; gap: 15px; margin-bottom: 5px;">
+										<div class="text-center" style="max-height: 200px; overflow-y: auto; font-size: 0.8rem; width: 150px;">
+											<p style="margin:0;"><strong>{{ strokes.length }}</strong> {{ $t('panel.ultraviolet.strokes') }}</p>
+											<!-- Solo se muestra una fila por cada figura CERRADA (las unicas que se pueden rellenar) -->
+											<template v-for="(st, i) in strokes">
+												<!-- Toda la fila es pulsable; numero, casilla y texto juntos -->
+												<div v-if="isClosedStroke(st)" :key="i" @click="toggleStrokeFill(i)" style="display:flex; align-items:center; justify-content:flex-start; gap: 4px; padding: 4px 2px; cursor:pointer;">
+													<span style="font-weight:bold; min-width: 18px; text-align:right;">{{ i + 1 }}</span>
+													<v-icon size="20" :color="strokeFill[i] ? 'teal darken-2' : 'grey darken-1'">{{ strokeFill[i] ? 'mdi-checkbox-marked' : 'mdi-checkbox-blank-outline' }}</v-icon>
+													<span style="white-space:nowrap;">{{ $t('panel.electrospinning.fillArea') }}</span>
+												</div>
+											</template>
+										</div>
+										<div style="display: flex; flex-direction: column; align-items: center;">
+											<div style="display: flex; align-items: flex-end; gap: 5px;">
+												<span style="writing-mode: vertical-rl; transform: rotate(180deg); font-weight: bold; font-size: 0.9em; letter-spacing: 1px; margin-bottom: 100px;">{{ $t('domotek.varios.ejeY') }}</span>
+												<div style="display: flex; flex-direction: column; align-items: center;">
+													<canvas
+														ref="freehandCanvas"
+														:width="canvasSizePx"
+														:height="canvasSizePx"
+														@pointerdown="handleFreehandPointerDown"
+														@pointermove="handleFreehandPointerMove"
+														@pointerup="handleFreehandPointerUp"
+														@pointerleave="handleFreehandPointerUp"
+														style="border: 1px solid #999; cursor: crosshair; background-color: white; touch-action: none;"
+													></canvas>
+													<div style="width: 100%; margin-top: 5px; display: flex; justify-content: center; position: relative;">
+														<span style="position: absolute; left: 0; bottom: 0; font-weight: bold; font-size: 0.8em; color: #333;">(0,0)</span>
+														<span style="font-weight: bold; font-size: 0.9em; letter-spacing: 1px;">{{ $t('domotek.varios.ejeX') }}</span>
+													</div>
+												</div>
+											</div>
+										</div>
+										<div style="display: flex; flex-direction: column; gap: 40px;">
+											<v-btn class="btnAction" small color="primary" @click="openFreehandBig">
+												<v-icon>mdi-arrow-expand-all</v-icon>
+											</v-btn>
+											<v-btn class="btnAction" small color="primary" @click="undoLastFreehandStroke" :disabled="strokes.length === 0">
+												{{ $t('panel.ultraviolet.undoStroke') }}
+											</v-btn>
+											<v-btn class="btnAction" small color="error" @click="clearFreehandPath" :disabled="strokes.length === 0">
+												{{ $t('list.eventLog.clear', 'Borrar') }}
+											</v-btn>
+										</div>
+									</div>
+								</v-card-text>
+
+								<div class="text-center pb-2 pt-1 mt-auto">
+									<v-btn class="btnContinue mr-4" color="primary" @click="CambiaStep('1')">
+										<v-icon dark left> mdi-arrow-left-bold-outline </v-icon>
+										{{ $t('domotek.toolNames.BACK') }}
+									</v-btn>
+									<v-btn class="btnContinue" color="primary" @click="confirmFreehandPath" :disabled="strokes.length === 0">
+										{{ $t('domotek.toolNames.CONTINUE') }}
+										<v-icon dark right> mdi-arrow-right-bold-outline </v-icon>
+									</v-btn>
+								</div>
+							</v-card>
+						</v-card>
+						<!-- CANVAS GRANDE: se abre por encima de todo para dibujar con mas precision -->
+					</v-stepper-content>
+				</v-stepper-items>
+				<!-- STEP 2 → Altura / Flujo / Tiempo (todo en una pantalla, como en UV) -->
+				<v-stepper-items>
+					<v-stepper-content step="2">
+						<v-card class="mb-0 blue lighten-4" :height="panelCardPx">
+							<v-card outlined class="blue lighten-4" :height="panelCardPx - 100" style="width: 800px">
+								<p style="font-size: 1.3rem; font-weight:bold;" class="mt-2 mb-5 text-center">{{ $t('panel.electrospinning.electrospinningParams') }}</p>
+								<!-- Rejilla de una columna: la columna toma el ancho del boton mas largo y los tres se estiran a ese ancho -->
+								<div style="display: inline-grid; grid-template-columns: auto; row-gap: 16px;">
+									<v-btn x-large outlined block color="#1976d2" @click="openHeightDialog" >
+										<v-icon left>mdi-ruler</v-icon>
+										<span class="subtitle-1">
+											{{ $t('panel.jobInfo.height') }}<span class="font-weight-bold">{{ alturaES }}</span> {{ $t('panel.settingsAppearance.unitMm') }}
+										</span>
+									</v-btn>
+									<v-btn x-large outlined block color="#1976d2" @click="openFlowDialog" >
+										<v-icon left>mdi-water</v-icon>
+										<span class="subtitle-1">
+											{{ flowLabel }}<span class="font-weight-bold">{{ (flowMlMin / 100).toFixed(2) }}</span> {{ $t('domotek.varios.mlMin') }}
+										</span>
+									</v-btn>
+									<v-btn x-large outlined block color="#1976d2" @click="openTimeDialog" >
+										<v-icon left>mdi-timer-outline</v-icon>
+										<span class="subtitle-1">
+											{{ $t('panel.ultraviolet.time') }}<span class="font-weight-bold">{{ (exposureTimeSeconds / 60).toFixed(2) }}</span> {{ $t('domotek.varios.min') }}
+										</span>
+									</v-btn>
+								</div>
+							</v-card>
+							<v-btn class="btnContinue mt-10 mr-5" color="primary" @click="handleBack"> <v-icon dark left> mdi-arrow-left-bold-outline </v-icon> {{ $t('domotek.toolNames.BACK') }}</v-btn>
+							<v-btn class="btnContinue mt-10" 	 color="primary" @click="CambiaStep('3')"> {{ $t('domotek.toolNames.CONTINUE') }} <v-icon dark right> mdi-arrow-right-bold-outline </v-icon></v-btn>
+						</v-card>
+					</v-stepper-content>
+				</v-stepper-items>
+
+				<!-- STEP 3 → Modo automatico / cadencia -->
+				<v-stepper-items>
+					<v-stepper-content step="3">
+						<v-card class="mb-0 blue lighten-4" :height="panelCardPx">
+							<v-card outlined class="blue lighten-4" :height="panelCardPx - 100" style="width: 800px">
+								<p style="font-size: 1.3rem; font-weight:bold;" class="mt-2 mb-5 text-center">{{ $t('panel.electrospinning.electrospinningParams') }}</p>
+								<v-row style="height:40px;margin-left:40px;">  
+									<v-checkbox v-model="enableES" :label="$t('panel.electrospinning.autoEsMode')"  class="etiqueta align-center justify-center"></v-checkbox>		
+								</v-row>
+								<v-row style="height:62px;margin-left:128px;">  
+										<v-col cols=5 >
+											<v-checkbox :disabled="!enableES" v-model="cadenceEnableES" :label="$t('domotek.varios.applyEvery') + ' ' + cadenceAmountES + ' ' + $t('domotek.varios.layers')"  class="etiqueta align-center justify-center"></v-checkbox>
+										</v-col>
+										<v-col cols=6 v-show="enableES">
+											<v-btn x-large outlined color="#1976d2" @click="openLayersDialog" >
+												<v-icon left>mdi-layers</v-icon>
+												<span class="subtitle-1">
+													<span class="font-weight-bold">{{ cadenceAmountES}}</span> {{ $t('domotek.varios.layers') }}
+												</span>
+											</v-btn>
+										</v-col>
+								</v-row>
+								<v-row style="height:40px;margin-left:140px;">  
+									<v-checkbox :disabled="!enableES" v-model="aplicarFinES" :label="$t('panel.electrospinning.applyWhen')"  class="etiqueta align-center justify-center"></v-checkbox>
+								</v-row>
+							</v-card>
+							<v-btn class="btnContinue mt-10 mr-5" color="primary" @click="CambiaStep('2')"> <v-icon dark left> mdi-arrow-left-bold-outline </v-icon> {{ $t('domotek.toolNames.BACK') }}</v-btn>
+							<v-btn class="btnContinue mt-10"  color="primary" @click="CambiaStep('S')">  {{ $t('domotek.varios.settings') }} <v-icon dark right> mdi-cog </v-icon></v-btn> 
+						</v-card>
+					</v-stepper-content>
+				</v-stepper-items>
+			</v-stepper>	
+			<!-- Dialogos y aviso dentro de la misma columna: asi no crean filas vacias que alargan el panel -->
+		</v-col>
+	</v-row>
+	<!-- diálogos compartidos por las dos vistas -->
 						<v-dialog v-model="dialogManualCoords" persistent max-width="380px">
 							<v-card>
 								<v-card-title class="justify-center text-center">
@@ -296,44 +663,6 @@
 								</v-card-actions>
 							</v-card>
 						</v-dialog>
-					</v-stepper-content>
-
-					<!-- Si el patron seleccionado es drum collector mostrar este step -->
-					<v-stepper-content step="1.5" v-if="patronES === 2">
-						<v-card class="mb-0 blue lighten-4" :height="panelCardPx">
-							<v-card outlined class="blue lighten-4" :height="panelCardPx - 100">
-								<p style="font-size: 1.3rem; font-weight:bold;" class="mt-2  text-center">{{ $t('panel.electrospinning.electrospinningDrumParams') }}</p>
-								<v-row justify="center" style="height:60px;">
-									<v-col cols="12" md="8" align="center">
-										<v-btn x-large outlined color="#1976d2" @click="openDrumRPMDialog" >								
-											<v-icon left>mdi-reload</v-icon>											
-											<span class="title font-weight-bold mr-2">{{ drumRPM }}</span>										
-											<span class="subtitle-1">{{ $t('generic.rpm') }}</span>
-										</v-btn>
-									</v-col>
-								</v-row>
-								<v-row justify="center" style="height:60px;">
-									<v-col cols="12" md="8" align="center">
-										<v-btn x-large outlined color="#1976d2" @click="openXSpeedDialog" >
-											<v-icon left>mdi-speedometer</v-icon>
-											<span class="title font-weight-bold mr-2">{{ (FPlataformaXMms/60)}}</span>
-											<span class="subtitle-1">{{ $t('panel.settingsAppearance.unitMmSpeed') }}</span>
-										</v-btn>
-									</v-col>
-								</v-row>
-								<v-row justify="center" style="height:60px;">
-									<v-col cols="12" md="8" align="center">
-										<v-btn x-large outlined color="#1976d2" @click="openXPointsDialog">
-											<v-icon left>mdi-map-marker</v-icon>
-											<span class="title font-weight-bold mr-2">{{ X1PointValue }} / {{ X2PointValue }}</span>
-											<span class="subtitle-1">X1 / X2</span>
-										</v-btn>
-									</v-col>
-								</v-row>
-							</v-card>
-							<v-btn class="btnContinue mt-10 mr-5" color="primary" @click="CambiaStep('1')"> <v-icon dark left> mdi-arrow-left-bold-outline </v-icon> {{ $t('domotek.toolNames.BACK') }}</v-btn>
-							<v-btn class="btnContinue mt-10" 	 color="primary" @click="CambiaStep('2')"> {{ $t('domotek.toolNames.CONTINUE') }} <v-icon dark right> mdi-arrow-right-bold-outline </v-icon></v-btn>
-						</v-card>
 						<v-dialog v-model="dialogManualDrumRPM" persistent max-width="380px">
 							<v-card>
 								<v-card-title class="justify-center text-center">
@@ -455,78 +784,6 @@
 								</v-card-actions>
 							</v-card>
 						</v-dialog>
-					</v-stepper-content>
-
-					<!-- STEP 1.5 → Trazo libre FREEHAND (solo si patronES === 4) -->
-					<v-stepper-content step="1.5" v-if="patronES === 4">
-						<v-card class="mb-0 blue lighten-5" :height="panelCardPx">
-							<v-card outlined class="blue lighten-4 d-flex flex-column" :height="panelCardPx - 20">
-
-								<p style="font-size: 1.3rem; font-weight:bold;" class="mt-2 mb-2 text-center"> {{ $t('panel.electrospinning.electrospinningDrawPath') }} </p>
-								<p class="text-center mb-2" style="font-size: 0.85rem;"> {{ $t('panel.electrospinning.electrospinningDrawPathHelp') }} </p>
-
-								<v-card-text class="pa-1 my-auto">
-									<div style="position: relative; display: inline-grid; grid-template-columns: 150px auto 150px; align-items: center; gap: 15px; margin-bottom: 5px;">
-										<div class="text-center" style="max-height: 200px; overflow-y: auto; font-size: 0.8rem; width: 150px;">
-											<p style="margin:0;"><strong>{{ strokes.length }}</strong> {{ $t('panel.ultraviolet.strokes') }}</p>
-											<!-- Solo se muestra una fila por cada figura CERRADA (las unicas que se pueden rellenar) -->
-											<template v-for="(st, i) in strokes">
-												<!-- Toda la fila es pulsable; numero, casilla y texto juntos -->
-												<div v-if="isClosedStroke(st)" :key="i" @click="toggleStrokeFill(i)" style="display:flex; align-items:center; justify-content:flex-start; gap: 4px; padding: 4px 2px; cursor:pointer;">
-													<span style="font-weight:bold; min-width: 18px; text-align:right;">{{ i + 1 }}</span>
-													<v-icon size="20" :color="strokeFill[i] ? 'teal darken-2' : 'grey darken-1'">{{ strokeFill[i] ? 'mdi-checkbox-marked' : 'mdi-checkbox-blank-outline' }}</v-icon>
-													<span style="white-space:nowrap;">{{ $t('panel.electrospinning.fillArea') }}</span>
-												</div>
-											</template>
-										</div>
-										<div style="display: flex; flex-direction: column; align-items: center;">
-											<div style="display: flex; align-items: flex-end; gap: 5px;">
-												<span style="writing-mode: vertical-rl; transform: rotate(180deg); font-weight: bold; font-size: 0.9em; letter-spacing: 1px; margin-bottom: 100px;">{{ $t('domotek.varios.ejeY') }}</span>
-												<div style="display: flex; flex-direction: column; align-items: center;">
-													<canvas
-														ref="freehandCanvas"
-														:width="canvasSizePx"
-														:height="canvasSizePx"
-														@pointerdown="handleFreehandPointerDown"
-														@pointermove="handleFreehandPointerMove"
-														@pointerup="handleFreehandPointerUp"
-														@pointerleave="handleFreehandPointerUp"
-														style="border: 1px solid #999; cursor: crosshair; background-color: white; touch-action: none;"
-													></canvas>
-													<div style="width: 100%; margin-top: 5px; display: flex; justify-content: center; position: relative;">
-														<span style="position: absolute; left: 0; bottom: 0; font-weight: bold; font-size: 0.8em; color: #333;">(0,0)</span>
-														<span style="font-weight: bold; font-size: 0.9em; letter-spacing: 1px;">{{ $t('domotek.varios.ejeX') }}</span>
-													</div>
-												</div>
-											</div>
-										</div>
-										<div style="display: flex; flex-direction: column; gap: 40px;">
-											<v-btn class="btnAction" small color="primary" @click="openFreehandBig">
-												<v-icon>mdi-arrow-expand-all</v-icon>
-											</v-btn>
-											<v-btn class="btnAction" small color="primary" @click="undoLastFreehandStroke" :disabled="strokes.length === 0">
-												{{ $t('panel.ultraviolet.undoStroke') }}
-											</v-btn>
-											<v-btn class="btnAction" small color="error" @click="clearFreehandPath" :disabled="strokes.length === 0">
-												{{ $t('list.eventLog.clear', 'Borrar') }}
-											</v-btn>
-										</div>
-									</div>
-								</v-card-text>
-
-								<div class="text-center pb-2 pt-1 mt-auto">
-									<v-btn class="btnContinue mr-4" color="primary" @click="CambiaStep('1')">
-										<v-icon dark left> mdi-arrow-left-bold-outline </v-icon>
-										{{ $t('domotek.toolNames.BACK') }}
-									</v-btn>
-									<v-btn class="btnContinue" color="primary" @click="confirmFreehandPath" :disabled="strokes.length === 0">
-										{{ $t('domotek.toolNames.CONTINUE') }}
-										<v-icon dark right> mdi-arrow-right-bold-outline </v-icon>
-									</v-btn>
-								</div>
-							</v-card>
-						</v-card>
-						<!-- CANVAS GRANDE: se abre por encima de todo para dibujar con mas precision -->
 						<v-dialog v-model="dialogFreehandBig" :max-width="freehandBigPx + 200">
 							<v-card class="pa-3">
 								<div style="display: flex; align-items: center; justify-content: center; gap: 12px;">
@@ -563,39 +820,6 @@
 								</div>
 							</v-card>
 						</v-dialog>
-					</v-stepper-content>
-				</v-stepper-items>
-				<!-- STEP 2 → Altura / Flujo / Tiempo (todo en una pantalla, como en UV) -->
-				<v-stepper-items>
-					<v-stepper-content step="2">
-						<v-card class="mb-0 blue lighten-4" :height="panelCardPx">
-							<v-card outlined class="blue lighten-4" :height="panelCardPx - 100" style="width: 800px">
-								<p style="font-size: 1.3rem; font-weight:bold;" class="mt-2 mb-5 text-center">{{ $t('panel.electrospinning.electrospinningParams') }}</p>
-								<!-- Rejilla de una columna: la columna toma el ancho del boton mas largo y los tres se estiran a ese ancho -->
-								<div style="display: inline-grid; grid-template-columns: auto; row-gap: 16px;">
-									<v-btn x-large outlined block color="#1976d2" @click="openHeightDialog" >
-										<v-icon left>mdi-ruler</v-icon>
-										<span class="subtitle-1">
-											{{ $t('panel.jobInfo.height') }}<span class="font-weight-bold">{{ alturaES }}</span> {{ $t('panel.settingsAppearance.unitMm') }}
-										</span>
-									</v-btn>
-									<v-btn x-large outlined block color="#1976d2" @click="openFlowDialog" >
-										<v-icon left>mdi-water</v-icon>
-										<span class="subtitle-1">
-											{{ flowLabel }}<span class="font-weight-bold">{{ (flowMlMin / 100).toFixed(2) }}</span> {{ $t('domotek.varios.mlMin') }}
-										</span>
-									</v-btn>
-									<v-btn x-large outlined block color="#1976d2" @click="openTimeDialog" >
-										<v-icon left>mdi-timer-outline</v-icon>
-										<span class="subtitle-1">
-											{{ $t('panel.ultraviolet.time') }}<span class="font-weight-bold">{{ (exposureTimeSeconds / 60).toFixed(2) }}</span> {{ $t('domotek.varios.min') }}
-										</span>
-									</v-btn>
-								</div>
-							</v-card>
-							<v-btn class="btnContinue mt-10 mr-5" color="primary" @click="handleBack"> <v-icon dark left> mdi-arrow-left-bold-outline </v-icon> {{ $t('domotek.toolNames.BACK') }}</v-btn>
-							<v-btn class="btnContinue mt-10" 	 color="primary" @click="CambiaStep('3')"> {{ $t('domotek.toolNames.CONTINUE') }} <v-icon dark right> mdi-arrow-right-bold-outline </v-icon></v-btn>
-						</v-card>
 						<v-dialog v-model="dialogManualHeight" persistent max-width="380px">
 							<v-card>
 								<v-card-title class="justify-center text-center">
@@ -719,38 +943,6 @@
 								</v-card-actions>
 							</v-card>
 						</v-dialog>
-					</v-stepper-content>
-				</v-stepper-items>
-
-				<!-- STEP 3 → Modo automatico / cadencia -->
-				<v-stepper-items>
-					<v-stepper-content step="3">
-						<v-card class="mb-0 blue lighten-4" :height="panelCardPx">
-							<v-card outlined class="blue lighten-4" :height="panelCardPx - 100" style="width: 800px">
-								<p style="font-size: 1.3rem; font-weight:bold;" class="mt-2 mb-5 text-center">{{ $t('panel.electrospinning.electrospinningParams') }}</p>
-								<v-row style="height:40px;margin-left:40px;">  
-									<v-checkbox v-model="enableES" :label="$t('panel.electrospinning.autoEsMode')"  class="etiqueta align-center justify-center"></v-checkbox>		
-								</v-row>
-								<v-row style="height:62px;margin-left:128px;">  
-										<v-col cols=5 >
-											<v-checkbox :disabled="!enableES" v-model="cadenceEnableES" :label="$t('domotek.varios.applyEvery') + ' ' + cadenceAmountES + ' ' + $t('domotek.varios.layers')"  class="etiqueta align-center justify-center"></v-checkbox>
-										</v-col>
-										<v-col cols=6 v-show="enableES">
-											<v-btn x-large outlined color="#1976d2" @click="openLayersDialog" >
-												<v-icon left>mdi-layers</v-icon>
-												<span class="subtitle-1">
-													<span class="font-weight-bold">{{ cadenceAmountES}}</span> {{ $t('domotek.varios.layers') }}
-												</span>
-											</v-btn>
-										</v-col>
-								</v-row>
-								<v-row style="height:40px;margin-left:140px;">  
-									<v-checkbox :disabled="!enableES" v-model="aplicarFinES" :label="$t('panel.electrospinning.applyWhen')"  class="etiqueta align-center justify-center"></v-checkbox>
-								</v-row>
-							</v-card>
-							<v-btn class="btnContinue mt-10 mr-5" color="primary" @click="CambiaStep('2')"> <v-icon dark left> mdi-arrow-left-bold-outline </v-icon> {{ $t('domotek.toolNames.BACK') }}</v-btn>
-							<v-btn class="btnContinue mt-10"  color="primary" @click="CambiaStep('S')">  {{ $t('domotek.varios.settings') }} <v-icon dark right> mdi-cog </v-icon></v-btn> 
-						</v-card>
 						<v-dialog v-model="dialogManualLayers" persistent max-width="380px">
 							<v-card>
 								<v-card-title class="justify-center text-center">
@@ -792,10 +984,6 @@
 								</v-card-actions>
 							</v-card>
 						</v-dialog>
-					</v-stepper-content>
-				</v-stepper-items>
-			</v-stepper>	
-			<!-- Dialogos y aviso dentro de la misma columna: asi no crean filas vacias que alargan el panel -->
 			<v-dialog v-model="dialogES" max-width="500">
 				<v-card>                                                                                  
 					<v-card-title class="headline">
@@ -849,8 +1037,7 @@
 			<v-snackbar content-class="snack" v-model="snackbar" :timeout="400" absolute left top :min-width="50"   color="light-blue white--text" >
 					{{this.snackbarValor}}
 			</v-snackbar>
-		</v-col>
-	</v-row>
+</div>
 </template>
 
 <script>
@@ -1138,6 +1325,39 @@ export default {
 			}
 		},
 		
+		temaBio() { return this.$store.state.settings.temaBio; }, // domotek
+		bioColores() { // colores de los lienzos según el tema
+			return this.temaBio
+				? { rejilla: '#2A3138', borde: '#3A444D', punto: '#3CC9B0', puntoEdit: '#F2D35A', puntoBorde: '#1F3B37', texto: '#E8EDF1', trazo: '#3CC9B0', relleno: 'rgba(60,201,176,0.18)', rayado: 'rgba(60,201,176,0.45)', cierra: '#6EDDA9', cierraFondo: 'rgba(110,221,169,0.22)', zona: 'rgba(255,255,255,0.06)', abierto: '#F08A83' }
+				: { rejilla: '#ddd', borde: '#999', punto: 'red', puntoEdit: '#1976d2', puntoBorde: 'darkred', texto: '#000', trazo: '#1976d2', relleno: 'rgba(25,118,210,0.22)', rayado: 'rgba(25,118,210,0.55)', cierra: '#2e7d32', cierraFondo: 'rgba(46,125,50,0.25)', zona: 'rgba(0,0,0,0.06)', abierto: 'red' };
+		},
+		bioPasos() {
+			const lista = [{ id: 'S', texto: this.$t('domotek.proc.summary') }, { id: '1', texto: `1 · ${this.$t('domotek.proc.pattern')}` }];
+			if (this.patronES === 3) { lista.push({ id: '1.5', texto: `1.5 · ${this.$t('domotek.proc.pointsStep')}` }); }
+			if (this.patronES === 4) { lista.push({ id: '1.5', texto: `1.5 · ${this.$t('domotek.proc.strokeStep')}` }); }
+			if (this.patronES === 2) { lista.push({ id: '1.5', texto: '1.5 · Drum' }); }
+			lista.push({ id: '2', texto: `2 · ${this.$t('domotek.proc.params')}` }, { id: '3', texto: '3 · Auto' });
+			return lista;
+		},
+		bioPatrones() {
+			const ico = {
+				1: '<svg viewBox="0 0 48 48" aria-hidden="true"><rect x="5" y="5" width="38" height="38" rx="6" fill="none" stroke="currentColor" stroke-width="3"/><rect x="11" y="11" width="26" height="26" rx="3" fill="currentColor" opacity=".25"/></svg>',
+				2: '<svg viewBox="0 0 48 48" aria-hidden="true"><ellipse cx="24" cy="24" rx="19" ry="11" fill="none" stroke="currentColor" stroke-width="3"/><path d="M5 24v4c0 6 8.5 11 19 11s19-5 19-11v-4" fill="none" stroke="currentColor" stroke-width="3"/></svg>',
+				3: '<svg viewBox="0 0 48 48" aria-hidden="true"><rect x="5" y="5" width="38" height="38" rx="6" fill="none" stroke="currentColor" stroke-width="3"/><circle cx="17" cy="19" r="4" fill="currentColor"/><circle cx="31" cy="15" r="4" fill="currentColor"/><circle cx="26" cy="32" r="4" fill="currentColor"/></svg>',
+				4: '<svg viewBox="0 0 48 48" aria-hidden="true"><rect x="5" y="5" width="38" height="38" rx="6" fill="none" stroke="currentColor" stroke-width="3"/><path d="M12 32c4-10 8-12 11-8s6 4 13-10" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>'
+			};
+			const todos = [
+				{ id: 1, nombre: this.$t('domotek.varios.allPlatform'), desc: this.$t('domotek.proc.fullSweep') },
+				{ id: 2, nombre: this.$t('domotek.varios.drumCollector'), desc: this.$t('domotek.proc.drumDesc') },
+				{ id: 3, nombre: this.$t('domotek.varios.customPoint'), desc: this.$t('domotek.proc.pointsDesc') },
+				{ id: 4, nombre: this.$t('domotek.varios.freehand'), desc: this.$t('domotek.proc.freehandDesc') }
+			].map(p => ({ ...p, svg: ico[p.id] }));
+			return this.bedSelected == 'D' ? todos.filter(p => p.id === 2) : todos.filter(p => p.id !== 2);
+		},
+		bioNombrePatron() {
+			const p = { 1: 'allPlatform', 2: 'drumCollector', 3: 'customPoint', 4: 'freehand' }[this.patronES];
+			return p ? this.$t('domotek.varios.' + p) : '—';
+		},
 		patronES: {
 			get() {
 				return this.$store.state.machine.model.global.patronES},
@@ -1398,6 +1618,12 @@ export default {
 		onWindowResize() {
 			this.windowHeight = window.innerHeight;
 		},
+		bioRedibujar() { // domotek: vuelve a pintar los lienzos con los colores del tema
+			this.$nextTick(() => {
+				if (this.patronES === 3 && this.ctx) { this.drawGrid(); }
+				if (this.patronES === 4 && this.freehandCtx) { this.drawFreehandCanvas(); }
+			});
+		},
 		CambiaStep(newStep){
 			this.pasos = newStep;
 		},
@@ -1542,8 +1768,9 @@ export default {
 			if (!this.ctx) return;
 			const canvas = this.$refs.gridCanvas;
 			const ctx = this.ctx;
+			const col = this.bioColores;
 			ctx.clearRect(0, 0, canvas.width, canvas.height);
-			ctx.strokeStyle = '#ddd';
+			ctx.strokeStyle = col.rejilla;
 			ctx.lineWidth = 0.5;
 			for (let x = 0; x <= this.canvasSizePx; x += this.cellSizePx) {
 				ctx.beginPath();
@@ -1557,24 +1784,24 @@ export default {
 				ctx.lineTo(this.canvasSizePx, Math.round(y));
 				ctx.stroke();
 			}
-			ctx.strokeStyle = '#999';
+			ctx.strokeStyle = col.borde;
 			ctx.lineWidth = 1;
 			ctx.strokeRect(0, 0, this.canvasSizePx, this.canvasSizePx);
 
 			// Puntos numerados
-			ctx.font = '10px sans-serif';
+			ctx.font = this.temaBio ? '11px "IBM Plex Sans", sans-serif' : '10px sans-serif';
 			this.customPoints.forEach((p, i) => {
 				const px = p.x * this.pxPerMm;
 				const py = (this.gridRealSizeMm - p.y) * this.pxPerMm;
 				ctx.beginPath();
-				ctx.arc(px, py, i === this.editingPointIndex ? 5 : 3, 0, 2 * Math.PI, false);
-				ctx.fillStyle = (i === this.editingPointIndex) ? '#1976d2' : 'red';
+				ctx.arc(px, py, this.temaBio ? (i === this.editingPointIndex ? 6 : 5) : (i === this.editingPointIndex ? 5 : 3), 0, 2 * Math.PI, false);
+				ctx.fillStyle = (i === this.editingPointIndex) ? col.puntoEdit : col.punto;
 				ctx.fill();
 				ctx.lineWidth = 1;
-				ctx.strokeStyle = 'darkred';
+				ctx.strokeStyle = col.puntoBorde;
 				ctx.stroke();
-				ctx.fillStyle = '#000';
-				ctx.fillText(String(i + 1), px + 5, py - 4);
+				ctx.fillStyle = col.texto;
+				ctx.fillText(String(i + 1), px + (this.temaBio ? 7 : 5), py - (this.temaBio ? 6 : 4));
 			});
 		},
 		handleCanvasClick(event) {
@@ -1812,9 +2039,9 @@ export default {
 				if (i === 0) ctx.moveTo(p.x, p.y); else ctx.lineTo(p.x, p.y);
 			});
 			ctx.closePath();
-			ctx.fillStyle = 'rgba(25,118,210,0.22)';
+			ctx.fillStyle = this.bioColores.relleno;
 			ctx.fill();
-			ctx.strokeStyle = 'rgba(25,118,210,0.55)';
+			ctx.strokeStyle = this.bioColores.rayado;
 			ctx.lineWidth = 0.7;
 			this.computeFillSegments(stroke).forEach(sg => {
 				const a = this.freehandMmToPixel(sg[0].x, sg[0].y);
@@ -1908,10 +2135,11 @@ export default {
 			const ctx = this.freehandCtx;
 			const size = this.freehandSizePx;
 			const cell = this.freehandCellPx;
+			const col = this.bioColores;
 			ctx.clearRect(0, 0, canvas.width, canvas.height);
 
 			// Rejilla
-			ctx.strokeStyle = '#ddd';
+			ctx.strokeStyle = col.rejilla;
 			ctx.lineWidth = 0.5;
 			for (let x = 0; x <= size; x += cell) {
 				ctx.beginPath();
@@ -1925,12 +2153,12 @@ export default {
 				ctx.lineTo(size, Math.round(y));
 				ctx.stroke();
 			}
-			ctx.strokeStyle = '#999';
+			ctx.strokeStyle = col.borde;
 			ctx.lineWidth = 1;
 			ctx.strokeRect(0, 0, size, size);
 
 			// Sub-trazos ya guardados
-			ctx.strokeStyle = '#1976d2';
+			ctx.strokeStyle = col.trazo;
 			ctx.lineWidth = this.dialogFreehandBig ? 3 : 2;
 			ctx.lineJoin = 'round';
 			ctx.lineCap = 'round';
@@ -1948,15 +2176,15 @@ export default {
 				ctx.save();
 				ctx.beginPath();
 				ctx.arc(st.x, st.y, r, 0, 2 * Math.PI);
-				ctx.fillStyle = willClose ? 'rgba(46,125,50,0.25)' : 'rgba(0,0,0,0.06)';
+				ctx.fillStyle = willClose ? col.cierraFondo : col.zona;
 				ctx.fill();
 				ctx.setLineDash([3, 3]);
 				ctx.lineWidth = 1;
-				ctx.strokeStyle = willClose ? '#2e7d32' : '#999';
+				ctx.strokeStyle = willClose ? col.cierra : col.borde;
 				ctx.stroke();
 				ctx.restore();
 
-				ctx.strokeStyle = willClose ? '#2e7d32' : 'red';
+				ctx.strokeStyle = willClose ? col.cierra : col.abierto;
 				this.drawStrokePolyline(ctx, this.currentStroke);
 			}
 		},

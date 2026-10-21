@@ -651,3 +651,92 @@ $bio-ambar:      #F5B52E;
 		&:active { background: $bio-acento-bg !important; }
 	}
 }
+
+// ---------------------------------------------------------------------------
+// Paneles de procesos (Electrospinning; reutilizable para UV y EMD)
+// ---------------------------------------------------------------------------
+.tema-bio {
+	.v-dialog--fullscreen > .col:has(> .es-raiz > .bio-pp) { padding: 0 !important; }
+	canvas[style*="background-color: white"] { background-color: #14171A !important; border-color: #3A444D !important; }
+	.bio-pp {
+		position: fixed; inset: 0; z-index: 1; background: $bio-fondo; color: $bio-texto;
+		display: flex; flex-direction: column; text-align: left; font-size: 14px;
+		button { font-family: inherit; color: inherit; border: none; cursor: pointer; }
+		button:disabled { cursor: default; opacity: .45; }
+	}
+	.bio-proc-cab { height: 64px; flex: none; display: flex; align-items: center; gap: 12px; padding: 0 16px; background: $bio-rail; box-sizing: border-box; }
+	.bio-proc-titulo { font-size: 17px; font-weight: 600; white-space: nowrap; }
+	.bio-proc-cab .bio-cal-pasos button { padding: 0 11px; }
+	.bio-proc-cuerpo { flex: 1; min-height: 0; padding: 14px 22px 16px; box-sizing: border-box; display: flex; flex-direction: column; gap: 12px; }
+	.bio-proc-h2 { margin: 0; font-size: 18px; font-weight: 600; display: flex; align-items: center; gap: 14px; }
+	.bio-proc-hv { display: inline-flex; align-items: center; gap: 4px; font-size: 13px; color: #F5B52E; font-weight: 600; }
+	.bio-proc-datos { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+	.bio-proc-datos > div { background: $bio-sup; border-radius: 14px; padding: 10px 14px; display: flex; flex-direction: column; min-width: 0; }
+	.bio-proc-datos span { font-size: 12px; color: $bio-tenue; }
+	.bio-proc-datos strong { font-size: 18px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; small { font-size: 13px; color: $bio-tenue; font-weight: 400; } }
+	.bio-proc-lista { background: $bio-sup; border-radius: 16px; padding: 4px 16px; }
+	.bio-proc-lista .fila { display: flex; align-items: center; gap: 12px; min-height: 44px; padding: 6px 0 6px 16px; border-top: 1px solid #2A3138; color: $bio-tenue; }
+	.bio-proc-lista .fila > span:first-child { flex: 1; }
+	.bio-proc-lista .fila.cab { padding-left: 0; border-top: none; color: $bio-texto; min-height: 50px; }
+	.bio-proc-lista .fila.cab small { display: block; font-size: 12px; color: $bio-tenue; }
+	.bio-proc-lista .fila.cab strong { font-weight: 500; font-size: 15px; }
+	.bio-proc-lista .fila.tenue { opacity: .55; }
+	.bio-proc-lista .pildora { background: $bio-sup2; border-radius: 999px; padding: 4px 12px; font-size: 13px; font-weight: 600; color: $bio-tenue; &.on { background: $bio-acento-bg; color: $bio-acento; } }
+	.bio-proc-avisos { display: flex; gap: 18px; font-size: 13px; color: $bio-acento; flex-wrap: wrap; }
+	.bio-proc-avisos span { display: inline-flex; align-items: center; gap: 6px; .v-icon { color: inherit !important; } }
+	.bio-proc-avisos span.off { color: $bio-calor; }
+	.bio-cal-principal.ancho { min-width: 150px; }
+	.bio-cal-principal.aviso { background: $bio-calor !important; }
+
+	.bio-proc-patrones { display: grid; grid-template-columns: repeat(auto-fit, minmax(0, 1fr)); grid-auto-flow: column; gap: 12px; }
+	.bio-proc-patron {
+		background: $bio-sup !important; border: 2px solid transparent !important; border-radius: 16px; padding: 18px 10px;
+		display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center; color: $bio-texto !important;
+		.icono { width: 48px; height: 48px; color: #9AA5AF; display: block; }
+		strong { font-size: 15px; font-weight: 600; margin-top: 6px; }
+		span:last-child { font-size: 13px; color: $bio-tenue; }
+		&.activo { border-color: $bio-acento !important; background: $bio-acento-bg !important; .icono { color: $bio-acento; } }
+	}
+	.bio-proc-patron .icono svg { width: 48px; height: 48px; }
+
+	.bio-proc-canvas-zona { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) auto 150px; gap: 16px; align-items: center; }
+	.bio-proc-lateral { background: $bio-sup; border-radius: 14px; padding: 10px 12px; display: flex; flex-direction: column; gap: 6px; min-height: 0; max-height: 100%; box-sizing: border-box; }
+	.bio-blanco { color: $bio-texto; }
+	.bio-proc-puntos { overflow-y: auto; display: flex; flex-direction: column; gap: 2px; min-height: 0; }
+	.bio-proc-punto { display: grid; grid-template-columns: 22px minmax(0, 1fr) 32px 32px; align-items: center; height: 34px; border-radius: 8px; padding: 0 2px; font-size: 14px; }
+	.bio-proc-punto.editando { background: $bio-acento-bg; }
+	.bio-proc-punto .n, .bio-proc-relleno .n { color: $bio-acento; font-weight: 600; }
+	.bio-proc-punto button { height: 32px; border-radius: 8px; background: transparent; display: flex; align-items: center; justify-content: center; .v-icon { color: $bio-tenue !important; } }
+	.bio-proc-punto button.borrar .v-icon { color: $bio-peligro !important; }
+	.bio-proc-relleno { display: grid; grid-template-columns: 22px minmax(0, 1fr) auto; align-items: center; gap: 6px; height: 38px; background: transparent; text-align: left; font-size: 14px; }
+	.bio-proc-ayuda { font-size: 12px; line-height: 1.4; }
+	.bio-proc-lienzo { display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 12px; color: $bio-tenue; }
+	.bio-proc-lienzo canvas { border-radius: 8px; border: 1px solid #3A444D; background: #14171A; cursor: crosshair; display: block; }
+	.bio-proc-acciones { display: flex; flex-direction: column; gap: 8px; }
+	.bio-proc-acciones button { height: 44px; border-radius: 12px; background: $bio-sup !important; font-size: 14px; font-weight: 500; display: flex; align-items: center; justify-content: center; gap: 6px; .v-icon { color: inherit !important; } &.peligro { background: $bio-peligro-bg !important; color: $bio-peligro !important; } }
+
+	.bio-proc-valores { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+	.bio-proc-valores button {
+		background: $bio-sup !important; border-radius: 16px; padding: 14px 16px; text-align: left;
+		display: flex; flex-direction: column; gap: 2px; min-width: 0;
+		.ic { width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 14px; }
+		.ic.verde { background: $bio-acento-bg; .v-icon { color: $bio-acento !important; } }
+		.ic.azul { background: #1C2F3A; .v-icon { color: #6CB8E6 !important; } }
+		.ic.lila { background: #2B2540; .v-icon { color: #B49CF2 !important; } }
+		> span:not(.ic) { font-size: 13px; color: $bio-tenue; }
+		strong { font-size: 28px; font-weight: 500; white-space: nowrap; small { font-size: 15px; color: $bio-tenue; } }
+		&:active { background: $bio-sup2 !important; }
+	}
+	.bio-proc-nota { margin: 0; font-size: 13px; }
+
+	.interruptor {
+		width: 52px; height: 30px; border-radius: 15px; background: #3A444D !important; position: relative; flex: none; padding: 0;
+		i { position: absolute; top: 4px; left: 4px; width: 22px; height: 22px; border-radius: 50%; background: #9AA5AF; transition: left .15s; }
+		&.on { background: $bio-acento !important; i { left: 26px; background: $bio-rail; } }
+	}
+	span.interruptor { display: inline-block; }
+	.bio-proc-contador { display: flex; align-items: center; gap: 8px; }
+	.bio-proc-contador button { width: 40px; height: 40px; border-radius: 10px; background: $bio-sup2 !important; font-size: 20px; }
+	.bio-proc-contador button.valor { width: auto; min-width: 80px; background: transparent !important; font-size: 13px; color: $bio-tenue; strong { font-size: 20px; color: $bio-texto; margin-right: 4px; } }
+}
+.tema-bio.bio-escritorio .bio-proc-cuerpo { width: 100%; max-width: 1100px; margin: 0 auto; }
