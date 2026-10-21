@@ -63,6 +63,11 @@
 				<emd-panel v-on:close-dialog="closeDialog"></emd-panel>
 			</v-col>
 		</v-dialog>
+		<v-dialog v-model="DialogCalibration" fullscreen hide-overlay>
+			<v-col cols="12" align="center" class="ma-0 pa-0">
+				<calibration-panel v-on:close-dialog="DialogCalibration = false"></calibration-panel>
+			</v-col>
+		</v-dialog>
 		<v-dialog v-model="DialogTmp" fullscreen hide-overlay>
 			<v-col cols="12" align="center" class="ma-0 pa-0">
 				<temp-panel v-on:close-dialog="closeDialog"></temp-panel>
@@ -103,15 +108,7 @@
 			<!-- Pestaña Trabajo -->
 			<div v-show="bioPestana === 'trabajo'" class="bio-job-cuerpo">
 				<section class="bio-job-vista">
-					<div class="bio-job-vista-tabs bio-segmentos" role="tablist">
-						<button type="button" role="tab" class="bio-seg" :class="{ activo: bioVista === 'webcam' }" @click="bioVista = 'webcam'">Webcam</button>
-						<button type="button" role="tab" class="bio-seg" :class="{ activo: bioVista === 'capas' }" @click="bioVista = 'capas'">{{ $t('domotek.jobs.layers') }}</button>
-					</div>
-					<template v-if="bioVista === 'webcam'">
-						<webcam-panel v-if="bioWebcam" class="bio-job-webcam"></webcam-panel>
-						<v-icon v-else size="56" color="#3A444D">mdi-camera-outline</v-icon>
-					</template>
-					<div v-else class="bio-job-capas"><layer-chart></layer-chart></div>
+					<bio-vista-trabajo :modos="bioEscritorio ? ['webcam', 'capas', 'figura'] : ['figura']"></bio-vista-trabajo>
 					<div class="bio-job-chips">
 						<span v-for="p in bioProcesosActivos" :key="p.id" class="bio-chip-proc" :style="{ color: p.color }">{{ p.texto }}</span>
 					</div>
@@ -354,6 +351,7 @@ import { registerRoute } from '..'
 import { mapState, mapGetters, mapActions } from 'vuex'
 import { isPrinting, isPaused } from '../../store/machine/modelEnums.js'
 import { extractFileName } from '../../utils/path.js'
+import { esEscritorio } from '../../utils/modoPantalla.js'
 export default {
 	install() {
 		// Register a route via Job -> Status
@@ -379,7 +377,7 @@ export default {
 			DialogTmp: false,
 			DialogEMD: false,
 			bioPestana: 'trabajo', // domotek
-			bioVista: 'webcam'
+			DialogCalibration: false
 		}
 	},
 
@@ -393,6 +391,7 @@ export default {
 		...mapGetters('machine/model', ['global', 'jobProgress']),
 		...mapState('machine/model', { job: state => state.job, bioStatus: state => state.state.status, bioGpOut: state => state.state.gpOut }),
 		temaBio() { return this.$store.state.settings.temaBio; }, // domotek
+		bioEscritorio() { return esEscritorio(); },
 		bioImprimiendo() { return isPrinting(this.bioStatus); },
 		bioPausado() { return isPaused(this.bioStatus); },
 		bioEstadoTexto() {
@@ -533,6 +532,18 @@ export default {
 			//this.$router.push(ruta)
 			this.$router.push({path: ruta, params: { pruebaparam: 'ricardo' }})
 		},
+		bioAbrirDesdeRuta() { // domotek: el menú de escritorio abre procesos con ?abrir=ES|UV|EMD|CL|CAL o ?pestana=procesos
+			const q = this.$route.query || {};
+			if (q.pestana === 'procesos' || q.pestana === 'trabajo') { this.bioPestana = q.pestana; }
+			const abrir = q.abrir;
+			if (!abrir) { return; }
+			if (abrir === 'ES') { this.MuestraES(); }
+			else if (abrir === 'UV') { this.MuestraUV(); }
+			else if (abrir === 'EMD') { this.MuestraEMD(); }
+			else if (abrir === 'CL') { this.DialogClean = true; }
+			else if (abrir === 'CAL') { this.DialogCalibration = true; }
+			this.$router.replace({ path: this.$route.path, query: {} }).catch(() => {});
+		},
 		closeDialog(){
 			console.log('Close Dialog UV - ES - CL - TMP - EMD');
 			this.DialogUltraviolet = false;
@@ -562,6 +573,11 @@ export default {
 	}, 
 	mounted() {
 		this.$vuetify.goTo(0);
+		this.bioAbrirDesdeRuta(); // domotek
+	},
+	activated() { this.bioAbrirDesdeRuta(); }, // domotek
+	watch: {
+		'$route.query'() { this.bioAbrirDesdeRuta(); } // domotek
 	}
 }
 </script>

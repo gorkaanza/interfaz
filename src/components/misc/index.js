@@ -20,6 +20,7 @@ import IconTurnRightRight from './IconTurnRR.vue'
 import IconTurnValue from './IconTurnValue.vue'
 import BioMacroEditor from './BioMacroEditor.vue'
 import BioEscritorioPanel from './BioEscritorioPanel.vue'
+import BioVistaTrabajo from './BioVistaTrabajo.vue'
 
 Vue.component('directory-breadcrumbs', DirectoryBreadcrumbs)
 Vue.component('job-progress', JobProgress)
@@ -30,6 +31,7 @@ Vue.component('slider', Slider)
 Vue.component('status-label', StatusLabel)
 Vue.component('bio-macro-editor', BioMacroEditor)
 Vue.component('bio-escritorio-panel', BioEscritorioPanel)
+Vue.component('bio-vista-trabajo', BioVistaTrabajo)
 Vue.component('thumbnail-img', ThumbnailImg)
 Vue.component('icon-base',IconBase)
 Vue.component('icon-izquierda',IconIzquierda)

@@ -466,23 +466,46 @@ $bio-ambar:      #F5B52E;
 }
 
 // ---------------------------------------------------------------------------
-// Modo escritorio: más compacto y sin estirar las pantallas táctiles
+// Modo escritorio (según la maqueta Escritorio_Panel)
 // ---------------------------------------------------------------------------
 .tema-bio.bio-escritorio {
-	.bio-nav .v-navigation-drawer__content { padding: 14px 10px; }
-	.bio-nav-logo { font-size: 19px; padding: 0 10px 8px; }
-	.bio-nav-grupo { padding: 12px 10px 4px; font-size: 10.5px; }
-	.bio-nav-item { height: 32px; font-size: 13px; gap: 9px; }
-	.bio-topbar .v-toolbar__content { padding: 0 20px; }
-	.bio-topbar .bio-maquina { font-size: 15px; }
-	.bio-topbar .bio-estado { font-size: 12px; padding: 4px 10px; }
-	.bio-topbar .clsvbtn2 { height: 34px !important; font-size: 13px; }
+	.bio-nav .v-navigation-drawer__content { padding: 20px 14px; gap: 4px; }
+	.bio-nav-logo { font-size: 22px; padding: 0 10px 18px; }
+	.bio-nav-grupo { font-size: 11px; color: $bio-tenue; letter-spacing: .06em; padding: 14px 10px 4px; }
+	.bio-nav-grupo:first-of-type { padding-top: 8px; }
+	.bio-nav-item { height: 40px; font-size: 14px; gap: 10px; color: $bio-texto; flex: none; }
+	.bio-nav-item.activo { color: $bio-acento; }
+	.bio-nav-item.tenue { color: $bio-tenue; font-size: 13px; height: 34px; }
+	.bio-nav-punto { width: 8px; height: 8px; border-radius: 50%; flex: none; }
 
-	// Las pantallas táctiles se muestran a su tamaño, centradas, en vez de ocupar todo el monitor
+	.bio-topbar.v-app-bar.v-toolbar.v-sheet { border-bottom: 1px solid #23292F !important; }
+	.bio-topbar .v-toolbar__content { padding: 0 24px; gap: 16px; }
+	.bio-topbar .bio-maquina { font-size: 16px; font-weight: 600; }
+	.bio-topbar .bio-estado { font-size: 13px; font-weight: 600; padding: 4px 12px; background: $bio-acento-bg; color: $bio-acento; }
+	.bio-codigo { flex: 1; max-width: 560px; margin-left: 24px; display: flex; gap: 8px; }
+	.bio-codigo input {
+		flex: 1; min-width: 0; height: 40px; border-radius: 10px; border: 1px solid #2A3138; background: $bio-sup; color: $bio-texto;
+		padding: 0 14px; font-size: 14px; font-family: 'IBM Plex Mono', ui-monospace, monospace; outline: none;
+		&:focus { border-color: $bio-acento; }
+		&::placeholder { color: #5A6670; }
+	}
+	.bio-codigo button { height: 40px; padding: 0 16px; border-radius: 10px; border: none; background: $bio-sup2; color: $bio-texto; font: inherit; font-size: 14px; cursor: pointer; &:disabled { opacity: .5; cursor: default; } }
+	.bio-parada.v-btn, .bio-parada .v-btn, .bio-topbar .clsvbtn2 {
+		width: auto !important; height: 42px !important; padding: 0 18px !important; border-radius: 10px !important;
+		background: #C93C35 !important; color: #fff !important; font-size: 14px; font-weight: 600;
+		.v-icon { color: #fff !important; }
+	}
+	.bio-topbar .v-btn--block { display: inline-flex; flex: none; min-width: 0 !important; }
+
+	// Las pantallas táctiles se ven a su tamaño y centradas, sin estirarse por el monitor
 	.bio-inicio, .bio-tools, .bio-mov, .bio-job {
-		height: min(calc(100vh - 48px - 40px), 600px); min-height: 0;
+		height: min(calc(100vh - 64px - 40px), 600px); min-height: 0;
 		width: 100%; max-width: 1040px; margin: 8px auto 0;
 	}
-	.bio-elegir { left: 232px; top: 48px; }
+	.bio-elegir { left: 240px; top: 64px; }
 	.bio-elegir .bio-elegir-grid { max-width: 1040px; }
+	.bio-editor { height: calc(100vh - 64px - 40px); }
 }
+
+// vista de la figura dentro de Trabajos
+.tema-bio .bio-job-vista > .bio-vista { width: 100%; height: 100%; background: transparent; border-radius: 0; }

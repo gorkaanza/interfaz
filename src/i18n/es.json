@@ -1172,6 +1172,16 @@
   },
   "domotek": {
     "desktop": {
+      "chartLast10": "Temperaturas · últimos 10 min",
+      "processes": "Procesos de este trabajo",
+      "noProcesses": "Ningún proceso programado",
+      "openProcesses": "Abrir procesos",
+      "requestedSpeed": "Velocidad pedida",
+      "topSpeed": "Máx.",
+      "nextLayer": "próxima: capa {0}",
+      "sendCode": "Enviar código",
+      "sendCodePlaceholder": "Enviar código… (G28, M98 P\"macro.g\")",
+      "send": "Enviar",
       "job": "Trabajo",
       "jobRunning": "Trabajo en curso",
       "noWebcam": "Webcam sin configurar",
@@ -1186,13 +1196,19 @@
       "modeAuto": "Automática (según el ancho)",
       "desktopMode": "Modo escritorio",
       "nav": {
+        "uv": "Ultravioleta",
+        "es": "Electrospinning",
+        "emd": "Solenoide",
+        "clean": "Limpieza",
+        "calibration": "Calibración",
+        "processes": "Procesos",
         "control": "Control",
         "dashboard": "Panel de control",
         "tools": "Herramientas",
         "move": "Movimiento",
         "console": "Consola",
         "work": "Trabajo",
-        "status": "Trabajo y procesos",
+        "status": "Trabajo",
         "files": "Archivos",
         "jobs": "Trabajos",
         "macros": "Macros",
@@ -1301,6 +1317,13 @@
       "extrude": "EXTRUIR"
     },
     "jobs": {
+      "view": {
+        "webcam": "Webcam",
+        "capas": "Capas",
+        "figura": "Figura",
+        "noThumbnail": "Este archivo no tiene imagen de vista previa",
+        "noJob": "No hay ningún trabajo en curso"
+      },
       "tabJob": "Trabajo",
       "tabProcesses": "Procesos",
       "layers": "Capas",

@@ -88,18 +88,19 @@ textarea {
 		<!-- domotek: un único menú lateral para el tema oscuro (táctil: 80 px, escritorio: 232 px).
 		     Se usa un solo componente porque al cambiar entre dos v-navigation-drawer Vuetify
 		     podía quedarse con el ancho del anterior y dejar un hueco a la izquierda. -->
-		<v-navigation-drawer v-if="temaBio" app permanent :width="escritorio ? 232 : 80" :class="escritorio ? 'bio-nav' : 'bio-rail'">
+		<v-navigation-drawer v-if="temaBio" app permanent :width="escritorio ? 240 : 80" :class="escritorio ? 'bio-nav' : 'bio-rail'">
 			<template v-if="escritorio">
 			<div class="bio-nav-logo"><span>domo</span><span class="bio-marca-bio">{{ modeloMaquina == 'HK' ? 'MAT' : 'BIO' }}</span></div>
 			<template v-for="grupo in navEscritorio">
 				<span :key="'g-' + grupo.id" class="bio-nav-grupo">{{ grupo.titulo }}</span>
 				<button v-for="item in grupo.items" :key="item.id" type="button" class="bio-nav-item" :class="{ activo: railActivo === item.id }" @click="railClick(item)">
-					<v-icon small>{{ item.icon }}</v-icon><span>{{ item.label }}</span>
+					<span v-if="item.punto" class="bio-nav-punto" :style="{ background: item.punto }"></span><span>{{ item.label }}</span>
 					<span v-if="item.id === 'job' && isPrinting" class="bio-nav-pct">{{ Math.round((jobProgress || 0) * 100) }} %</span>
 				</button>
 			</template>
 			<div class="bio-rail-hueco"></div>
-			<button type="button" class="bio-nav-item" @click="cambiarModo('tactil')"><v-icon small>mdi-tablet</v-icon><span>{{ $t('domotek.desktop.touchMode') }}</span></button>
+			<button v-for="item in navEscritorioAbajo" :key="item.id" type="button" class="bio-nav-item" :class="{ activo: railActivo === item.id }" @click="railClick(item)"><span>{{ item.label }}</span></button>
+			<button type="button" class="bio-nav-item tenue" @click="cambiarModo('tactil')"><v-icon small>mdi-tablet</v-icon><span>{{ $t('domotek.desktop.touchMode') }}</span></button>
 			</template>
 			<template v-else>
 			<button v-for="item in railItems" :key="item.id" type="button" class="bio-rail-btn" :class="{ activo: railActivo === item.id }" :aria-label="item.label" @click="railClick(item)">
@@ -115,11 +116,16 @@ textarea {
 			</button>
 			</template>
 		</v-navigation-drawer>
-		<v-app-bar v-if="temaBio && escritorio" app flat height="48" class="bio-topbar">
+		<v-app-bar v-if="temaBio && escritorio" app flat height="64" class="bio-topbar">
 			<span class="bio-maquina"><span>{{ bioNombre.domo }}</span><span class="bio-marca-bio">{{ bioNombre.marca }}</span><span class="bio-tenue" style="font-weight: 500">{{ bioNombre.resto }}</span></span>
-			<status-label v-if="status" class="ml-3"></status-label>
+			<status-label v-if="status" class="ml-4"></status-label>
+			<form class="bio-codigo" @submit.prevent="enviarCodigo">
+				<label for="bio-codigo" class="d-sr-only">{{ $t('domotek.desktop.sendCode') }}</label>
+				<input id="bio-codigo" v-model="codigoEscritorio" type="text" autocomplete="off" spellcheck="false" :placeholder="$t('domotek.desktop.sendCodePlaceholder')">
+				<button type="submit" :disabled="!codigoEscritorio.trim()">{{ $t('domotek.desktop.send') }}</button>
+			</form>
 			<v-spacer></v-spacer>
-			<div style="width: 240px"><emergency-btn></emergency-btn></div>
+			<emergency-btn class="bio-parada"></emergency-btn>
 		</v-app-bar>
 		<v-navigation-drawer v-if="!temaBio" app permanent width="100px" class="blue lighten-4">
 			<v-bottom-navigation color="teal" height="0" v-model="numMenuSelect">
@@ -335,6 +341,7 @@ import PositionPanel from './components/panels/PositionPanel.vue'
 import { MachineMode } from './store/machine/modelEnums.js';
 import { DashboardMode } from './store/settings.js'
 import { esEscritorio, forzarModo } from './utils/modoPantalla.js'
+import { iniciarHistorial } from './utils/historialTemp.js'
 
 
 export default {
@@ -429,32 +436,41 @@ export default {
 		escritorio() { return esEscritorio(); }, // domotek
 		navEscritorio() { // domotek: menú del modo escritorio
 			const nivel = this.$store.state.nivelUsuario || 0;
+			const g = (this.$store.state.machine.model.global) || {};
 			const t = k => this.$t('domotek.desktop.nav.' + k);
-			const archivos = [{ id: 'files-jobs', icon: 'mdi-file-document-outline', label: t('jobs'), ruta: '/Files/Jobs' }];
+			const procesos = [];
+			if (g.UV_Capable) { procesos.push({ id: 'p-UV', label: t('uv'), punto: '#B49CF2', ruta: '/Job/Status', query: { abrir: 'UV' } }); }
+			if (g.ES_Capable) { procesos.push({ id: 'p-ES', label: t('es'), punto: '#F2D35A', ruta: '/Job/Status', query: { abrir: 'ES' } }); }
+			if (g.EMD_Capable) { procesos.push({ id: 'p-EMD', label: t('emd'), punto: '#3CC9B0', ruta: '/Job/Status', query: { abrir: 'EMD' } }); }
+			if (g.CL_Capable) { procesos.push({ id: 'p-CL', label: t('clean'), punto: '#6CB8E6', ruta: '/Job/Status', query: { abrir: 'CL' } }); }
+			procesos.push({ id: 'p-CAL', label: t('calibration'), punto: '#9AA5AF', ruta: '/Job/Status', query: { abrir: 'CAL' } });
+			const archivos = [{ id: 'files-jobs', label: t('jobs'), ruta: '/Files/Jobs' }];
 			if (nivel >= 2) {
-				archivos.push({ id: 'files-macros', icon: 'mdi-code-braces', label: t('macros'), ruta: '/Files/Macros' });
-				archivos.push({ id: 'files-system', icon: 'mdi-cog-box', label: t('system'), ruta: '/Files/System' });
+				archivos.push({ id: 'files-macros', label: t('macros'), ruta: '/Files/Macros' });
+				archivos.push({ id: 'files-system', label: t('system'), ruta: '/Files/System' });
 			}
-			const ajustes = [{ id: 'settings', icon: 'mdi-cog-outline', label: t('settings'), ruta: '/Settings/General' }];
-			if (nivel >= 3) { ajustes.push({ id: 'machine', icon: 'mdi-cogs', label: t('machine'), ruta: '/Settings/Machine' }); }
 			return [
 				{ id: 'control', titulo: t('control'), items: [
-					{ id: 'home', icon: 'mdi-view-dashboard-outline', label: t('dashboard') },
-					{ id: 'tools', icon: 'mdi-tools', label: t('tools'), ruta: '/Files/tools' },
-					{ id: 'move', icon: 'mdi-arrow-all', label: t('move'), ruta: '/' },
-					{ id: 'console', icon: 'mdi-console', label: t('console'), ruta: '/Console' }
+					{ id: 'home', label: t('dashboard') },
+					{ id: 'job', label: t('status'), ruta: '/Job/Status' },
+					{ id: 'tools', label: t('tools'), ruta: '/Files/tools' },
+					{ id: 'move', label: t('move'), ruta: '/' },
+					{ id: 'console', label: t('console'), ruta: '/Console' }
 				] },
-				{ id: 'trabajo', titulo: t('work'), items: [
-					{ id: 'job', icon: 'mdi-play-circle-outline', label: t('status'), ruta: '/Job/Status' }
-				] },
-				{ id: 'archivos', titulo: t('files'), items: archivos },
-				{ id: 'ajustes', titulo: t('settingsGroup'), items: ajustes }
+				{ id: 'procesos', titulo: t('processes'), items: procesos },
+				{ id: 'archivos', titulo: t('files'), items: archivos }
 			];
+		},
+		navEscritorioAbajo() {
+			const t = k => this.$t('domotek.desktop.nav.' + k);
+			const items = [{ id: 'settings', label: t('settings'), ruta: '/Settings/General' }];
+			if ((this.$store.state.nivelUsuario || 0) >= 3) { items.push({ id: 'machine', label: t('machine'), ruta: '/Settings/Machine' }); }
+			return items;
 		},
 		railActivo() {
 			if (this.mostrarHome) { return 'home'; }
 			const path = (this.$route.path || '').toLowerCase();
-			const todos = this.railItems.concat(this.railItemsAbajo).concat(...this.navEscritorio.map(g => g.items));
+			const todos = this.railItems.concat(this.railItemsAbajo).concat(this.navEscritorioAbajo).concat(...this.navEscritorio.map(g => g.items)).filter(i => !i.query);
 			const item = todos.find(i => i.ruta && i.ruta.toLowerCase() === path);
 			return item ? item.id : null;
 		},
@@ -490,6 +506,7 @@ export default {
 			MenuTools: false, //domotek
 			numMenuSelect: 0, //domotek
 			snackbarES:false,
+			codigoEscritorio: '', // domotek
 			snackbarValorES:"HV WARNING",
 		}
 	},
@@ -546,7 +563,18 @@ export default {
 		cambiarModo(modo) { // domotek
 			forzarModo(modo);
 		},
+		enviarCodigo() { // domotek: barra superior del modo escritorio
+			const codigo = this.codigoEscritorio.trim();
+			if (!codigo) { return; }
+			this.$store.dispatch('machine/sendCode', { code: codigo, fromInput: true });
+			this.codigoEscritorio = '';
+		},
 		railClick(item) { // domotek: barra lateral del tema oscuro
+			if (item.query) {
+				this.mostrarHome = false;
+				this.$router.push({ path: item.ruta, query: item.query }).catch(() => {});
+				return;
+			}
 			if (item.id === 'home') {
 				this.mostrarHome = true;
 			} else {
@@ -591,6 +619,7 @@ export default {
 		// Attempt to load the settings
 		this.load();
 		this.$vuetify.theme.dark = this.temaBio || this.darkTheme; // domotek
+		iniciarHistorial(this.$store); // domotek: datos para la gráfica de temperaturas
 
 		// Validate navigation
 		Vue.prototype.$vuetify = this.$vuetify;

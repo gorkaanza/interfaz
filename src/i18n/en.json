@@ -1177,6 +1177,16 @@
   },
   "domotek": {
     "desktop": {
+      "chartLast10": "Temperatures · last 10 min",
+      "processes": "Processes in this job",
+      "noProcesses": "No processes scheduled",
+      "openProcesses": "Open processes",
+      "requestedSpeed": "Requested speed",
+      "topSpeed": "Max.",
+      "nextLayer": "next: layer {0}",
+      "sendCode": "Send code",
+      "sendCodePlaceholder": "Send code… (G28, M98 P\"macro.g\")",
+      "send": "Send",
       "job": "Job",
       "jobRunning": "Job in progress",
       "noWebcam": "Webcam not configured",
@@ -1191,13 +1201,19 @@
       "modeAuto": "Automatic (by window width)",
       "desktopMode": "Desktop mode",
       "nav": {
+        "uv": "Ultraviolet",
+        "es": "Electrospinning",
+        "emd": "Solenoid",
+        "clean": "Cleaning",
+        "calibration": "Calibration",
+        "processes": "Processes",
         "control": "Control",
         "dashboard": "Dashboard",
         "tools": "Tools",
         "move": "Movement",
         "console": "Console",
         "work": "Work",
-        "status": "Job and processes",
+        "status": "Job",
         "files": "Files",
         "jobs": "Jobs",
         "macros": "Macros",
@@ -1307,6 +1323,13 @@
       "extrude": "EXTRUDE"
     },
     "jobs": {
+      "view": {
+        "webcam": "Webcam",
+        "capas": "Layers",
+        "figura": "Part",
+        "noThumbnail": "This file has no preview image",
+        "noJob": "No job in progress"
+      },
       "tabJob": "Job",
       "tabProcesses": "Processes",
       "layers": "Layers",
