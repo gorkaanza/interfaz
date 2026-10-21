@@ -9,7 +9,153 @@
 	.FrenteDchaRotIzda {fill-rule:evenodd;clip-rule:evenodd;fill:#0a21ad; }	
 </style> -->
 <template>
-	<v-row class="mb-0 pb-0"  style="background-color: #e3f2fd ;">
+	<!-- domotek: calibración con el tema oscuro (3 pasos a pantalla completa) -->
+	<div v-if="temaBio" class="bio-cal">
+		<header class="bio-cal-cab">
+			<button type="button" class="bio-volver" :aria-label="$t('domotek.tools.back')" @click="closeDialog"><v-icon>mdi-chevron-left</v-icon></button>
+			<v-icon color="#3CC9B0">mdi-axis-arrow</v-icon>
+			<span class="bio-cal-titulo">{{ $t('domotek.calibracion.calibrate_button') }}</span>
+			<div style="flex: 1"></div>
+			<ol class="bio-cal-pasos" :aria-label="$t('domotek.calibracion.steps')">
+				<li v-for="p in pasosBio" :key="p.n">
+					<button type="button" :class="{ activo: pasos == p.n, hecho: hechos[p.n] && pasos != p.n }" :aria-current="pasos == p.n ? 'step' : null" @click="pasos = p.n">
+						<v-icon v-if="hechos[p.n] && pasos != p.n" small>mdi-check</v-icon>{{ p.i }} · {{ p.titulo }}
+					</button>
+				</li>
+			</ol>
+		</header>
+
+		<!-- Paso 1: AUTO-CAL Z -->
+		<main v-if="pasos == 1" class="bio-cal-cuerpo">
+			<section class="bio-cal-tarjeta bio-cal-paso1">
+				<svg class="bio-cal-dibujo" viewBox="0 0 220 200" aria-hidden="true">
+					<rect x="10" y="168" width="200" height="12" rx="6" fill="#262C33"></rect>
+					<rect x="88" y="140" width="40" height="28" rx="6" fill="#2F363E"></rect>
+					<rect x="84" y="18" width="48" height="70" rx="8" fill="#2F363E"></rect>
+					<path d="M94 88h28l-8 24h-12z" fill="#3A444D"></path>
+					<path d="M108 116v20M100 128l8 8 8-8" stroke="#3CC9B0" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></path>
+					<circle cx="108" cy="140" r="5" fill="#3CC9B0"></circle>
+					<path d="M150 36h28M150 36v130M150 166h12" stroke="#5A6670" stroke-width="2" stroke-dasharray="5 5" fill="none"></path>
+					<text x="162" y="106" fill="#9AA5AF" font-size="14" font-family="IBM Plex Sans, sans-serif">Z</text>
+				</svg>
+				<div class="bio-cal-texto">
+					<h2>{{ $t('domotek.calibracion.autoCal') }}</h2>
+					<p>{{ $t('domotek.calibracion.autoCalHelp') }}</p>
+					<ul class="bio-cal-check">
+						<li :class="{ ok: sondaMontada }"><v-icon small>{{ sondaMontada ? 'mdi-check' : 'mdi-alert-outline' }}</v-icon>{{ sondaMontada ? $t('domotek.calibracion.probeOk') : $t('domotek.calibracion.probeMissing') }}</li>
+						<li :class="{ ok: plataformaLibre }"><button type="button" class="bio-cal-marcar" @click="plataformaLibre = !plataformaLibre"><v-icon small>{{ plataformaLibre ? 'mdi-check' : 'mdi-circle-outline' }}</v-icon>{{ $t('domotek.calibracion.platformClear') }}</button></li>
+					</ul>
+					<button v-if="!(calibrando && numeroActual === 0)" type="button" class="bio-cal-principal" :disabled="calibrando" @click="SelectCalibration(0)">{{ $t('domotek.calibracion.startCal') }}</button>
+					<div v-else class="bio-cal-progreso"><v-progress-linear indeterminate rounded height="6" color="#3CC9B0"></v-progress-linear><span>{{ $t('domotek.calibracion.running') }}</span></div>
+				</div>
+			</section>
+			<footer class="bio-cal-pie">
+				<button type="button" class="bio-cal-sec" :disabled="calibrando" @click="siguientePaso">{{ $t('domotek.calibracion.skip') }}</button>
+				<button type="button" class="bio-cal-sec" :class="{ listo: hechos[1] }" :disabled="!hechos[1] || calibrando" @click="siguientePaso">{{ $t('domotek.calibracion.continue') }}</button>
+			</footer>
+		</main>
+
+		<!-- Paso 2: Nivelado -->
+		<main v-else-if="pasos == 2" class="bio-cal-cuerpo bio-cal-dos">
+			<section class="bio-cal-tarjeta bio-cal-cama" :aria-label="$t('domotek.calibracion.platformLeveling')">
+				<div class="bio-cal-cama-placa">
+					<span class="bio-cal-lado arriba">{{ $t('domotek.calibracion.back') }}</span>
+					<div v-for="e in esquinas" :key="e.id" class="bio-cal-esquina" :class="e.estado" :aria-label="e.descripcion">
+						<v-icon>{{ e.icono }}</v-icon>
+						<strong>{{ e.texto }}</strong>
+						<span>{{ e.unidad }}</span>
+					</div>
+					<span class="bio-cal-lado abajo">{{ $t('domotek.calibracion.front') }}</span>
+				</div>
+			</section>
+			<section class="bio-cal-texto">
+				<h2>{{ $t('domotek.calibracion.platformLeveling') }}</h2>
+				<p>{{ $t('domotek.calibracion.levelingHelp') }}</p>
+				<div class="bio-cal-leyenda">
+					<span><i class="verde"></i>{{ $t('domotek.calibracion.greenLegend') }}</span>
+					<span><i class="rojo"></i>{{ $t('domotek.calibracion.redLegend') }}</span>
+				</div>
+				<div v-if="hayMedida" class="bio-cal-resumen" :class="{ ok: !porAjustar.length }">
+					{{ porAjustar.length ? $tc('domotek.calibracion.cornersToAdjust', porAjustar.length, [porAjustar.length, porAjustar.join(', ')]) : $t('domotek.calibracion.allLevel') }}
+				</div>
+				<div style="flex: 1"></div>
+				<button v-if="!calibrandoPaso2" type="button" class="bio-cal-principal" :disabled="calibrando" @click="SelectCalibration(1)">{{ hayMedida ? $t('domotek.calibracion.measureAgain') : $t('domotek.calibracion.measure') }}</button>
+				<div v-else class="bio-cal-progreso"><v-progress-linear indeterminate rounded height="6" color="#3CC9B0"></v-progress-linear><span>{{ $t('domotek.calibracion.leveling') }}</span></div>
+				<div class="bio-cal-pie dentro">
+					<button type="button" class="bio-cal-sec" :disabled="calibrando" @click="pasos = 1">{{ $t('domotek.tools.back') }}</button>
+					<button type="button" class="bio-cal-sec listo" :disabled="calibrando" @click="siguientePaso">{{ $t('domotek.calibracion.continue') }}</button>
+				</div>
+			</section>
+		</main>
+
+		<!-- Paso 3: Ajuste manual -->
+		<main v-else class="bio-cal-cuerpo">
+			<section class="bio-cal-mandos">
+				<div class="bio-cruz">
+					<div></div>
+					<code-btn class="bio-flecha" :disabled="bloqueadoAjuste" :code="modeloMaquina != '2A' ? `M120\nG91\nG1 Y${pasoAjuste} F600\nG90\nM121` : `M120\nG91\nG1 Y-${pasoAjuste} F600\nG90\nM121`" no-wait><v-icon>mdi-arrow-up</v-icon>Y</code-btn>
+					<div></div>
+					<code-btn class="bio-flecha col" :disabled="bloqueadoAjuste" :code="modeloMaquina != '2A' ? `M120\nG91\nG1 X${pasoAjuste} F600\nG90\nM121` : `M120\nG91\nG1 X-${pasoAjuste} F600\nG90\nM121`" no-wait><v-icon>mdi-arrow-left</v-icon>X</code-btn>
+					<div class="bio-cruz-centro">
+						<div class="bio-segmentos" role="group" :aria-label="$t('domotek.movePanel.toolToMove')">
+							<code-btn v-for="i in (modeloMaquina != '2A' ? [0, 1, 2, 3] : [0, 1])" :key="i" class="bio-seg" :class="{ activo: toolActiva === i }" :code="toolActiva === i ? 't-1' : `t${i}`" no-wait>{{ $t('domotek.tools.T' + i + 'Mini') }}</code-btn>
+						</div>
+					</div>
+					<code-btn class="bio-flecha col" :disabled="bloqueadoAjuste" :code="boards.length > 2 ? `M120\nG91\nG1 X-${pasoAjuste} F600\nG90\nM121` : `M120\nG91\nG1 X${pasoAjuste} F600\nG90\nM121`" no-wait><v-icon>mdi-arrow-right</v-icon>X</code-btn>
+					<div></div>
+					<code-btn class="bio-flecha" :disabled="bloqueadoAjuste" :code="boards.length > 2 ? `M120\nG91\nG1 Y-${pasoAjuste} F600\nG90\nM121` : `M120\nG91\nG1 Y${pasoAjuste} F600\nG90\nM121`" no-wait><v-icon>mdi-arrow-down</v-icon>Y</code-btn>
+					<div></div>
+				</div>
+				<div class="bio-z">
+					<code-btn class="bio-flecha" :disabled="bloqueadoAjuste" :code="`M120\nG91\nG1 Z${pasoAjuste} F600\nG90\nM121`" no-wait><v-icon>mdi-arrow-up</v-icon></code-btn>
+					<span class="bio-tenue">Z</span>
+					<code-btn class="bio-flecha" :disabled="bloqueadoAjuste" :code="`M120\nG91\nG1 Z-${pasoAjuste} F600\nG90\nM121`" no-wait><v-icon>mdi-arrow-down</v-icon></code-btn>
+				</div>
+				<div class="bio-cal-pos">
+					<span class="bio-tenue">{{ toolActiva >= 0 ? $t('domotek.calibracion.positionOf', [`T${toolActiva + 1}`]) : $t('domotek.desktop.position') }}</span>
+					<span v-for="(eje, i) in ejesVisibles" :key="i">{{ etiquetaEje(i, eje) }} <strong :class="{ 'sin-home': !eje.homed }">{{ eje.letter === 'Z' ? $displayZ(eje.userPosition, false) : $display(eje.userPosition, 1) }}</strong></span>
+					<div style="flex: 1"></div>
+					<template v-if="offsetZ !== null">
+						<span class="bio-tenue">{{ $t('domotek.calibracion.savedOffset') }}</span>
+						<span class="bio-cal-offset">{{ offsetZ }} mm</span>
+					</template>
+				</div>
+			</section>
+			<footer class="bio-cal-pie bio-cal-pie3">
+				<div class="bio-segmentos bio-pasos" role="group" :aria-label="$t('domotek.movePanel.stepSize')">
+					<button v-for="d in [0.1, 0.5, 1, 5, 25]" :key="d" type="button" class="bio-seg" :class="{ activo: pasoAjuste === d }" @click="pasoAjuste = d">{{ $display(d, d >= 1 ? 0 : 1) }}</button>
+					<span class="bio-tenue bio-mm">mm</span>
+				</div>
+				<div style="flex: 1"></div>
+				<button type="button" class="bio-cal-home" :class="{ ok: todosHomed }" :disabled="bloqueadoAjuste" @click="ejecutarHome">{{ $t('domotek.calibracion.homeAll') }}</button>
+				<button type="button" class="bio-cal-sec" :disabled="!todosHomed || bloqueadoAjuste" @click="dialogOffset = true">{{ $t('domotek.calibracion.saveOffset') }}</button>
+				<button type="button" class="bio-cal-principal corto" @click="terminar">{{ $t('domotek.calibracion.finish') }}</button>
+			</footer>
+		</main>
+
+		<!-- Confirmaciones -->
+		<v-dialog v-model="dialog" max-width="480">
+			<v-card class="bio-cal-dialogo">
+				<v-card-title>{{ nombreCal ? $t(nombreCal) : '' }}</v-card-title>
+				<v-card-actions>
+					<button type="button" class="bio-cal-sec" @click="dialog = false">{{ $t('generic.cancel') }}</button>
+					<button type="button" class="bio-cal-principal corto" :disabled="calibrando" @click="ConfirmarCalibracion">{{ $t('domotek.varios.yes') }}</button>
+				</v-card-actions>
+			</v-card>
+		</v-dialog>
+		<v-dialog v-model="dialogOffset" max-width="520">
+			<v-card class="bio-cal-dialogo">
+				<v-card-title>{{ $t('domotek.calibracion.calibrate_option') }}</v-card-title>
+				<v-card-actions>
+					<button type="button" class="bio-cal-sec" @click="dialogOffset = false">{{ $t('generic.cancel') }}</button>
+					<button type="button" class="bio-cal-sec listo" :disabled="bloqueadoAjuste" @click="ejecutarOffset('XY')">X-Y</button>
+					<button type="button" class="bio-cal-principal corto" :disabled="bloqueadoAjuste" @click="ejecutarOffset('Z')">Z</button>
+				</v-card-actions>
+			</v-card>
+		</v-dialog>
+	</div>
+
+	<v-row v-else class="mb-0 pb-0"  style="background-color: #e3f2fd ;">
 		<v-col class="ml-2 mt-2">
 			<v-icon>mdi-axis-arrow</v-icon><span class="mt-5 ml-2">{{ $t('domotek.calibracion.calibrate_button') }}</span>
 			<!-- <v-icon>mdi-radiobox-marked</v-icon><span class="mt-5 ml-2">Calibration</span> -->
@@ -229,7 +375,13 @@ export default {
 			nombreCal: null,
 			pasos: 1,
 			calibrando: false,
-			numeroActual: null
+			numeroActual: null,
+			// domotek: tema oscuro
+			hechos: { 1: false, 2: false, 3: false },
+			plataformaLibre: false,
+			pasoAjuste: 1,
+			dialogOffset: false,
+			ajustando: false
 			//nivelFOI: -1,
 			//nivelFOD: 1,
 			//nivelFRI: -1,
@@ -299,6 +451,61 @@ export default {
 						}
 				}
 			},
+			temaBio() { return this.$store.state.settings.temaBio; }, // domotek
+			g() { return this.$store.state.machine.model.global || {}; },
+			pasosBio() {
+				const lista = [{ n: 1, titulo: 'AUTO-CAL Z' }];
+				if (this.modeloMaquina != 'HK') { lista.push({ n: 2, titulo: this.$t('domotek.calibracion.levelingShort') }); }
+				lista.push({ n: 3, titulo: this.$t('domotek.calibracion.manualShort') });
+				return lista.map((p, k) => ({ ...p, i: k + 1 }));
+			},
+			sondaMontada() { // AUTO-CAL es el tipo de tool 15
+				for (let i = 0; i < 4; i++) { if (this.g['T' + i] == 15) { return true; } }
+				return false;
+			},
+			esquinas() {
+				const def = [
+					{ id: 0, nombre: this.$t('domotek.calibracion.backLeft') },
+					{ id: 3, nombre: this.$t('domotek.calibracion.backRight') },
+					{ id: 1, nombre: this.$t('domotek.calibracion.frontLeft') },
+					{ id: 2, nombre: this.$t('domotek.calibracion.frontRight') }
+				];
+				return def.map(e => {
+					const pnt = this.g['calibrPnt' + e.id];
+					const val = this.g['calibrVal' + e.id];
+					const n = parseFloat(pnt);
+					const medido = pnt !== undefined && pnt !== null && pnt !== '' && !isNaN(n);
+					const estado = !medido ? 'sin' : ((val == 0 || Math.abs(n) <= 0.25) ? 'ok' : 'mal');
+					const icono = !medido ? 'mdi-minus' : (val == 0 ? 'mdi-check' : (val < 0 ? 'mdi-rotate-left' : 'mdi-rotate-right'));
+					return {
+						...e, estado, icono,
+						texto: medido ? this.$display(Math.abs(n), 2) : '—',
+						unidad: this.$t('domotek.calibracion.turns'),
+						descripcion: `${e.nombre}: ${medido ? this.$display(Math.abs(n), 2) : '—'} ${this.$t('domotek.calibracion.turns')}`
+					};
+				});
+			},
+			hayMedida() { return this.esquinas.some(e => e.estado !== 'sin'); },
+			porAjustar() { return this.esquinas.filter(e => e.estado === 'mal').map(e => e.nombre); },
+			ejesVisibles() { return (this.$store.state.machine.model.move.axes || []).filter(a => a.visible); },
+			todosHomed() {
+				const a = this.$store.state.machine.model.move.axes || [];
+				const n = (this.modeloMaquina === '2A') ? 4 : 7;
+				for (let i = 0; i < n; i++) { if (!a[i] || !a[i].homed) { return false; } }
+				return true;
+			},
+			toolActiva() {
+				for (let i = 0; i < 4; i++) { if (this.g['T' + i + 'Activo']) { return i; } }
+				return -1;
+			},
+			offsetZ() {
+				const tools = this.$store.state.machine.model.tools || [];
+				const t = tools[this.toolActiva];
+				if (!t || !t.offsets || t.offsets.length < 3) { return null; }
+				const v = t.offsets[2];
+				return (v > 0 ? '+' : '') + this.$display(v, 2);
+			},
+			bloqueadoAjuste() { return this.calibrando || this.ajustando; },
 			calibrandoPaso2() {
 				return this.calibrando && this.numeroActual === 1;
 			}
@@ -350,6 +557,32 @@ export default {
 			// Enviar el comando M98 a la impresora
 			//this.sendGCode('M98 P"0:/macros/Pruebas_AUTO-CAL/Enable-Disable/habilitar.g"');
 		},
+		siguientePaso() { // domotek
+			const orden = this.pasosBio.map(p => p.n);
+			const k = orden.indexOf(Number(this.pasos));
+			if (k >= 0 && k < orden.length - 1) { this.pasos = orden[k + 1]; }
+		},
+		etiquetaEje(index, axis) {
+			const nombres = { '2A': ['X0', 'Y', 'Z', 'X1'], '4A': ['X', 'Y1', 'Z1', 'Y2', 'Y3', 'Y4', 'Z2'], 'HK': ['X1', 'Y1', 'Z', 'X2', 'X3', 'X4', 'Y2'] };
+			const lista = nombres[this.modeloMaquina];
+			return (lista && lista[index]) ? lista[index] : axis.letter;
+		},
+		async ejecutarHome() { // igual que MovementPanelCalibration
+			this.ajustando = true;
+			try { await this.$store.dispatch('machine/sendCode', { code: 'G28' }); } catch (e) { /* notificado */ } finally { this.ajustando = false; }
+		},
+		async ejecutarOffset(tipo) { // igual que MovementPanelCalibration
+			this.dialogOffset = false;
+			const archivo = (tipo === 'XY') ? '/calibration/03_XY_offset.g' : '/calibration/03_Z_offset.g';
+			this.ajustando = true;
+			try {
+				await this.$store.dispatch('machine/sendCode', { code: `M98 P"${archivo}"` });
+				this.hechos = { ...this.hechos, 3: true };
+			} catch (e) { /* notificado */ } finally { this.ajustando = false; }
+		},
+		terminar() {
+			this.closeDialog();
+		},
 		async ConfirmarCalibracion(){
 			this.dialog = false;
 			this.toolClick = false;
@@ -358,6 +591,8 @@ export default {
 			this.calibrando = true;
 			try {
 			await this.$store.dispatch('machine/sendCode', { code: `M98 p${this.codigo}` });
+			if (this.numeroActual === 0) { this.hechos = { ...this.hechos, 1: true }; } // domotek
+			if (this.numeroActual === 1) { this.hechos = { ...this.hechos, 2: true }; }
 			} catch (e) {
 			console.error('Error ejecutando calibración:', e);
 			// opcional: mostrar snackbar/alerta

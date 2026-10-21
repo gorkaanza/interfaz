@@ -509,3 +509,93 @@ $bio-ambar:      #F5B52E;
 
 // vista de la figura dentro de Trabajos
 .tema-bio .bio-job-vista > .bio-vista { width: 100%; height: 100%; background: transparent; border-radius: 0; }
+
+// ---------------------------------------------------------------------------
+// Calibración (CalibrationPanel) · 3 pasos a pantalla completa
+// ---------------------------------------------------------------------------
+.tema-bio {
+	.v-dialog--fullscreen > .col:has(> .bio-cal) { padding: 0 !important; }
+	.bio-cal {
+		position: fixed; inset: 0; z-index: 1; background: $bio-fondo; color: $bio-texto;
+		display: flex; flex-direction: column; text-align: left; font-size: 14px;
+		button { font-family: inherit; color: inherit; border: none; cursor: pointer; }
+		button:disabled { cursor: default; }
+	}
+	.bio-cal-cab { height: 64px; flex: none; display: flex; align-items: center; gap: 12px; padding: 0 16px; background: $bio-rail; box-sizing: border-box; }
+	.bio-cal-titulo { font-size: 17px; font-weight: 600; }
+	.bio-cal-pasos { list-style: none; margin: 0; padding: 0; display: flex; gap: 6px; }
+	.bio-cal-pasos button {
+		height: 34px; padding: 0 12px; border-radius: 999px; background: $bio-sup !important; color: $bio-tenue !important;
+		font-size: 13px; font-weight: 500; display: inline-flex; align-items: center; gap: 4px; white-space: nowrap;
+		.v-icon { color: $bio-acento !important; }
+		&.activo { background: $bio-acento !important; color: $bio-rail !important; }
+		&.hecho { color: $bio-texto !important; }
+	}
+	.bio-cal-cuerpo { flex: 1; min-height: 0; padding: 14px 24px 16px; box-sizing: border-box; display: flex; flex-direction: column; gap: 10px; }
+	.bio-cal-tarjeta { background: $bio-sup; border-radius: 16px; min-height: 0; }
+	.bio-cal-paso1 { flex: 1; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); align-items: center; gap: 24px; padding: 16px 28px; }
+	.bio-cal-dibujo { width: 100%; max-height: 220px; }
+	.bio-cal-texto { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+	.bio-cal-texto h2 { margin: 0; font-size: 22px; font-weight: 600; line-height: 1.2; }
+	.bio-cal-texto p { margin: 0; color: $bio-tenue; font-size: 14px; line-height: 1.45; }
+	.bio-cal-check { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; font-size: 14px; }
+	.bio-cal-check li { display: flex; align-items: center; gap: 8px; color: $bio-texto; .v-icon { color: $bio-calor !important; } }
+	.bio-cal-check li.ok .v-icon { color: $bio-acento !important; }
+	.bio-cal-marcar { display: flex; align-items: center; gap: 8px; background: none; padding: 0; font-size: 14px; min-height: 28px; }
+	.bio-cal-check li .bio-cal-marcar .v-icon { color: $bio-tenue !important; }
+	.bio-cal-check li.ok .bio-cal-marcar .v-icon { color: $bio-acento !important; }
+	.bio-cal-principal {
+		height: 52px; border-radius: 14px; background: $bio-acento !important; color: $bio-rail !important; font-size: 15px; font-weight: 600; padding: 0 20px;
+		&.corto { min-width: 130px; }
+		&:disabled { opacity: .5; }
+	}
+	.bio-cal-sec {
+		height: 52px; min-width: 130px; padding: 0 18px; border-radius: 14px; background: $bio-sup !important; color: $bio-texto !important; font-size: 15px; font-weight: 500;
+		&.listo { background: $bio-sup2 !important; }
+		&:disabled { color: #5A6670 !important; }
+	}
+	.bio-cal-progreso { display: flex; flex-direction: column; gap: 6px; color: $bio-tenue; font-size: 13px; padding: 10px 0; }
+	.bio-cal-pie { display: flex; justify-content: flex-end; gap: 10px; flex: none; }
+	.bio-cal-pie.dentro { margin-top: 4px; .bio-cal-sec { flex: 1; } }
+
+	// paso 2
+	.bio-cal-dos { flex-direction: row; gap: 16px; }
+	.bio-cal-dos > .bio-cal-texto { flex: 1.1; }
+	.bio-cal-cama { flex: 1; padding: 14px; display: flex; }
+	.bio-cal-cama-placa {
+		flex: 1; background: $bio-sup2; border-radius: 12px; padding: 22px 12px; position: relative;
+		display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: repeat(2, minmax(0, 1fr)); gap: 30px 24px;
+	}
+	.bio-cal-lado { position: absolute; left: 0; right: 0; text-align: center; font-size: 11px; color: $bio-tenue; }
+	.bio-cal-lado.arriba { top: 4px; } .bio-cal-lado.abajo { bottom: 4px; }
+	.bio-cal-esquina {
+		border-radius: 12px; background: $bio-sup; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+		.v-icon { font-size: 26px; color: $bio-tenue !important; }
+		strong { font-size: 22px; font-weight: 600; line-height: 1.1; }
+		span { font-size: 12px; color: $bio-tenue; }
+		&.ok { background: #183A30; color: #6EDDA9; .v-icon, span { color: #6EDDA9 !important; } }
+		&.mal { background: #3A1D1C; color: $bio-peligro; .v-icon, span { color: $bio-peligro !important; } }
+	}
+	.bio-cal-leyenda { background: $bio-sup; border-radius: 12px; padding: 10px 14px; display: flex; flex-direction: column; gap: 6px; font-size: 13px; }
+	.bio-cal-leyenda span { display: flex; align-items: center; gap: 10px; }
+	.bio-cal-leyenda i { width: 14px; height: 14px; border-radius: 4px; display: inline-block; }
+	.bio-cal-leyenda i.verde { background: #6EDDA9; } .bio-cal-leyenda i.rojo { background: $bio-peligro; }
+	.bio-cal-resumen { border-radius: 12px; padding: 10px 14px; background: #3A1D1C; color: $bio-peligro; font-size: 13.5px; }
+	.bio-cal-resumen.ok { background: #183A30; color: #6EDDA9; }
+
+	// paso 3
+	.bio-cal-mandos { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) 96px 170px; gap: 10px; }
+	.bio-cal-pos {
+		background: $bio-sup; border-radius: 16px; padding: 12px 14px; display: flex; flex-direction: column; gap: 4px; font-size: 14px; min-height: 0; overflow: hidden;
+		strong { font-weight: 600; } strong.sin-home { color: $bio-calor; }
+		.bio-tenue { font-size: 12px; }
+	}
+	.bio-cal-offset { font-size: 20px; font-weight: 600; color: $bio-acento; }
+	.bio-cal-pie3 { align-items: stretch; .bio-cal-sec, .bio-cal-principal, .bio-cal-home { height: auto; min-height: 52px; } }
+	.bio-cal-home { min-width: 120px; padding: 0 16px; border-radius: 14px; background: $bio-calor !important; color: $bio-rail !important; font-size: 14px; font-weight: 600; &.ok { background: $bio-sup2 !important; color: $bio-texto !important; } &:disabled { opacity: .5; } }
+
+	.bio-cal-dialogo { padding: 8px 8px 12px; }
+	.bio-cal-dialogo .v-card__title { font-size: 16px !important; word-break: normal; }
+	.bio-cal-dialogo .v-card__actions { justify-content: flex-end; gap: 10px; }
+}
+.tema-bio.bio-escritorio .bio-cal-cuerpo { width: 100%; max-width: 1100px; margin: 0 auto; }
