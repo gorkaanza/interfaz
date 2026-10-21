@@ -36,13 +36,88 @@
 		
 		
 		<!-- <v-col cols="12" class="mt-10 mb-2"> -->
-		<v-col cols="12" class="mt-5 ">	
+		<v-col cols="12" :class="temaBio ? 'mt-0 pt-0' : 'mt-5'">	
 			<!-- <v-row v-if="!this.toolClick"> -->
 			<v-row>	
-				<v-col cols="12" class="mt-6">  <!--v-show="$vuetify.breakpoint.mdAndDown"> -->
+				<v-col cols="12" :class="temaBio ? 'mt-0 pt-0' : 'mt-6'">  <!--v-show="$vuetify.breakpoint.mdAndDown"> -->
 					
 					<v-row class="templateSlotButtons">
 						<v-col cols="12">
+				<!-- domotek: Herramientas con el tema oscuro -->
+				<div v-if="temaBio">
+					<div class="bio-tools">
+						<h1 class="bio-h1">{{ $t('domotek.tools.toolsTitle') }}</h1>
+						<section class="bio-tools-grid" :style="{ gridTemplateColumns: `repeat(${bioTools.length}, minmax(0, 1fr))` }">
+							<article v-for="t in bioTools" :key="t.i" class="bio-tool" :class="{ 'bio-tool--sel': ClickToolAnterior === t.i && toolClick }">
+								<div class="bio-tool-cab">
+									<button type="button" class="bio-punto" :class="'bio-punto--' + t.estado" :aria-label="$t('domotek.tools.toggleHeater')" @click="toolHeaterClick(nameTools[t.i], heaterTools[t.i + 1])"></button>
+									<button type="button" class="bio-tool-nombre" @click="ChangeTool(t.i), camaClick = false, $vuetify.goTo(pageHeight)"><span class="bio-cap">{{ $t('domotek.tools.t' + t.i) }}</span></button>
+									<button type="button" class="bio-icono" :class="t.cal ? 'ok' : 'aviso'" :aria-label="t.cal ? $t('panel.tools.calibrado') : $t('panel.tools.noCalibrado')" @click="showToolOffsets(t.i)">
+										<v-icon>mdi-tune-variant</v-icon>
+									</button>
+								</div>
+								<button type="button" class="bio-tool-tipo" :class="{ vacio: t.vacio }" @click="ChangeTool(t.i), camaClick = false, $vuetify.goTo(pageHeight)">{{ t.nombre || '—' }}</button>
+								<button type="button" class="bio-tool-temp" :disabled="!t.editable" @click="bioClickTemp(t)">
+									<template v-if="t.temps.length">
+										<span v-for="(h, k) in t.temps" :key="k" class="bio-temp-fila" :class="{ sec: k > 0 }">
+											<span class="nom">{{ h.nombre }}</span>
+											<span class="val">{{ h.actual }}<small> / {{ h.objetivo }} °C</small></span>
+										</span>
+									</template>
+									<span v-else class="bio-tenue">{{ t.vacio ? $t('domotek.tools.noTool') : $t('domotek.tools.noHeater') }}</span>
+								</button>
+							</article>
+						</section>
+
+						<section class="bio-tools-abajo" :class="{ 'sin-chamber': !bioChamberVisible }">
+							<button type="button" class="bio-calib" @click="DialogCalibration = true">
+								<v-icon size="36">mdi-axis-arrow</v-icon>
+								<span class="bio-cap">{{ $t('domotek.tools.calibrationBtn') }}</span>
+							</button>
+
+							<article class="bio-tool">
+								<div class="bio-tool-cab">
+									<span class="bio-punto" :class="'bio-punto--' + bioEstado(heaterTools[0])"></span>
+									<button type="button" class="bio-tool-nombre" @click="ChangeCama(4), camaClick = true, $vuetify.goTo(pageHeight)"><span class="bio-cap">{{ $t('domotek.tools.platform') }}</span></button>
+									<span class="bio-tenue bio-chip">{{ bioNombreCama }}</span>
+								</div>
+								<div class="bio-fila-valor">
+									<template v-if="bedSelected != 'D'">
+										<span class="bio-grande">{{ bioTemp(heaterTools[0]) }} <small>°C</small></span>
+										<button type="button" class="bio-objetivo" :disabled="bedSelected == 'M'" @click="(bedSelected == 'M') ? nothing(4) : keyboardScreen(4)">
+											{{ $t('domotek.tools.target') }} <strong>{{ heaterTools[0] ? heaterTools[0].active : '--' }} °C</strong>
+										</button>
+									</template>
+									<template v-else>
+										<span class="bio-grande">{{ drumSpeed }} <small>rpm</small></span>
+										<button type="button" class="bio-objetivo" @click="keyboardScreenDrum()">
+											{{ $t('domotek.tools.target') }} <strong>{{ drumSpeedSet }} rpm</strong>
+										</button>
+									</template>
+								</div>
+							</article>
+
+							<article v-if="bioChamberVisible" class="bio-tool">
+								<div class="bio-tool-cab">
+									<span class="bio-punto" :class="'bio-punto--' + bioEstado(heaterTools[20])"></span>
+									<span class="bio-tool-nombre"><span class="bio-cap">{{ $t('domotek.tools.chamber') }}</span></span>
+									<v-icon :color="doorStateOpen ? '#3CC9B0' : '#9AA5AF'">{{ doorStateOpen ? 'mdi-door-open' : 'mdi-door-closed' }}</v-icon>
+								</div>
+								<div class="bio-fila-valor">
+									<template v-if="miniclima_capable && modoInput === 'HUM'">
+										<span class="bio-grande">{{ miniclima_rh !== undefined && miniclima_rh !== null ? Number(miniclima_rh).toFixed(1) : '--' }} <small>%</small></span>
+										<button type="button" class="bio-objetivo hum" @click="keyboardScreen(20)">{{ miniclima_setPoint === 0 ? '--' : miniclima_setPoint }} %</button>
+									</template>
+									<template v-else>
+										<span class="bio-grande">{{ bioTemp(heaterTools[20]) }} <small>°C</small></span>
+										<button type="button" class="bio-objetivo" @click="keyboardScreen(20)">{{ heaterTools[20] ? heaterTools[20].active : '--' }} °C</button>
+									</template>
+								</div>
+							</article>
+						</section>
+					</div>
+				</div>
+							<template v-if="!temaBio">
 							<v-row class="pt-2 pb-4">
 								<!-- TOOL1 -->
 								<v-card v-if="modeloMaquina == '4A' || modeloMaquina == '2A' || modeloMaquina == 'HK' " class=" rounded-xl col blue lighten-5 pa-0 mr-1 " elevation="5">	
@@ -346,20 +421,6 @@
 										</v-card>
 									</v-card-text>
 								</v-card>
-								<v-dialog v-model="dialogOffsetsVisible" max-width="500px">
-									<v-card>
-										<v-card-title class="headline grey lighten-2">
-										{{ offsetTitulo }}
-										</v-card-title>
-										<v-card-text style="white-space: pre-line;">
-										{{ offsetTexto }}
-										</v-card-text>
-										<v-card-actions>
-										<v-spacer></v-spacer>
-										<v-btn color="primary" text @click="dialogOffsetsVisible = false">{{ $t('generic.close') }}</v-btn>
-										</v-card-actions>
-									</v-card>
-								</v-dialog>
 
 
 								<!-- TOOL4 -->
@@ -628,6 +689,21 @@
 								</v-card>	
 								</v-col>	
 							</v-row>
+							</template>
+								<v-dialog v-model="dialogOffsetsVisible" max-width="500px">
+									<v-card>
+										<v-card-title class="headline grey lighten-2">
+										{{ offsetTitulo }}
+										</v-card-title>
+										<v-card-text style="white-space: pre-line;">
+										{{ offsetTexto }}
+										</v-card-text>
+										<v-card-actions>
+										<v-spacer></v-spacer>
+										<v-btn color="primary" text @click="dialogOffsetsVisible = false">{{ $t('generic.close') }}</v-btn>
+										</v-card-actions>
+									</v-card>
+								</v-dialog>
 							<!-- </v-card> -->
 						</v-col>
 						<v-col cols="12" class="pa-0 ma-0">
@@ -1341,6 +1417,39 @@ export default {
 		...mapState('machine/model', {
 			boards: state => state.boards,
 		}),
+		...mapState('settings', ['temaBio']), // domotek
+		bioTools() { // domotek: datos de las tarjetas del tema oscuro
+			const n = (this.modeloMaquina == '2A') ? 2 : 4;
+			const out = [];
+			for (let i = 0; i < n; i++) {
+				const tipo = this['T' + i];
+				const nh = this['nameTools' + i + 'heaterslength'] || 0;
+				const temps = [];
+				[[i + 1, 0], [i + 11, 1]].forEach(([hi, k]) => {
+					if (nh > k && this.heaterTools && this.heaterTools[hi]) {
+						const sensor = this.nameHeaters && this.nameHeaters.analog && this.nameHeaters.analog[hi];
+						temps.push({ nombre: sensor ? sensor.name : '', actual: this.bioTemp(this.heaterTools[hi]), objetivo: this.heaterTools[hi].active });
+					}
+				});
+				out.push({
+					i,
+					tipo,
+					nombre: this['T' + i + 'Name'],
+					cal: !!this['T' + i + 'CAL'],
+					vacio: tipo == 0 || tipo === undefined,
+					estado: this.bioEstado(this.heaterTools && this.heaterTools[i + 1]),
+					editable: tipo == 9 || (tipo != 0 && tipo != 7 && tipo != 8 && tipo != 1 && tipo != 3 && tipo != 15 && tipo != 11),
+					temps
+				});
+			}
+			return out;
+		},
+		bioChamberVisible() {
+			return (this.modeloMaquina != '2A') && (this.chamberMode == true) && !!(this.heaterTools && this.heaterTools[20]);
+		},
+		bioNombreCama() {
+			try { return this.nameCama.analog[0].name; } catch (e) { return ''; }
+		},
 
 
 		...mapGetters('isConnected', 'machine/model', ['global']),
@@ -1718,6 +1827,18 @@ export default {
 
 	},
 	methods: {
+		bioTemp(h) { // domotek
+			if (!h || h.current === undefined || h.current <= -273) { return '--'; }
+			return h.current.toFixed(1);
+		},
+		bioEstado(h) { // domotek: off / active / standby / fault
+			return (h && h.state) ? h.state : 'off';
+		},
+		bioClickTemp(t) { // domotek: misma lógica que las tarjetas antiguas
+			if (t.tipo == 9) { this.screenMix(t.i); }
+			else if (t.editable) { this.keyboardScreen(t.i); }
+			else { this.nothing(t.i); }
+		},
 		...mapActions('machine', ['sendCode']),
 		closeDialog(){
 			this.DialogCalibration = false;
