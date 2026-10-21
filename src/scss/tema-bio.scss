@@ -770,3 +770,63 @@ $bio-ambar:      #F5B52E;
 	.bio-teclado-atajos button.azul.activo { background: #1C2F3A !important; color: #6CB8E6 !important; }
 	.bio-teclado-ok.lila { background: #B49CF2 !important; } .bio-teclado-ok.azul { background: #6CB8E6 !important; }
 }
+
+// ---------------------------------------------------------------------------
+// Modo escritorio: acabado de las pantallas de DWC (listas, consola, ajustes)
+// ---------------------------------------------------------------------------
+.tema-bio.bio-escritorio {
+	// Menú: se puede desplazar y se compacta en pantallas bajas
+	.bio-nav .v-navigation-drawer__content { overflow-y: auto; }
+	@media (max-height: 860px) {
+		.bio-nav-item { height: 34px; }
+		.bio-nav-grupo { padding: 10px 10px 2px; }
+		.bio-nav-logo { padding-bottom: 10px; }
+	}
+
+	// Contenido de las rutas: márgenes y ancho máximo como en el panel de control
+	#content > .v-main__wrap > .container { padding: 20px 24px 24px; max-width: 1688px; margin: 0 auto; }
+
+	// Tablas (Trabajos, Macros, Sistema, Consola...)
+	.v-data-table.theme--dark {
+		background: $bio-sup !important; border-radius: 16px !important; overflow: hidden; box-shadow: none !important;
+		> .v-data-table__wrapper > table > thead > tr > th { background: $bio-sup; color: $bio-tenue !important; font-size: 12px; font-weight: 500; border-bottom: 1px solid #2A3138 !important; height: 44px; }
+		> .v-data-table__wrapper > table > tbody > tr > td { border-bottom: 1px solid #262C33 !important; font-size: 14px; height: 44px; }
+		> .v-data-table__wrapper > table > tbody > tr:hover:not(.v-data-table__expanded__content):not(.v-data-table__empty-wrapper) { background: $bio-sup2 !important; }
+		.v-data-footer { border-top: 1px solid #2A3138 !important; color: $bio-tenue; }
+	}
+	.v-data-table .v-alert, .component .v-alert {
+		background: transparent !important; color: $bio-tenue !important; border: none !important; box-shadow: none !important; padding: 28px 16px;
+		.v-alert__icon { color: $bio-tenue !important; }
+	}
+	// barras de herramientas encima de las listas
+	.v-toolbar.theme--dark:not(.bio-topbar) { background: $bio-sup !important; border-radius: 16px 16px 0 0; box-shadow: none !important; }
+	.v-toolbar.theme--dark:not(.bio-topbar) .v-btn { background: $bio-sup2 !important; border-radius: 10px !important; height: 36px !important; font-size: 13px; }
+	.v-card .v-toolbar + .v-data-table, .v-toolbar + .v-data-table { border-radius: 0 0 16px 16px !important; }
+
+	// Consola: filas con una franja de color en vez de fondos saturados
+	.v-data-table tbody tr.red, .v-data-table tbody tr.amber, .v-data-table tbody tr.green, .v-data-table tbody tr.blue, .v-data-table tbody tr.light-blue {
+		background: transparent !important; color: $bio-texto !important;
+		td:first-child { box-shadow: inset 3px 0 0 $bio-tenue; color: $bio-tenue; font-size: 12px; white-space: nowrap; }
+		.message { color: $bio-tenue; }
+	}
+	.v-data-table tbody tr.red td:first-child { box-shadow: inset 3px 0 0 $bio-peligro; }
+	.v-data-table tbody tr.red .title-cell strong, .v-data-table tbody tr.red td strong { color: $bio-peligro; }
+	.v-data-table tbody tr.amber td:first-child { box-shadow: inset 3px 0 0 $bio-calor; }
+	.v-data-table tbody tr.green td:first-child { box-shadow: inset 3px 0 0 $bio-acento; }
+	.v-data-table tbody tr.blue td:first-child, .v-data-table tbody tr.light-blue td:first-child { box-shadow: inset 3px 0 0 #6CB8E6; }
+
+	// Campos de texto (consola, diálogos)
+	.v-text-field--solo > .v-input__control > .v-input__slot, .v-text-field--outlined > .v-input__control > .v-input__slot { background: $bio-sup !important; border-radius: 12px !important; box-shadow: none !important; }
+	.v-text-field--solo > .v-input__control > .v-input__slot { border: 1px solid #2A3138; }
+
+	// Ajustes: pestañas y tarjetas
+	.v-tabs.theme--dark > .v-tabs-bar { background: transparent !important; border-bottom: 1px solid #2A3138; }
+	.v-tab { text-transform: none !important; letter-spacing: 0 !important; font-size: 14px; }
+	.v-tabs-items.theme--dark, .v-window-item { background: transparent !important; }
+	.v-card.theme--dark { border: 1px solid #23292F; }
+	.v-card .v-card { border: none; }
+	.v-card__title { font-size: 15px !important; font-weight: 600; }
+
+	// Las pantallas táctiles (Herramientas, Movimiento) dentro del escritorio
+	.bio-tools, .bio-mov { max-width: 1100px; }
+}

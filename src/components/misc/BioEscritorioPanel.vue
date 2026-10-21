@@ -1,7 +1,9 @@
 <style lang="scss">
 // domotek: panel de control del modo escritorio (según la maqueta Escritorio_Panel)
 .bio-esc {
-	height: calc(100vh - 64px - 40px); min-height: 560px;
+	/* Ocupa la ventana sin estirarse sin límite en monitores grandes */
+	height: min(calc(100vh - 64px - 40px), 760px); min-height: 560px;
+	max-width: 1640px; margin: 0 auto;
 	display: grid; gap: 16px;
 	grid-template-columns: repeat(3, minmax(0, 1fr));
 	grid-template-rows: 250px minmax(0, 1fr);
