@@ -7,7 +7,7 @@
 </style>
 
 <template>
-	<v-row elevation="0" class="teal lighten-4">
+	<v-row elevation="0" class="blue lighten-4">
 
 		<v-card-text v-show="visibleAxes.length">
 			<!-- Mobile home buttons -->
@@ -32,7 +32,7 @@
 							<code-btn-redondo :code="modeloMaquina != '2A' ? `M120\nG91\nG1 X${sizeMove} F600\nG90\nM121`:`M120\nG91\nG1 X-${sizeMove} F600\nG90\nM121`" no-wait class="move-btn mr-10">
 								<v-icon  size="70">mdi-arrow-left-bold-circle</v-icon>
 							</code-btn-redondo>
-							<v-btn-toggle v-model="toggleTool" color="blue" background-color="teal lighten-5" rounded>
+							<!-- <v-btn-toggle v-model="toggleTool" color="blue" background-color="teal lighten-5" rounded>
 								<code-btn :code="toolsActive0state == 'active' ? `t-1` : `t0`" no-wait class="move-btn" height="50" width="60">
 									<span>	{{ $t('domotek.tools.T0Mini') }}	</span>
 								</code-btn>
@@ -43,6 +43,19 @@
 									<span>	{{ $t('domotek.tools.T2Mini') }}	</span>
 								</code-btn>
 								<code-btn :code="toolsActive3state == 'active' ? `t-1` : `t3`" no-wait class="move-btn" height="50" width="60"		v-if="modeloMaquina != '2A'" >
+									<span>	{{ $t('domotek.tools.T3Mini') }}	</span>
+								</code-btn> -->
+							<v-btn-toggle v-model="toogleToolState" color="blue" background-color="blue lighten-5" rounded>
+								<code-btn :code="toolsActive0state == 'active' ? `t-1` : `t0`" no-wait class="move-btn" height="50" width="60">
+									<span>	{{ $t('domotek.tools.T0Mini') }}	</span>
+								</code-btn>
+								<code-btn :code="toolsActive1state == 'active' ? `t-1` : `t1`" no-wait class="move-btn" height="50" width="60">
+									<span>	{{ $t('domotek.tools.T1Mini') }}	</span>
+								</code-btn>
+								<code-btn :code="toolsActive2state == 'active' ? `t-1` : `t2`" no-wait class="move-btn" height="50" width="60"   v-if="modeloMaquina != '2A'">
+									<span> 	{{ $t('domotek.tools.T2Mini') }}	</span>
+								</code-btn>
+								<code-btn :code="toolsActive3state == 'active' ? `t-1` : `t3`" no-wait class="move-btn" height="50" width="60"   v-if="modeloMaquina != '2A'">
 									<span>	{{ $t('domotek.tools.T3Mini') }}	</span>
 								</code-btn>
 								<!-- <v-btn @click="changeAxis('X')" tile class="move-btn" height="50" width="60">
@@ -112,17 +125,42 @@
 				</v-col>
 				
 				<v-col cols="4">
-						<v-badge color="teal" v-if="move.axes[0].homed">
-							<v-btn class="teal lighten-5" block rounded @click="dialog = true">
+						<!-- <v-badge color="teal" v-if="move.axes[0].homed">
+							<v-btn class="blue lighten-5" block rounded @click="dialog = true">
 
 								<span>{{ $t('domotek.calibracion.calibrate_button') }}</span> 
 							</v-btn>
+						</v-badge> -->
+
+						<!-- BOTÓN CALIBRATION (solo si todo está homed) -->
+						<v-badge color="teal" v-if="allAxesHomed">
+							<v-btn class="blue lighten-5" block rounded @click="dialog = true" :disabled="bloqueado">
+								<span>{{ $t('domotek.calibracion.calibrate_button') }}</span>
+							</v-btn>
 						</v-badge>
-						<code-btn v-if="!move.axes[0].homed" :color="move.axes[0].homed ? 'teal':'warning'" code="G28" :title="$t('button.home.titleAll')" block rounded style="border:10px;">
+						<!-- <code-btn v-if="!move.axes[0].homed" :color="move.axes[0].homed ? 'teal':'warning'" code="G28" :title="$t('button.home.titleAll')" block rounded style="border:10px;">
 							<span>
 								{{ $t('button.home.captionAll') }}
 							</span>
-						</code-btn>
+						</code-btn> -->
+						<!-- <code-btn :color="(modeloMaquina === '2A' ? move.axes[0].homed && move.axes[1].homed && move.axes[2].homed && move.axes[3].homed : move.axes[0].homed && move.axes[1].homed && move.axes[2].homed && move.axes[3].homed && move.axes[4].homed && move.axes[5].homed && move.axes[6].homed ) ? 'teal' : 'warning'" code="G28" :title="$t('button.home.titleAll')" block rounded style="border:10px;" >
+							<span>
+								{{ $t('button.home.captionAll') }}
+							</span>
+						</code-btn> -->
+						<!-- BOTÓN HOME (solo si NO está todo homed) -->
+						<v-btn
+							v-else
+							color="warning"
+							block
+							rounded
+							style="border:10px;"
+							:disabled="bloqueado"
+							:title="$t('button.home.titleAll')"
+							@click="EjecutarHome"
+						>
+							<span>{{ $t('button.home.captionAll') }}</span>
+						</v-btn>
 				</v-col>
 				<!-- <v-col cols="2" lg="1" class="ml-0 mt-5" align="center">
 					<code-btn :code="`M18`" icon>
@@ -163,20 +201,28 @@
 								<v-col align="center">
 									<v-btn width="100" height="100" rounded color="red lighten-3" text @click="dialog = false" outlined>
 										<code-btn width="100" height="100"  color="red lighten-3" rounded>
-											{{ $t('domotek.varios.no') }}
+											{{ $t('generic.cancel') }}
 										</code-btn>
 									</v-btn>
 								</v-col>
 								<v-col align="center">
-									<v-btn width="100" height="100"  rounded color="green darken-1" text @click="dialog = false" outlined>
-										<code-btn width="100" height="100" rounded :code='`M98 P"/calibration/03_XY_offset.g"`' color="green lighten-3">
+									<v-btn
+										width="100" height="100" rounded color="green darken-1" text outlined
+										:disabled="bloqueado"
+										@click="EjecutarCalibracion('XY')"
+									>
+										<code-btn width="100" height="100" rounded color="green lighten-3">
 											X-Y
 										</code-btn>
 									</v-btn>
 								</v-col>
 								<v-col align="center">
-									<v-btn width="100" height="100" rounded color="green darken-1" text @click="dialog = false" outlined>
-										<code-btn width="100" height="100" rounded :code='`M98 P"/calibration/03_Z_offset.g"`' color="blue lighten-3">
+									<v-btn
+										width="100" height="100" rounded color="green darken-1" text outlined
+										:disabled="bloqueado"
+										@click="EjecutarCalibracion('Z')"
+									>
+										<code-btn width="100" height="100" rounded color="blue lighten-3">
 											Z
 										</code-btn>
 									</v-btn>
@@ -266,6 +312,12 @@ import { mapState, mapGetters, mapActions, mapMutations } from 'vuex'
 import { KinematicsName } from '../../store/machine/modelEnums.js'
 
 export default {
+	props: {
+        calibrandoExterno: {
+            type: Boolean,
+            default: false
+        }
+    },
 	computed: {
 		...mapGetters(['isConnected', 'uiFrozen']),
 		...mapState('machine/model', {
@@ -289,50 +341,104 @@ export default {
 		unhomedAxes() { return this.move.axes.filter(axis => axis.visible && !axis.homed); },
 
 		//toolsActive[0].state
+		
 		toolsActive0state: {
 			get() {
 					try {
-						return this.$store.state.machine.model.tools[0].state;			// Puede estar:		off		→	active	→	standby
+							if(this.$store.state.machine.model.global.T0Activo){
+								return  "active";
+							}
+							else
+							{
+								return "inactive";
+							}
 					} catch (error) {
-						console.log(`error toolsActive0state MovementPanelCalibration.vue`);
-						return "active";		// cuando no se sepa el estado real del tool, se devuelve "active", de esta manera el click del boton ejecutara un T-1
+							console.log(`error toolsActive0state`);
+							return "active";
 					}
 			}
 		},
-		//toolsActive[1].state
 		toolsActive1state: {
 			get() {
 					try {
-						return this.$store.state.machine.model.tools[1].state;
+							if(this.$store.state.machine.model.global.T1Activo){
+								return  "active";
+							}
+							else
+							{
+								return "inactive";
+							}
+							
 					} catch (error) {
-						console.log(`error toolsActive1state MovementPanelCalibration.vue`);
-						return "active";
+							console.log(`error toolsActive1state`);
+							return "active";
 					}
 			}
 		},
-		//toolsActive[2].state
 		toolsActive2state: {
 			get() {
 					try {
-						return this.$store.state.machine.model.tools[2].state;
+							if(this.$store.state.machine.model.global.T2Activo){
+								return  "active";
+							}
+							else
+							{
+								return "inactive";
+							}
+							
 					} catch (error) {
-						console.log(`error toolsActive2state MovementPanelCalibration.vue`);
-						return "active";
+							console.log(`error toolsActive2state`);
+							return "active";
 					}
 			}
 		},
-		//toolsActive[3].state
 		toolsActive3state: {
 			get() {
 					try {
-						return this.$store.state.machine.model.tools[3].state;			// Puede estar:		off		→	active	→	standby
+							if(this.$store.state.machine.model.global.T3Activo){
+								return  "active";
+							}
+							else
+							{
+								return "inactive";
+							}
+							
 					} catch (error) {
-						console.log(`error toolsActive3state MovementPanelCalibration.vue`);
-						return "active";		// cuando no se sepa el estado real del tool, se devuelve "active", de esta manera el click del boton ejecutara un T-1
+							console.log(`error toolsActive3state MovementPanel.vue`);
+							return "active";
 					}
 			}
 		},
-		
+		toogleToolState: {
+			get() {
+					try {
+						if(this.$store.state.machine.model.global.T0Activo){
+							return  1;
+						}
+						else
+						if(this.$store.state.machine.model.global.T1Activo){
+							return  3;
+						}
+						else
+						if(this.$store.state.machine.model.global.T2Activo){
+							return  5;
+						}
+						else
+						if(this.$store.state.machine.model.global.T3Activo){
+							return  7;
+						}
+						else
+							{
+								return 0;
+							}
+							
+					} catch (error) {
+							console.log(`error toogleTollstate`);
+							return 0;
+					}
+			}
+		},
+
 		modeloMaquina: {
 			get() {
 					try {
@@ -343,6 +449,25 @@ export default {
 					}
 			}
 		},
+		allAxesHomed () {
+			if (this.modeloMaquina === '2A') {
+				return this.move.axes[0].homed &&
+						this.move.axes[1].homed &&
+						this.move.axes[2].homed &&
+						this.move.axes[3].homed
+				}
+
+			return this.move.axes[0].homed &&
+				this.move.axes[1].homed &&
+				this.move.axes[2].homed &&
+				this.move.axes[3].homed &&
+				this.move.axes[4].homed &&
+				this.move.axes[5].homed &&
+				this.move.axes[6].homed
+		},
+		bloqueado() {
+            return this.calibrando || this.calibrandoExterno;
+        }
 	},
 	data() {
 		return {
@@ -359,7 +484,8 @@ export default {
 			toggleTool: 0,
 			toggleMove: 2,
 			countTools: 0,
-			dialog: false
+			dialog: false,
+			calibrando: false
 		}
 
 	},
@@ -391,6 +517,32 @@ export default {
 		},
 		changeSizeMove(size){
 			this.sizeMove = size;
+		},
+		async EjecutarHome() {
+			this.calibrando = true;
+			try {
+				await this.sendCode({ code: 'G28' });
+			} catch (e) {
+				console.error('Error ejecutando home:', e);
+			} finally {
+				this.calibrando = false;
+			}
+		},
+
+		async EjecutarCalibracion(tipo) {
+			this.dialog = false;
+			const archivo = tipo === 'XY'
+				? '/calibration/03_XY_offset.g'
+				: '/calibration/03_Z_offset.g';
+
+			this.calibrando = true;
+			try {
+				await this.sendCode({ code: `M98 P"${archivo}"` });
+			} catch (e) {
+				console.error('Error ejecutando calibración:', e);
+			} finally {
+				this.calibrando = false;
+			}
 		},
 		// viewToolActive(){
 		// 	return;
@@ -438,16 +590,6 @@ export default {
 			// Hide dialogs when the connection is interrupted
 			this.showMeshEditDialog = false;
 			this.moveStepDialog.shown = false;
-		},
-		// Agregar watcher para el estado de homing
-		'move.axes': {
-			handler(newAxes) {
-				// Si todos los ejes están homed, deseleccionar cualquier tool activo
-				if (newAxes.every(axis => axis.homed)) {
-					this.sendCode('T-1');
-				}
-			},
-			deep: true
 		}
 	},
 	/* beforeMount(){

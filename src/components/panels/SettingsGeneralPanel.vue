@@ -1,5 +1,5 @@
 <template>
-	<v-card outlined v-if="$store.state.nivelUsuario >= 2" class="blue lighten-5" elevation="5">
+	<v-card outlined v-if="$store.state.nivelUsuario >= 3" class="blue lighten-5" elevation="5">
 		<v-card-title class="pb-0">
 			{{ $t('panel.settingsGeneral.caption') }}
 			<v-spacer></v-spacer>

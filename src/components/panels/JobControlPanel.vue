@@ -40,7 +40,7 @@
 					</code-btn-redondo>
 				</v-col>
 				<v-col cols="6" v-if="isPaused" align="center" >
-					<code-btn-redondo height="130px" width="130px" color="error" code="M0 H1">
+					<code-btn-redondo height="130px" width="130px" color="error" :code="cancelCode">
 						<!-- <v-icon class="mr-1">mdi-stop</v-icon> {{ cancelText }} -->
 						<v-icon class="mr-1" x-large>mdi-stop</v-icon>
 					</code-btn-redondo>
@@ -96,21 +96,37 @@ export default {
 			return this.$t(this.isPaused ? 'panel.jobControl.resumeJob' : 'panel.jobControl.pauseJob');
 		},
 
-		// 
-		//  2024/07/16	Jon Ander
-		//  He cambiado la respuesta de la funcion "hvProbe"  y he añadido "uvProbe"
-		//  Ahora responden true o false, en vez del texto a enseñar.
-		//	TODO: en vez de usar los numeros de salida (1,2,...,9,10,...) deberia usar los "global.T0SalidaES" y "global.T0SalidaUVonoff"
-		//
 
 		hvProbe() {
-			if ((this.gpOuts[1].pwm > 0)||(this.gpOuts[2].pwm > 0)||(this.gpOuts[3].pwm > 0)||(this.gpOuts[4].pwm > 0))		{	return true;	}
-			else {	return false;	}
-
+			if (this.modeloMaquina === "2A") {
+				return (
+					this.gpOuts[1].pwm > 0 ||
+					this.gpOuts[2].pwm > 0
+				);
+			} else {
+				return (
+					this.gpOuts[1].pwm > 0 ||
+					this.gpOuts[2].pwm > 0 ||
+					this.gpOuts[3].pwm > 0 ||
+					this.gpOuts[4].pwm > 0
+				);
+			}
 		},
-		uvProbe(){
-			if ((this.gpOuts[9].pwm > 0)||(this.gpOuts[10].pwm > 0)||(this.gpOuts[11].pwm > 0)||(this.gpOuts[12].pwm > 0))	{	return true;	}
-			else {	return false;	}
+
+		uvProbe() {
+			if (this.modeloMaquina === "2A") {
+				return (
+					this.gpOuts[9].pwm > 0 ||
+					this.gpOuts[10].pwm > 0
+				);
+			} else {
+				return (
+					this.gpOuts[9].pwm > 0 ||
+					this.gpOuts[10].pwm > 0 ||
+					this.gpOuts[11].pwm > 0 ||
+					this.gpOuts[12].pwm > 0
+				);
+			}
 		},
 		
 		cancelText() {
@@ -142,6 +158,22 @@ export default {
 		},
 		validThumbnails() {
 			return this.thumbnails.filter(thumbnail => !!thumbnail.data);
+		},
+		modeloMaquina: {
+			get() {
+					try {
+							return this.$store.state.machine.model.global.MachineModel ;
+					} catch (error) {
+							console.log(`error PositionPanel.vue modeloMaquina`);
+							return "2A";
+					}
+			}
+		},
+		cancelCode() {
+			if (this.$store.state.machine.model.global.notifyPrintCanceled) {
+				return "set global.jobWasCancelled = true\nM1212\nM0 H1"
+			}
+			return "set global.jobWasCancelled = true\nM0 H1"
 		}
 	},
 	data() {

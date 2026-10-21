@@ -1096,7 +1096,7 @@ export default {
 			tall: 'All Tools'
 		},
 		movePanel:{
-			disableSteppers: 'DSB STPPR',
+			disableSteppers: 'Motor Off',
 			extrude: 'EXTRUDE'
 		},
 		jobs:{
@@ -1123,7 +1123,7 @@ export default {
 			
 		},
 		error: {
-			toolAgotado: "Error, Tool disconnected or Out of material"
+			toolAgotado: "Tool disconnected or Out of material"
 
 		}
 	}

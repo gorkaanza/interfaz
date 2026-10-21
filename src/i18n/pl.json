@@ -193,7 +193,8 @@
       "gcodeReference": "G-Code Reference",
       "menuReference": "Menu Reference",
       "save": "Zapisz",
-      "confirmClose": "Plik był modyfikowany. Jeżeli kontynuujesz zmiany zostaną utracone."
+      "confirmClose": "Plik był modyfikowany. Jeżeli kontynuujesz zmiany zostaną utracone.",
+      "confirmSaveEmpty": ""
     },
     "fileTransfer": {
       "uploadingTitle": "Wgrywanie pliku {0} z z{1}, {2}% ukończono",

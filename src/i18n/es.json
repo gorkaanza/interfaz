@@ -145,7 +145,8 @@
       "layerHeight": "Altura de Capa: {0}",
       "filamentUsage": "Filamento Usado: {0}",
       "fractionPrinted": "Progreso de Archivo: {0}",
-      "temperatures": "Temperaturas: {0}"
+      "temperatures": "Temperaturas: {0}",
+      "interval": "Intervalo"
     },
     "temperature": {
       "caption": "Grafico de Temperaturas",
@@ -604,7 +605,10 @@
       "amount": "Cantidad de material en {0}:",
       "feedrate": "Velocidad de avance en {0}:",
       "retract": "Retracción",
-      "extrude": "Extrusión"
+      "extrude": "Extrusión",
+      "retractQuestion": "¿Desea retraer el tool?",
+      "retractFullSyringe": "Full Syringe",
+      "retractHalfSyringe": "Half Syringe"
     },
     "extrusionFactors": {
       "caption": "Extrusión",
@@ -640,8 +644,8 @@
       "repeatPrint": "Imprimir de nuevo",
       "repeatSimulation": "Simular de nuevo",
       "showPreview": "Mostrar vista previa",
-      "warninghv": "WARNING HIGH VOLTAGE",
-      "warninguv": "WARNING UV RADIATION"
+      "warninghv": "ADVERTENCIA ALTO VOLTAJE",
+      "warninguv": "ADVERTENCIA RADIACIÓN UV"
     },
     "jobData": {
       "caption": "Informacion (histórico)",
@@ -660,7 +664,7 @@
     },
     "jobInfo": {
       "caption": "Información (trabajo)",
-      "height": "Altura:",
+      "height": "Altura: ",
       "layerHeight": "Altura de Capa:",
       "filament": "Filamento empleado:",
       "generatedBy": "Generado por:"
@@ -833,6 +837,13 @@
       "standby": "En Espera",
       "bed": "Cama {0}",
       "chamber": "Habitáculo {0}",
+      "calibrado": "Calibrado",
+      "toolCalibrado": "✅ Tool calibrado",
+      "toolNoCalibrado": "⚠️ Tool no calibrado",
+      "noCalibrado": "No calibrado",
+      "platformOffsets": "Offsets de plataforma",
+      "platformOffsetsText": "Puente izquierdo (Z):\nMínimo: {zMin}\nMáximo: {zMax}\n\nPuente derecho (A):\nMínimo: {aMin}\nMáximo: {aMax}",
+      "chamberNotHeating": "La chamber no está calentando. Asegúrate de que la puerta esté cerrada y el interruptor esté encendido.",
       "extra": {
         "caption": "Extra",
         "sensor": "Sensor",
@@ -850,7 +861,8 @@
       "noConex": "Webcam no conectada"
     },
     "clean": {
-      "enableClean": "Habilitar Limpieza"   
+      "enableClean": "Habilitar Limpieza" ,
+      "clJobInProgress": "Trabajo en curso, ¿quieres lanzar la limpieza?"
     },
     "electrospinning":{
       "electrospinningSettings": "ELECTROSPINNING - AJUSTES",
@@ -864,10 +876,25 @@
       "electrospinningFlow": "ELECTROSPINNING - FLUJO",
       "electrospinningExpTime": "ELECTROSPINNING - TIEMPO DE EXPOSICIÓN",
       "electrospinningParams": "ELECTROSPINNING - PARÁMETROS",
-      "autoEsMode": "Modo ES automático"
-
-
+      "electrospinningDrumParams": "ELECTROSPINNING - PARÁMETROS DE COLECTOR",
+      "autoEsMode": "Modo ES automático",
+      "electrospinningCustomPoint": "ELECTROSPINNING - PUNTO PERSONALIZADO",
+      "timeInMinutes": "Tiempo en minutos",
+      "flowInMlMin": "Flujo en ml/min",
+      "minutes": "Minutos",
+      "flow": "ml/min ",
+      "flowRangeErrorDetailed": "Valor debe estar entre {min} y {max}. Actual: {val}",
+      "timeRangeErrorDetailed": "Valor debe estar entre {min} y {max}. Actual: {val}",
+      "drumRPMRangeErrorDetailed": "Valor debe estar entre {min} y {max}. Actual: {val}",
+      "esJobInProgress": "Trabajo en curso, ¿quieres lanzar Electrospinning?",
+      "cleanDuringES": "Limpieza durante ES activada",
+      "platformSpeedX": "Velocidad de Plataforma Eje X (mm/s)",
+      "editXPoints": "Editar puntos X",
+      "electrospinningDrawPath": "ELECTROSPINNING - DIBUJAR TRAYECTORIA",
+      "electrospinningDrawPathHelp": "Dibuja con el dedo o arrastrando el ratón. Puedes hacer varios trazos.",
+      "fillArea": "Rellenar área"
     },
+    
     "temperatures":{
       "toolTemperatures": "Mantener Temperaturas de Tool",
       "bedTemperatures": "Mantener Temperaturas de Cama",
@@ -877,10 +904,64 @@
     "ultraviolet":{
       "ultravioletSettings": "ULTRAVIOLETA - AJUSTES",
       "ultravioletParams": "ULTRAVIOLETA - PARÁMETROS",
-      "UvPower": "Potencia UV (%): ",
+      "ultravioletPattern": "ULTRAVIOLETA - PATRÓN",
+      "UvPower": "Potencia UV (%) ",
+      "resumeUvPower": "% Potencia",
+      "power": "Potencia: ",
+      "percent":"%",
+      "time":"Tiempo: ",
       "autoUvMode": "Modo UV automático ",
       "applyBefore": "Aplicar antes de imprimir (esterilizar superficie)",
-      "applyWhen": "Aplicar al finalizar impresión"
+      "applyWhen": "Aplicar al finalizar impresión",
+      "ultravioletSelectPoint": "ULTRAVIOLETA - SELECCIONAR PUNTO",
+      "manualEditCoordsTittle": "Modificar coordenadas",
+      "CoordsX": "Coordenada X",
+      "CoordsY": "Coordenada Y",
+      "rangeErrorDetailed": "Valor debe estar entre {min} y {max}. Actual: {val}",
+      "invalidOrRange": "Valor inválido o fuera de rango",
+      "uvJobInProgress": "Trabajo en curso, ¿quieres lanzar Ultravioleta?",
+      "ultravioletDrawPath": "ULTRAVIOLETA - DIBUJAR TRAYECTORIA",
+      "ultravioletDrawPathHelp": "Dibuja con el dedo o arrastrando el ratón. Puedes hacer varios trazos.",
+      "strokes": "trazos",
+      "undoStroke": "Deshacer",
+      "fillArea": "Rellenar área",
+      "points": "Puntos"
+    },
+    "emd": {
+      "EMDSettings": "Configuración del solenoide",
+      "EMDSelectPoint": "Selecciona el punto de disparo",
+      "EMDJobInProgress": "Hay un trabajo en curso. Se pausará para disparar y después continuará. ¿Seguir?",
+      "autoEMDMode": "Modo automático",
+      "autoParams": "Modo automático",
+      "dropParams": "Gota y material",
+      "dropVolume": "Volumen por gota",
+      "viscosity": "Viscosidad (a 25 °C)",
+      "drops": "Nº de gotas",
+      "temperature": "Temperatura",
+      "heating": "Calentar",
+      "heatingOff": "Sin calentar",
+      "viscAtTemp": "Viscosidad a esta temperatura",
+      "pressure": "Presión",
+      "openTime": "Apertura",
+      "cycleTime": "Ciclo",
+      "testShot": "Disparo de prueba",
+      "confirmTestShot": "¿Disparar en la posición actual?",
+      "calibration": "Calibración",
+      "calibHint": "Coloca un recipiente bajo la boquilla. La impresora hará 4 pruebas y medirá el volumen de cada gota.",
+      "dropsPerPoint": "Gotas por prueba",
+      "startCalib": "Calibrar",
+      "applyCalib": "Aplicar",
+      "calibConfirm": "¿Empezar la calibración? La impresora disparará sin moverse.",
+      "calibNoReply": "La impresora no ha devuelto el resultado de la prueba",
+      "lowR2": "ajuste poco fiable, repite la calibración",
+      "calibrated": "Calibrado",
+      "notCalibrated": "Sin calibrar",
+      "estimated": "Estimado (calibrado con {visc} mPa·s)",
+      "solve_missingData": "Introduce el volumen y la viscosidad",
+      "solve_tooSmall": "Volumen demasiado pequeño para esta boquilla",
+      "solve_tooLarge": "Volumen demasiado grande para esta boquilla",
+      "fit_notEnoughPoints": "No hay suficientes pruebas válidas para calcular",
+      "fit_badFit": "Los resultados no son coherentes, repite la calibración"
     }
   },
   "pluginPermissions": {
@@ -1094,33 +1175,37 @@
       "slicer": "Fileteador"
     },
     "tools": {
-      "t0": "TOOL 1",
-      "t1": "TOOL 2",
-      "t2": "TOOL 3",
-      "t3": "TOOL 4",
+      "t0": "CABEZAL 1",
+      "t1": "CABEZAL 2",
+      "t2": "CABEZAL 3",
+      "t3": "CABEZAL 4",
       "T0Mini": "T1",
       "T1Mini": "T2",
       "T2Mini": "T3",
       "T3Mini": "T4",
       "platform": "Plataforma",
       "platformMini": "PLTF",
-      "calibrationBtn": "CALIBRACION",
+      "calibrationBtn": "CALIBRACIÓN",
       "confirm_change": "Por favor, confirma el cambio de tool",
-      "chamber": "CÁMARA"
+      "chamber": "CHAMBER",
+      "humidity": "Humedad",
+      "heater": "Calefactor"
     },
     "toolNames": {
-      "EMPTY": "EMPTY",
-      "CHANGE": "CHANGE",
+      "EMPTY": "VACÍO",
+      "CHANGE": "CAMBIAR",
       "BACK": "ATRÁS",
       "CONTINUE": "CONTINUAR",
       "SYRINGE": "SYRINGE",
       "SYRINGE_STD": "SYRINGE-STD",
       "SYRINGE_ES": "SYRINGE-ES",
       "SYRINGE_HEAT": "SYRINGE-HEAT",
-      "THERMOPLASTICS": "THERMOPLASTICS",
-      "FIL": "FILAMENT",
+      "SYRINGE_EMD": "SYRINGE-EMD",
+      "THERMOPLASTICS": "TERMOPLÁSTICOS",
+      "FIL": "FIL",
+      "FIL-HT": "FIL-HT",
       "UPE": "UPE",
-      "UV": "ULTRAVIOLET",
+      "UV": "ULTRAVIOLETA",
       "UTILITY": "UTILITY",
       "AUTOCAL": "AUTO-CAL",
       "UPEADV": "UPE ADVANCED",
@@ -1142,10 +1227,13 @@
       "start": "Empezar",
       "calibrate_button": "Calibración",
       "calibrate_option": "Por favor confirma el eje que quieres calibrar",
-      "tall": "Todos los tools"
+      "tall": "Todos los tools",
+      "greenLegend": "Valor recomendado ≤ 0.25 vueltas",
+      "redLegend": "No recomendado",
+      "leveling":"Nivelando..."
     },
     "movePanel": {
-      "disableSteppers": "DSB STPPR",
+      "disableSteppers": "MOTOR OFF",
       "extrude": "EXTRUIR"
     },
     "jobs": {
@@ -1153,7 +1241,22 @@
       "electrospinning": "ElectroSpinning",
       "ultraviolet": "Ultravioleta",
       "clean": "Limpiar",
-      "temperatures": "Temperaturas"
+      "temperatures": "Temperaturas",
+      "EMD":"EMD",
+      "notifications": {
+        "emailNotifications": "Email de notificaciones",
+        "duringprinting": "Notificaciones durante la impresión",
+        "printFinished": "Impresión terminada",
+        "printPaused": "Impresión pausada",
+        "printStarted": "Impresión comenzada",
+        "printResumed": "Impresión reanudada",
+        "printCanceled": "Impresión cancelada",
+        "emailHint": "Puedes introducir varios correos separados por comas",
+        "invalidEmails": "Direcciones no válidas",
+        "saving": "Guardando...",
+        "toolDisc": "Tool desconectado o jeringa vacía",
+        "heaterFault": "Fault de heater"     
+      }
     },
     "settings": {
       "usuarioAvanzado": "Usuario administrador"
@@ -1167,24 +1270,53 @@
       "runOnce": "EJECUTAR",
       "change": "Cambiar",
       "applyEvery": "Aplicar cada",
+      "cleanDuringES": "Limpiar durante ES cada",
       "layers": "capas",
+      "Layers": "Capas",
       "heightMm": "Altura (mm): ",
-      "exposureheightMm": "ALTURA de Exposición (mm): ",
-      "exposureTimeS": "TIEMPO de Exposición (s): ",
+      "exposureheightMm": "ALTURA de Exposición (mm) ",
+      "exposureTimeM": "TIEMPO de Exposición (min): ",
       "centered": "CENTRADO",
-      "allPlatform": "All Platform",
+      "allPlatform": "Toda la plataforma",
+      "freehand": "Trazo libre",
+      "drumCollector": "Colector de tambor",
+      "customPoint": "Punto personalizado",
       "syringe": "Jeringa",
       "ga": "GA",
-      "mlMin": "ml / min",
+      "mlMin": "ml/min",
       "min": "min",
       "settings": "AJUSTES",
       "confirm_settings": "Por favor, confirme la configuración",
       "confirm_electospinning": "Por favor, confirme ElectroSpinning",
       "confirm_UV": "Por favor, confirme UV",
+      "confirm_EMD": "Por favor, confirme EMD",
       "confirm_clean": "Por favor, confirme limpieza",
       "temp_out": "Temperatura fuera de rango",
-      "rpm_out": "RPM fuera de rango"
-
+      "hum_out": "Humedad fuera de rango",
+      "rpm_out": "RPM fuera de rango",
+      "center" : "Centrar",
+      "manual": "Manual",
+      "ejeX": "Eje X",
+      "ejeY": "Eje Y",
+      "valorRequerido": "El valor es requerido",
+      "numeroPositivo": "El valor debe ser positivo",
+      "numeroEntero": "El valor debe ser entero",
+      "minutes": "minutos",
+      "door_interlock_disabled": "Interbloqueo de puerta deshabilitado",
+      "door_interlock_enabled": "Interbloqueo de puerta habilitado",
+      "minTemp": "Ambiente",
+      "temp": "Temp (°C)",
+      "RH": "HR (%)",
+      "RH_enabled": "El control automático de humedad está activo. Para establecer la temperatura de la chamber, primero debes desactivarlo.",
+      "OffAndContinue": "Apagar y continuar",
+      "pltfref_unreachable": "No se puede alcanzar {value}°C con la temperatura ambiente actual ({ambient}°C). Mínimo alcanzable: {min}°C. Reduzca la temperatura de la sala o ajuste el objetivo.",
+      "cool_to_minimum": "Enfriar al mínimo ({min}°C)",
+      "axesNotHomedTitle": "Ejes sin referenciar",
+      "axesNotHomed": "Haz el homing de todos los ejes antes de configurar este tool",
+      "axesNotHomedLink": "Haz el homing de todos los ejes antes de vincular los tools",
+      "showCalc": "Ver cálculo",
+      "calcTitle": "Parámetros calculados",
+      "height": "Altura"
     },
     "babystepping": {
       "current": "Offset Z Actual: {0}",
@@ -1192,7 +1324,7 @@
       "current2": "Offset Z1 Actual : {0}"
     },
     "error": {
-      "toolAgotado": "Error, Tool desconectado o sin material"
+      "toolAgotado": "Tool desconectado o sin material"
     }
     
   }

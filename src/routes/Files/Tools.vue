@@ -1,8 +1,8 @@
 <style>
 .v-btn-toggle:not(.v-btn-toggle--dense) .v-btn.v-btn.v-size--default {
-    height: 48px;
-    min-height: 0;
-    /* min-width: 110px; */
+	height: 48px;
+	min-height: 0;
+	/* min-width: 110px; */
 }
 
 /*.v-btn-toggle {
@@ -21,7 +21,7 @@
 .vctCentradoBold {
 	font-weight: bold;
 	font-size: large;
-    padding: 25px 0px 10px 0px;
+	padding: 25px 0px 10px 0px;
 }
 
 
@@ -45,9 +45,7 @@
 						<v-col cols="12">
 							<v-row class="pt-2 pb-4">
 								<!-- TOOL1 -->
-								<v-card v-if="modeloMaquina == '4A' || modeloMaquina == '2A' || modeloMaquina == 'HK' " class=" rounded-xl col blue lighten-5 pa-0 mr-1 " elevation="5">
-									
-									
+								<v-card v-if="modeloMaquina == '4A' || modeloMaquina == '2A' || modeloMaquina == 'HK' " class=" rounded-xl col blue lighten-5 pa-0 mr-1 " elevation="5">	
 									<v-card-text align="center" textcolor="black" class="blue lighten-5 pa-0 pt-1 pb-0">
 										<v-row class=" mt-0">
 											<v-col cols=3 class="pr-0">	
@@ -62,7 +60,7 @@
 												<!-- <v-btn style=" width:95%; " class="" color="black " text height="45px" elevation="2" @click="ChangeTool(0), camaClick = false, $vuetify.goTo(pageHeight)">
 													<span ><strong>{{ $t('domotek.tools.t0') }}</strong></span>
 												</v-btn> -->
-												<v-btn style=" width:95%; " class="" :color="((ClickToolAnterior === 0) && toolClick) ? 'primary' : 'blue lighten-5'" height="45px" elevation="2" @click="ChangeTool(0), camaClick = false, $vuetify.goTo(pageHeight)">
+												<v-btn style=" width:110%; " class="" :color="((ClickToolAnterior === 0) && toolClick) ? 'primary' : 'blue lighten-5'" height="45px" elevation="2" @click="ChangeTool(0), camaClick = false, $vuetify.goTo(pageHeight)">
 													<span ><strong>{{ $t('domotek.tools.t0') }}</strong></span>
 												</v-btn>
 											</v-col>
@@ -71,6 +69,20 @@
 												<!--<v-btn icon elevation="4" @click="DialogCalibration = true" >
 													<v-icon large > mdi-axis-arrow </v-icon>
 												</v-btn>-->
+												<v-tooltip top>
+													<template v-slot:activator="{ on, attrs }">
+														<v-icon
+														v-bind="attrs"
+														v-on="on"
+														:color="T0CAL ? 'green' : 'orange'"
+														medium
+														@click="showToolOffsets(0)"
+														>
+														{{ T0CAL ? 'mdi-tune' : 'mdi-tune' }}
+														</v-icon>
+													</template>
+													<span>{{ T0CAL ? $t('panel.tools.calibrado') : $t('panel.tools.noCalibrado') }}</span>
+												</v-tooltip>
 											</v-col>
 										</v-row>
 									</v-card-text>
@@ -79,10 +91,9 @@
 										<v-row class=" ">
 											<v-col cols=12 class=" ">
 												<span style="color:#0a21ad; font-size:large;"><strong>{{ T0Name }}</strong></span> 
-
 											</v-col> 
 										</v-row>
-										<v-card @click="(T0 == 9)?screenMix(0):(T0 != 0 && T0 != 7 && T0 != 8 && T0 != 1 && T0 != 3 && T0 != 15)?keyboardScreen(0):nothing(0)" class="rounded-xl blue lighten-5 pa-0 pt-1 pb-0" elevation="5" >
+										<v-card @click="(T0 == 9)?screenMix(0):(T0 != 0 && T0 != 7 && T0 != 8 && T0 != 1 && T0 != 3 && T0 != 15 && T0 != 11)?keyboardScreen(0):nothing(0)" class="rounded-xl blue lighten-5 pa-0 pt-1 pb-0" elevation="5" >
 											<v-row class="pa-1 mt-0" v-if="nameTools0heaterslength > 0">
 												<v-col cols=6 class=" pa-1 ">
 													<span class="clsHeatersMultiH2" v-if="nameTools0heaterslength > 0">{{ nameHeaters.analog[1].name }}</span>
@@ -146,7 +157,7 @@
 													<!-- <v-btn style=" width:95%; " class="" color="black " text height="45px" elevation="2" @click="ChangeTool(1), camaClick = false">
 														<span ><strong>{{ $t('domotek.tools.t1') }}</strong></span>
 													</v-btn> -->
-													<v-btn style=" width:95%; " class="" :color="((ClickToolAnterior === 1) && toolClick) ? 'primary' : 'blue lighten-5'" height="45px" elevation="2" @click="ChangeTool(1), camaClick = false, $vuetify.goTo(pageHeight)">
+													<v-btn style=" width:110%; " class="" :color="((ClickToolAnterior === 1) && toolClick) ? 'primary' : 'blue lighten-5'" height="45px" elevation="2" @click="ChangeTool(1), camaClick = false, $vuetify.goTo(pageHeight)">
 														<span ><strong>{{ $t('domotek.tools.t1') }}</strong></span>
 													</v-btn>			
 											</v-col>
@@ -155,6 +166,20 @@
 												<!--<v-btn icon elevation="4" @click="DialogCalibration = true" >
 													<v-icon large > mdi-axis-arrow </v-icon>
 												</v-btn>-->
+												<v-tooltip top>
+													<template v-slot:activator="{ on, attrs }">
+														<v-icon
+														v-bind="attrs"
+														v-on="on"
+														:color="T1CAL ? 'green' : 'orange'"
+														medium
+														@click="showToolOffsets(1)"
+														>
+														{{ T1CAL ? 'mdi-tune' : 'mdi-tune' }}
+														</v-icon>
+													</template>
+													<span>{{ T1CAL ? $t('panel.tools.calibrado') : $t('panel.tools.noCalibrado') }}</span>
+												</v-tooltip>
 											</v-col>
 										</v-row>
 									</v-card-text>
@@ -165,7 +190,7 @@
 												<span style="color:#0a21ad;font-size:large;"><strong>{{ T1Name }}</strong></span>
 											</v-col> 
 										</v-row>
-										<v-card @click="(T1 == 9)?screenMix(1):(T1 != 0 && T1 != 7 && T1 != 8 && T1 != 1 && T1 != 3 && T1 != 15)?keyboardScreen(1):nothing(1)" class="rounded-xl blue lighten-5 pa-0 pt-1 pb-0" elevation="5" >
+										<v-card @click="(T1 == 9)?screenMix(1):(T1 != 0 && T1 != 7 && T1 != 8 && T1 != 1 && T1 != 3 && T1 != 15 && T1 != 11)?keyboardScreen(1):nothing(1)" class="rounded-xl blue lighten-5 pa-0 pt-1 pb-0" elevation="5" >
 											<v-row class="pa-1 mt-0" v-if="nameTools1heaterslength > 0">
 												<v-col cols=6 class=" pa-1 ">
 													<span class="clsHeatersMultiH2" v-if="nameTools1heaterslength > 0">{{ nameHeaters.analog[2].name }}</span>
@@ -239,11 +264,26 @@
 												<!-- <v-btn style=" width:95%; " class="" color="black" text height="45px" elevation="2" @click="ChangeTool(2), camaClick = false">
 													<span ><strong>{{ $t('domotek.tools.t2') }}</strong></span>
 												</v-btn> -->
-												<v-btn style=" width:95%; " class="" :color="((ClickToolAnterior === 2) && toolClick) ? 'primary' : 'blue lighten-5'" height="45px" elevation="2" @click="ChangeTool(2), camaClick = false, $vuetify.goTo(pageHeight)">
+												<v-btn style=" width:110%; " class="" :color="((ClickToolAnterior === 2) && toolClick) ? 'primary' : 'blue lighten-5'" height="45px" elevation="2" @click="ChangeTool(2), camaClick = false, $vuetify.goTo(pageHeight)">
 													<span ><strong>{{ $t('domotek.tools.t2') }}</strong></span>
 												</v-btn>						
 											</v-col>
 											<v-col cols=3 class="pl-0">
+												<!-- Botón para mostrar estado de calibración y abrir offsets -->
+												<v-tooltip top>
+													<template v-slot:activator="{ on, attrs }">
+														<v-icon
+														v-bind="attrs"
+														v-on="on"
+														:color="T2CAL ? 'green' : 'orange'"
+														medium
+														@click="showToolOffsets(2)"
+														>
+														{{ T2CAL ? 'mdi-tune' : 'mdi-tune' }}
+														</v-icon>
+													</template>
+													<span>{{ T2CAL ? $t('panel.tools.calibrado') : $t('panel.tools.noCalibrado') }}</span>
+												</v-tooltip>
 												<!-- <v-btn icon elevation="4" @click="cambiarRuta('/Files/Calibracion')"> -->
 												<!--<v-btn icon elevation="4" @click="DialogCalibration = true" >
 													<v-icon large > mdi-axis-arrow </v-icon>
@@ -258,7 +298,7 @@
 												<span style="color:#0a21ad;font-size:large;"><strong>{{ T2Name }}</strong></span>
 											</v-col> 
 										</v-row>
-										<v-card @click="(T2 == 9)?screenMix(2):(T2 != 0 && T2 != 7 && T2 != 8 && T2 != 1  && T2 != 3 && T2 != 15)?keyboardScreen(2):nothing(2)" class="rounded-xl blue lighten-5 pa-0 pt-1 pb-0" elevation="5" >
+										<v-card @click="(T2 == 9)?screenMix(2):(T2 != 0 && T2 != 7 && T2 != 8 && T2 != 1  && T2 != 3 && T2 != 15 && T2 != 11)?keyboardScreen(2):nothing(2)" class="rounded-xl blue lighten-5 pa-0 pt-1 pb-0" elevation="5" >
 											<v-row class="pa-1 mt-0" v-if="nameTools2heaterslength > 0">
 												<v-col cols=6 class=" pa-1 ">
 													<span class="clsHeatersMultiH2" v-if="nameTools2heaterslength > 0">{{ nameHeaters.analog[3].name }}</span>
@@ -306,6 +346,22 @@
 										</v-card>
 									</v-card-text>
 								</v-card>
+								<v-dialog v-model="dialogOffsetsVisible" max-width="500px">
+									<v-card>
+										<v-card-title class="headline grey lighten-2">
+										{{ offsetTitulo }}
+										</v-card-title>
+										<v-card-text style="white-space: pre-line;">
+										{{ offsetTexto }}
+										</v-card-text>
+										<v-card-actions>
+										<v-spacer></v-spacer>
+										<v-btn color="primary" text @click="dialogOffsetsVisible = false">{{ $t('generic.close') }}</v-btn>
+										</v-card-actions>
+									</v-card>
+								</v-dialog>
+
+
 								<!-- TOOL4 -->
 								<v-card v-if="modeloMaquina != '2A'" class=" rounded-xl col blue lighten-5 pa-0 " elevation="5">
 									<v-card-text align="center" textcolor="black" class="blue lighten-5 pa-0 pt-1 pb-0">
@@ -322,7 +378,7 @@
 												<!-- <v-btn style=" width:95%; " class="" color="black " text height="45px" elevation="2" @click="ChangeTool(3), camaClick = false">
 													<span ><strong>{{ $t('domotek.tools.t3') }}</strong></span>
 												</v-btn> -->
-												<v-btn style=" width:95%; " class="" :color="((ClickToolAnterior === 3) && toolClick) ? ' primary ' : 'blue lighten-5'"  height="45px" elevation="2" @click="ChangeTool(3), camaClick = false, $vuetify.goTo(pageHeight)">
+												<v-btn style=" width:110%; " class="" :color="((ClickToolAnterior === 3) && toolClick) ? ' primary ' : 'blue lighten-5'"  height="45px" elevation="2" @click="ChangeTool(3), camaClick = false, $vuetify.goTo(pageHeight)">
 													<span ><strong>{{ $t('domotek.tools.t3') }}</strong></span>
 												</v-btn>			
 											</v-col>
@@ -331,6 +387,14 @@
 												<!--<v-btn icon elevation="4" @click="DialogCalibration = true" >
 													<v-icon large > mdi-axis-arrow </v-icon>
 												</v-btn>-->
+												<v-tooltip top>
+													<template v-slot:activator="{ on, attrs }">
+														<v-icon v-bind="attrs" v-on="on" :color="T3CAL ? 'green' : 'orange'" medium @click="showToolOffsets(3)" >
+														{{ T3CAL ? 'mdi-tune' : 'mdi-tune' }}
+														</v-icon>
+													</template>
+													<span>{{ T3CAL ? $t('panel.tools.calibrado') : $t('panel.tools.noCalibrado') }}</span>
+												</v-tooltip>
 											</v-col>
 										</v-row>
 									</v-card-text>
@@ -341,7 +405,7 @@
 												<span style="color:#0a21ad;font-size:large;"><strong>{{ T3Name }}</strong></span>
 											</v-col> 
 										</v-row>
-										<v-card @click="(T3 == 9)?screenMix(3):(T3 != 0 && T3 != 7 && T3 != 8 && T3 != 1 && T3 != 3 && T3 != 15)?keyboardScreen(3):nothing(3)" class="rounded-xl blue lighten-5 pa-0 pt-1 pb-0" elevation="5" >
+										<v-card @click="(T3 == 9)?screenMix(3):(T3 != 0 && T3 != 7 && T3 != 8 && T3 != 1 && T3 != 3 && T3 != 15 && T3 != 11)?keyboardScreen(3):nothing(3)" class="rounded-xl blue lighten-5 pa-0 pt-1 pb-0" elevation="5" >
 											<v-row class="pa-1 mt-0" v-if="nameTools3heaterslength > 0">
 												<v-col cols=6 class=" pa-1 ">
 													<span class="clsHeatersMultiH2" v-if="nameTools3heaterslength > 0">{{ nameHeaters.analog[4].name }}</span>
@@ -392,7 +456,7 @@
 							</v-row>
 							<v-row>
 								<v-col cols=1 class="pr-0"></v-col>
-								<!--boton de calibracion //Gorka-->
+								<!--boton de calibracion //-->
 								<v-col cols="2" class="pl-0 pr-0" style="text-align: center;"> 
 									<v-btn icon elevation="4" @click="DialogCalibration = true"  class="d-flex align-center" style="font-size: 60px; padding: 40px;  height: 100px; width: 100px; background-color: #e2f1fc;  display: block; margin: 0 auto;">
 										<v-icon style="font-size: 60px;">mdi-axis-arrow</v-icon> 
@@ -406,9 +470,9 @@
 									<v-card-text align="center" textcolor="black" class="blue lighten-5 pa-0 pt-1 pb-0">
 										<v-row class=" mt-0">
 											<v-col cols=3 class="pr-0">	
-												<v-btn icon elevation="1" @click="reserve" class=" ">
+												<v-btn icon elevation="1"  class=" ">
 													<v-icon large color="red" v-if="heaterTools[0].state == 'fault'">mdi-close-circle-outline</v-icon>
-													<v-icon large color="light-green accent-4" v-if="heaterTools[0].state == 'active'">mdi-power</v-icon>
+													<v-icon large color="teal" v-if="heaterTools[0].state == 'active'">mdi-power</v-icon>
 													<v-icon large color="warning" v-if="heaterTools[0].state == 'standby'">mdi-power-cycle</v-icon>
 													<v-icon large color="grey" v-if="heaterTools[0].state == 'off'">mdi-power-off</v-icon>
 												</v-btn>
@@ -418,11 +482,26 @@
 													<span><strong>{{ $t('domotek.tools.platform') }}</strong></span>
 												</v-btn>			
 											</v-col>
+											<!-- <v-col cols=3 class="pl-0"> -->
+												<!-- <v-btn icon elevation="4" @click="cambiarRuta('/Files/Calibracion')"> -->
+												<!--<v-btn icon elevation="4" @click="DialogCalibration = true" >
+													<v-icon large > mdi-axis-arrow </v-icon>
+												</v-btn>-->
+											<!-- </v-col> -->
 											<v-col cols=3 class="pl-0">
 												<!-- <v-btn icon elevation="4" @click="cambiarRuta('/Files/Calibracion')"> -->
 												<!--<v-btn icon elevation="4" @click="DialogCalibration = true" >
 													<v-icon large > mdi-axis-arrow </v-icon>
 												</v-btn>-->
+
+												<!-- VER OFFSETS DE PLATAFORMA -->
+												<!-- <v-tooltip top>
+													<template v-slot:activator="{ on, attrs }">
+														<v-icon v-bind="attrs" v-on="on"  medium @click="showPlatformOffsets" >
+														{{ T3CAL ? 'mdi-tune' : 'mdi-tune' }}
+														</v-icon>
+													</template>
+												</v-tooltip> -->
 											</v-col>
 										</v-row>
 									</v-card-text>
@@ -434,9 +513,10 @@
 											</v-col> 
 										</v-row>
 										<!-- DOMOTEK DOMOTEK DOMOTEK DOMOTEK DOMOTEK DOMOTEK DOMOTEK DOMOTEK DOMOTEK DOMOTEK DOMOTEK -->
-										<!-- Sacamos teclado para los tools con temperatura y selector de RPM para DRUM		  		 -->
+										<!-- Sacamos teclado para los tools con temperatura y selector de RPM para DRUM. Si la plataforma es Mew, se deshabilita la aparición de la ventana	  		 -->
 										<!-- DOMOTEK DOMOTEK DOMOTEK DOMOTEK DOMOTEK DOMOTEK DOMOTEK DOMOTEK DOMOTEK DOMOTEK DOMOTEK -->
-										<v-card v-if="bedSelected != 'D'" @click="keyboardScreen(4)" class="rounded-xl blue lighten-5 pa-0 pt-1 pb-0" elevation="5" >
+										<!--<v-card v-if="bedSelected != 'D'" @click="keyboardScreen(4)" class="rounded-xl blue lighten-5 pa-0 pt-1 pb-0" elevation="5" >-->
+										<v-card @click="(bedSelected == 'M') ? nothing(4) : keyboardScreen(4)" class="rounded-xl blue lighten-5 pa-0 pt-1 pb-0" elevation="5" v-if="bedSelected != 'D'">
 											<v-row class="pa-1 mt-0" >
 												<v-col cols=6 class=" pa-1 ">
 													<span class="clsHeatersMultiH2" > &nbsp; </span>
@@ -471,7 +551,7 @@
 									<v-card-text align="center" textcolor="black" class="blue lighten-5 pa-0 pt-1 pb-0">
 										<v-row class=" mt-0">
 											<v-col cols=3 class="pr-0">	
-												<v-btn icon elevation="1" @click="reserve" class=" ">
+												<v-btn icon elevation="1"  class=" ">
 													<v-icon large color="red" v-if="heaterTools[20].state == 'fault'">mdi-close-circle-outline</v-icon>
 													<v-icon large color="light-green accent-4" v-if="heaterTools[20].state == 'active'">mdi-power</v-icon>
 													<v-icon large color="warning" v-if="heaterTools[20].state == 'standby'">mdi-power-cycle</v-icon>
@@ -484,7 +564,7 @@
 												</v-btn>			
 											</v-col>
 											<v-col cols=3 class="pl-0">
-												<v-btn icon elevation="1" @click="reserve" class=" ">
+												<v-btn icon elevation="1" class=" ">
 													<v-icon large color="green" v-if="doorStateOpen == true">mdi-door-open</v-icon> <!--puerta chamber abierta-->
 													<v-icon  large color="grey" v-if="doorStateOpen == false">mdi-door-closed</v-icon> <!--puerta chamber cerrada-->
 												</v-btn>
@@ -499,24 +579,50 @@
 									<v-card-text align="center" class="clsDesTool blue lighten-5 pa-0 pt-2 pb-3" >
 										<v-row class=" ">
 											<v-col cols=12 class=" ">
-												<span style="color:#0a21ad;font-size:large;"><strong>{{ $t('domotek.tools.chamber') }}</strong></span>
-											</v-col> 
+												<!-- <span style="color:#0a21ad;font-size:large;"><strong>{{ $t('domotek.tools.chamber') }}</strong></span> -->
+												<span style="color:#0a21ad;font-size:large;"><strong>{{ miniclima_capable ? (modoInput === 'TEMP' ? 'Heater' : 'Humidity') : 'Heater' }}</strong></span>											</v-col> 
 										</v-row>
 										<!-- DOMOTEK DOMOTEK DOMOTEK DOMOTEK DOMOTEK DOMOTEK DOMOTEK DOMOTEK DOMOTEK DOMOTEK DOMOTEK -->
 										<!-- Sacamos teclado para los tools con temperatura y selector de RPM para DRUM		  		 -->
 										<!-- DOMOTEK DOMOTEK DOMOTEK DOMOTEK DOMOTEK DOMOTEK DOMOTEK DOMOTEK DOMOTEK DOMOTEK DOMOTEK -->
 										<v-card @click="keyboardScreen(20)" class="rounded-xl blue lighten-5 pa-0 pt-1 pb-0" elevation="5" >
-											<v-row class="pa-1 mt-0" >
-												<v-col cols=6 class=" pa-1 ">
-													<span class="clsHeatersMultiH2" > &nbsp; </span>
-												</v-col> 
-												<v-col cols=3 class=" pa-1 ">
-													<span class="clsHeatersMultiH1" >{{heaterTools[20].current == -273.1 || heaterTools[20].current == -273.15? "--":heaterTools[20].current.toFixed(1)}}</span>
-												</v-col>
-												<v-col cols=3 class=" pa-1 ">
-													<span class="clsHeatersMultiH1" ><strong>/ {{heaterTools[20].active}}</strong></span>
-												</v-col>
-											</v-row>
+											<!-- Con miniclima: muestra RH o Temp según modoInput -->
+											<template v-if="miniclima_capable">
+												<v-row class="pa-1 mt-0" v-if="modoInput === 'HUM'">
+													<v-col cols=6 class="pa-1">
+														<span class="clsHeatersMultiH2">{{ $t('domotek.varios.RH') }}</span>
+													</v-col>
+													<v-col cols=3 class="pa-1">
+														<span class="clsHeatersMultiH1">{{ miniclima_rh !== undefined && miniclima_rh !== null ? Number(miniclima_rh).toFixed(1) : "--" }}</span>
+													</v-col>
+													<v-col cols=3 class="pa-1">
+														<span class="clsHeatersMultiH1"><strong>/ {{ miniclima_setPoint === 0 ? '--' : miniclima_setPoint }}</strong></span>
+													</v-col>
+												</v-row>
+												<v-row class="pa-1 mt-0" v-else>
+													<v-col cols=6 class="pa-1">
+														<span class="clsHeatersMultiH2">{{ $t('domotek.varios.temp') }}</span>
+													</v-col>
+													<v-col cols=3 class="pa-1">
+														<span class="clsHeatersMultiH1">{{heaterTools[20].current == -273.1 || heaterTools[20].current == -273.15? "--":heaterTools[20].current.toFixed(1)}}</span>
+													</v-col>
+													<v-col cols=3 class="pa-1">
+														<span class="clsHeatersMultiH1"><strong>/ {{heaterTools[20].active}}</strong></span>
+													</v-col>
+												</v-row>
+											</template>
+											<!-- Sin miniclima: siempre temperatura -->
+											<template v-else>
+												<v-row class="pa-1 mt-0">
+													<v-col cols=6 class="pa-1"></v-col>
+													<v-col cols=3 class="pa-1">
+														<span class="clsHeatersMultiH1">{{heaterTools[20].current == -273.1 || heaterTools[20].current == -273.15? "--":heaterTools[20].current.toFixed(1)}}</span>
+													</v-col>
+													<v-col cols=3 class="pa-1">
+														<span class="clsHeatersMultiH1"><strong>/ {{heaterTools[20].active}}</strong></span>
+													</v-col>
+												</v-row>
+											</template>
 										</v-card>
 									</v-card-text>
 								</v-card>	
@@ -534,199 +640,258 @@
 										<v-col class="ma-1" cols="12">
 											<v-row class="ma-0">
 												<v-col align="center" cols="12" class="ma-2 clsVcol">
-													<!-- <span>{{cadenaNum}}</span> -->
-													<v-row>
-														<v-col cols="5" class="mt-3 clsTools">
-															<v-btn class="clsvbtn1" width="80px" v-if="heaterTools[ toolClickTemperature == 4 ? 0 : toolClickTemperature == 20 ? 20 : toolClickTemperature+1].state == 'active'" @click="handleOffButton()" rounded>
-																<code-btn width="80px" rounded class="red clscodebtn1" :code="toolClickTemperature == 4 ? `M140 S-273.15` : toolClickTemperature == 20 ? `M141 S-273.15` : `G10 P${toolClickTemperature} S-273.15 R-273.15`">OFF</code-btn>
-															</v-btn>
-															<v-btn class="clsvbtn2" width="80px" v-if="heaterTools[ toolClickTemperature == 4 ? 0 : toolClickTemperature == 20 ? 20 : toolClickTemperature+1].state == 'standby'" @click="handleOffButton()" rounded>
-																<code-btn width="80px" rounded class="red clscodebtn2" :code="toolClickTemperature == 4 ? `M140 S-273.15` : toolClickTemperature == 20 ? `M141 S-273.15` : `G10 P${toolClickTemperature} S-273.15 R-273.15`">OFF</code-btn>
-															</v-btn>
-															<!-- <v-btn class="clsvbtn3" width="80px" v-if="heaterTools[ toolClickTemperature == 4 ? 0 : toolClickTemperature == 20 ? 20 : toolClickTemperature+1].state == 'off'" @click="handleOffButton()" rounded>
-																<code-btn width="80px" rounded class="red clscodebtn3" :code="toolClickTemperature == 4 ? `M140 S${heaterTools[0].active}` : toolClickTemperature == 20 ? `M141 S${heaterTools[20].active}` : `G10 P${toolClickTemperature} S${heaterTools[this.toolClickTemperature +1].active} R${heaterTools[this.toolClickTemperature +1].active}`">heat</code-btn>
-															</v-btn> -->
-															<v-btn class="clsvbtn3" width="80px" v-if="heaterTools[toolClickTemperature == 4 ? 0 : toolClickTemperature == 20 ? 20 : toolClickTemperature + 1].state == 'off'" @click="okNums()" rounded>
-																<code-btn width="80px" rounded class="red clscodebtn3" :code="toolClickTemperature == 4 ? `M140 S${parseInt(cadenaNum)} R${parseInt(cadenaNum)}` : toolClickTemperature == 20 ? `M141 S${parseInt(cadenaNum)} R${parseInt(cadenaNum)}` : `M104 S${parseInt(cadenaNum)} T${toolClickTemperature}`" :disabled="isNaN(parseInt(cadenaNum)) || parseInt(cadenaNum) < getMinValue() || parseInt(cadenaNum) > getMaxValue()"> heat</code-btn>
-															</v-btn>
-															<v-btn class="clsvbtn4"  width="80px" v-if="heaterTools[ toolClickTemperature == 4 ? 0 : toolClickTemperature == 20 ? 20 : toolClickTemperature+1].state == 'fault'" @click="handleOffButton()" rounded>
-																<code-btn width="80px" rounded class="red clscodebtn4" :code="`M562 P${toolClickTemperature == 4 ? 0: toolClickTemperature == 20 ? 20 :toolClickTemperature +1}`">fix</code-btn>
-															</v-btn>
+													<v-row justify="center" align="center">
+
+														<!-- Max/Min HUM o vacío -->
+														<v-col cols="2" class="d-flex flex-column align-center justify-center">
+															<template v-if="modoDialog === 'HUM' && modoInput === 'HUM'">
+																<span>max: {{ HUMIDITY_max }}</span>
+																<span>min: {{ HUMIDITY_min }}</span>
+															</template>
+															<template v-else-if="modoDialog === 'HUM' && modoInput === 'TEMP'">
+																<span>max: {{ heaterTools[20].max - 10 }}</span>
+																<span>min: {{ $t('domotek.varios.minTemp') }}</span>
+															</template>
 														</v-col>
-														<!--Cambio Gorka -->
-														<!-- <v-col cols="2">
-															<v-text-field color="black" v-if="toolClickTemperature != null"  disabled="true" :label="this.heaterTools[this.toolClickTemperature == 4 ? 0 :this.toolClickTemperature == 20 ? 20 : this.toolClickTemperature +1].active" :value="this.cadenaNum">{{cadenaNum}}</v-text-field>
-														</v-col> -->
-														<v-col align="center" cols="2" class="pa-1">
-															<v-text-field v-model="cadenaNum"  readonly outlined label="Temp (°C)" ref="cadenaNumInput" @keydown.enter="okNums()">{{cadenaNum}}</v-text-field>
+														<!-- <v-col cols="2" v-else></v-col> -->
+
+														<!-- Botón -->
+														<v-col cols="2" class="d-flex align-center justify-center">
+															<template v-if="modoDialog === 'HUM' && modoInput === 'HUM'">
+																<v-btn width="80px" v-if="miniclima_on" @click="stopHumedad()" rounded color="red lighten-3"><v-icon>mdi-stop</v-icon></v-btn>
+																<v-btn width="80px" v-else @click="startHumedad()" rounded color="green lighten-3"><v-icon>mdi-play</v-icon></v-btn>
+															</template>
+															<template v-else>
+																<v-btn width="80px" v-if="heaterTools[toolClickTemperature == 4 ? 0 : toolClickTemperature == 20 ? 20 : toolClickTemperature+1].state == 'active'" @click="handleOffButton()" rounded color="red lighten-3">
+																	<v-icon>mdi-stop</v-icon>
+																</v-btn>
+																<v-btn width="80px" v-else-if="heaterTools[toolClickTemperature == 4 ? 0 : toolClickTemperature == 20 ? 20 : toolClickTemperature+1].state == 'standby'" @click="handleOffButton()" rounded color="red lighten-3">
+																	<v-icon>mdi-stop</v-icon>
+																</v-btn>
+																<v-btn width="80px" v-else-if="heaterTools[toolClickTemperature == 4 ? 0 : toolClickTemperature == 20 ? 20 : toolClickTemperature+1].state == 'off'" @click="okNums()" rounded color="green lighten-3">
+																	<v-icon>mdi-play</v-icon>
+																</v-btn>
+																<v-btn class="clsvbtn4" width="80px" v-else-if="heaterTools[toolClickTemperature == 4 ? 0 : toolClickTemperature == 20 ? 20 : toolClickTemperature+1].state == 'fault'" @click="handleFixButton()" rounded>
+																	<code-btn width="80px" rounded class="red clscodebtn4" :code="`M562 P${toolClickTemperature == 4 ? 0 : toolClickTemperature == 20 ? 20 : toolClickTemperature+1}`">fix</code-btn>
+																</v-btn>
+															</template>
+															
 														</v-col>
-														<!--Fin cambio-->
-														<v-col cols="5" class="clsCama">
+
+														<!-- Campo de valor -->
+														<v-col align="center" cols="2" class="pa-1" style="transform: translateX(30%);">
+															<v-text-field v-if="modoDialog === 'HUM' && modoInput === 'HUM'"
+																v-model="humedad" readonly outlined label="RH (%)"
+																ref="humedadInput" input-class="text-center">
+															</v-text-field>
+															<v-text-field v-else
+																v-model="cadenaNum" readonly outlined label="Temp (°C)"
+																ref="cadenaNumInput" @keydown.enter="okNums()"
+																input-class="text-center">
+															</v-text-field>
+														</v-col>
+
+														<!-- Info derecha -->
+														<v-col cols="6" class="clsCama">
 															<v-row>
-																<v-col cols="2" align="center">
-																	<v-icon color="red" v-if="heaterTools[ toolClickTemperature == 4 ? 0 : toolClickTemperature == 20 ? 20 : toolClickTemperature+1].state == 'fault'">mdi-close-circle-outline</v-icon> 
-																	<v-icon color="teal" v-if="heaterTools[ toolClickTemperature == 4 ? 0 : toolClickTemperature == 20 ? 20 : toolClickTemperature+1].state == 'active'">mdi-power</v-icon>
-																	<v-icon color="warning" v-if="heaterTools[ toolClickTemperature == 4 ? 0 : toolClickTemperature == 20 ? 20 : toolClickTemperature+1].state == 'standby'">mdi-power-cycle</v-icon>
-																	<v-icon color="grey" v-if="heaterTools[ toolClickTemperature == 4 ? 0 : toolClickTemperature == 20 ? 20 : toolClickTemperature+1].state == 'off'">mdi-power-off</v-icon>
+																<v-col cols="2" align="center" style="transform: translateX(25%);">
+																	<template v-if="modoDialog === 'HUM'">
+																		<v-icon color="teal" v-if="miniclima_on">mdi-power</v-icon>
+																		<v-icon color="grey" v-else>mdi-power-off</v-icon>
+																	</template>
+																	<template v-else>
+																		<v-icon color="red" v-if="heaterTools[toolClickTemperature == 4 ? 0 : toolClickTemperature == 20 ? 20 : toolClickTemperature+1].state == 'fault'">mdi-close-circle-outline</v-icon>
+																		<v-icon color="teal" v-else-if="heaterTools[toolClickTemperature == 4 ? 0 : toolClickTemperature == 20 ? 20 : toolClickTemperature+1].state == 'active'">mdi-power</v-icon>
+																		<v-icon color="warning" v-else-if="heaterTools[toolClickTemperature == 4 ? 0 : toolClickTemperature == 20 ? 20 : toolClickTemperature+1].state == 'standby'">mdi-power-cycle</v-icon>
+																		<v-icon color="grey" v-else>mdi-power-off</v-icon>
+																	</template>
 																</v-col>
-																<v-col cols="10" align="left" v-if="toolClickTemperature != 4 && toolClickTemperature != 20 && toolClickTemperature != null">
-																	<v-row>
-																		<v-col align="center">
-																			<!--{{ nameTools[toolClickTemperature].name }}-->
-																			{{ NombreTool(toolClickTemperature) }}
-																		</v-col>
-																		<v-col>
-																			<span>max: {{heaterTools[ toolClickTemperature == 4 ? 0 : toolClickTemperature == 20 ? 20 : toolClickTemperature+1].max -10}} </span>
-																		</v-col>
-																	</v-row>
-																</v-col>
-																<v-col cols="10" align="left" v-if="toolClickTemperature == 4">
-																	<v-row>
-																		<v-col align="center">
-																			{{ nameCama.analog[0].name == "PLTF-REF" ? "PLTF-REF":"PLTF-HT" }}
-																		</v-col>
-																		<v-col>
-																			<span>max: {{heaterTools[ toolClickTemperature == 4 ? 0 : toolClickTemperature == 20 ? 20 : toolClickTemperature+1].max - 10}} </span>
-																		</v-col>
-																	</v-row>
-																</v-col>
-																<v-col cols="10" align="left" v-if="toolClickTemperature == 20">
-																	<v-row>
-																		<v-col align="center">
-																			{{ "CHAMBER Rev" }}
-																		</v-col>
-																		<v-col>
-																			<span>max: {{heaterTools[toolClickTemperature].max - 10}} </span>
-																			
-																		</v-col>
-																	</v-row>
-																</v-col>
-																<v-col cols="2"></v-col>
-																<v-col cols="10" class="pa-0" align="left" v-if="toolClickTemperature == 4">
-																	<v-row>
-																		<v-col align="center">														
-																			<span>{{heaterTools[ toolClickTemperature == 4 ? 0 : toolClickTemperature == 20 ? 20 : toolClickTemperature+1].current == -273.1 || heaterTools[ toolClickTemperature == 4 ? 0 : toolClickTemperature == 20 ? 20 : toolClickTemperature+1].current == -273.15 ? "--":heaterTools[toolClickTemperature == 4 ? 0:toolClickTemperature == 20 ? 20: toolClickTemperature + 1].current.toFixed(1)}}</span> <strong>/ {{heaterTools[toolClickTemperature == 4 ? 0:toolClickTemperature == 20 ? 20: toolClickTemperature + 1].active}}</strong>
-																		</v-col>
-																		<v-col>
-																			<span>min: {{ nameCama.analog[0].name == "PLTF-REF" ? (heaterTools[0].min + 278.1) : tempAmbiente }}</span> <!--si es cama fria se pone la temepratura minima a 5º, si es cama caliente la temperatura minima sera la de ambiente-->
-																		</v-col>
-																	</v-row>
-																</v-col>
-																<v-col cols="10" class="pa-0" align="left" v-if="toolClickTemperature == 20 || toolClickTemperature != 4 && toolClickTemperature != 20 && toolClickTemperature != null">
-																	<v-row>
-																		<v-col align="center">														
-																			<span>{{heaterTools[ toolClickTemperature == 4 ? 0 : toolClickTemperature == 20 ? 20 : toolClickTemperature+1].current == -273.1 || heaterTools[ toolClickTemperature == 4 ? 0 : toolClickTemperature == 20 ? 20 : toolClickTemperature+1].current == -273.15 ? "--":heaterTools[toolClickTemperature == 4 ? 0:toolClickTemperature == 20 ? 20: toolClickTemperature + 1].current.toFixed(1)}}</span> <strong>/ {{heaterTools[toolClickTemperature == 4 ? 0:toolClickTemperature == 20 ? 20: toolClickTemperature + 1].active}}</strong>
-																		</v-col>
-																		<v-col>
-																			<span>min: {{tempAmbiente}} </span>
-																		</v-col>
-																	</v-row>
+																<v-col cols="10" align="left">
+																	<template v-if="modoDialog === 'HUM'">
+																		<v-card elevation="1" rounded style="border: 1px solid #90CAF9;" class="pa-0 mt-n6">
+																			<v-row no-gutters align="center">
+																				<v-col cols="6" class="pa-1">
+																					<v-card @click="modoInput = 'HUM'" class="pa-1" style="cursor: pointer;"
+																						:style="modoInput === 'HUM' ? 'background-color: #E3F2FD;' : 'background-color: transparent;'"
+																						elevation="0" rounded>
+																						<v-row no-gutters>
+																							<v-col align="center">
+																								<span :style="modoInput === 'HUM' ? 'color: #1565C0; font-weight: bold;' : 'color: grey;'">{{ $t('domotek.varios.RH') }}</span>
+																							</v-col>
+																						</v-row>
+																						<v-row no-gutters>
+																							<v-col align="center">
+																								<span :style="modoInput === 'HUM' ? 'color: #1565C0; font-weight: bold;' : 'color: grey;'">
+																									{{ miniclima_rh !== undefined && miniclima_rh !== null ? Number(miniclima_rh).toFixed(1) : "--" }}
+																								</span>
+																								<strong :style="modoInput === 'HUM' ? 'color: #1565C0;' : 'color: grey;'">
+																									/ {{ miniclima_setPoint === 0 ? '--' : miniclima_setPoint }}
+																								</strong>
+																							</v-col>
+																						</v-row>
+																					</v-card>
+																				</v-col>
+																				<v-divider vertical></v-divider>
+																				<v-col cols="6" class="pa-1">
+																					<v-card @click="switchToTemp()" class="pa-1" style="cursor: pointer;"
+																						:style="modoInput === 'TEMP' ? 'background-color: #E3F2FD;' : 'background-color: transparent;'"
+																						elevation="0" rounded>
+																						<v-row no-gutters>
+																							<v-col align="center">
+																								<span :style="modoInput === 'TEMP' ? 'color: #1565C0; font-weight: bold;' : 'color: grey;'">
+																									{{ $t('domotek.varios.temp') }}
+																								</span>
+																							</v-col>
+																						</v-row>
+																						<v-row no-gutters>
+																							<v-col align="center">
+																								<span :style="modoInput === 'TEMP' ? 'color: #1565C0; font-weight: bold;' : 'color: grey;'">
+																									{{ heaterTools[20].current == -273.1 || heaterTools[20].current == -273.15 ? "--" : heaterTools[20].current.toFixed(1) }}
+																								</span>
+																								<strong :style="modoInput === 'TEMP' ? 'color: #1565C0;' : 'color: grey;'">
+																									/ {{ heaterTools[20].active == 0 ? '--' : heaterTools[20].active }}
+																								</strong>
+																							</v-col>
+																						</v-row>
+																					</v-card>
+																				</v-col>
+																			</v-row>
+																		</v-card>
+																	</template>
+																	<template v-else>
+																		<!-- Modo HEAT normal -->
+																		<v-row>
+																			<v-col align="center" v-if="toolClickTemperature != 4 && toolClickTemperature != 20">Temp (°C)</v-col>
+																			<v-col align="center" v-else-if="toolClickTemperature == 4">{{ nameCama.analog[0].name == "PLTF-REF" ? "PLTF-REF" : "PLTF-HT" }}</v-col>
+																			<v-col align="center" v-else>Temp (°C)</v-col>
+																			<v-col><span>max: {{ toolClickTemperature == 20 ? heaterTools[20].max - 10 : heaterTools[toolClickTemperature == 4 ? 0 : toolClickTemperature+1].max - 10 }}</span></v-col>
+																		</v-row>
+																		<v-row>
+																			<v-col align="center">
+																				<span>{{ heaterTools[toolClickTemperature == 4 ? 0 : toolClickTemperature == 20 ? 20 : toolClickTemperature+1].current == -273.1 || heaterTools[toolClickTemperature == 4 ? 0 : toolClickTemperature == 20 ? 20 : toolClickTemperature+1].current == -273.15 ? "--" : heaterTools[toolClickTemperature == 4 ? 0 : toolClickTemperature == 20 ? 20 : toolClickTemperature+1].current.toFixed(1) }}</span>
+																				<strong> / {{ heaterTools[toolClickTemperature == 4 ? 0 : toolClickTemperature == 20 ? 20 : toolClickTemperature+1].active }}</strong>
+																			</v-col>
+																			<v-col>
+																				<span>min: {{ 
+																					toolClickTemperature == 4 && nameCama.analog[0].name == "PLTF-REF" 
+																						? getMinValue() 
+																						: (NombreTool(toolClickTemperature) === 'FIL' || NombreTool(toolClickTemperature) === 'UPE' || NombreTool(toolClickTemperature) === 'FIL-HT')
+																							? 60
+																							: $t('domotek.varios.minTemp')
+																				}}</span>
+																			</v-col>
+																		</v-row>
+																	</template>
 																</v-col>
 															</v-row>
 														</v-col>
+
 													</v-row>
 												</v-col>
-												
+
+												<!-- TECLADO -->
 												<v-col align="center" cols="12" class="pa-1">
-													<v-btn rounded height="50" width="170" class="teal lighten-4 ml-4 mr-4" @click="clickNums(7)">
-														<span>7</span>
-													</v-btn>
-													<v-btn rounded height="50" width="170" class="teal lighten-4 ml-4 mr-4" @click="clickNums(8)">
-														<span>8</span>
-													</v-btn>
-													<v-btn rounded height="50" width="170" class="teal lighten-4 ml-4 mr-4" @click="clickNums(9)">
-														<span>9</span>
-													</v-btn>
+													<v-btn rounded height="50" width="170" class="blue lighten-4 ml-4 mr-4" @click="modoDialog === 'HUM' && modoInput === 'HUM' ? clickHumedad(7) : clickNums(7)"><span>7</span></v-btn>
+													<v-btn rounded height="50" width="170" class="blue lighten-4 ml-4 mr-4" @click="modoDialog === 'HUM' && modoInput === 'HUM' ? clickHumedad(8) : clickNums(8)"><span>8</span></v-btn>
+													<v-btn rounded height="50" width="170" class="blue lighten-4 ml-4 mr-4" @click="modoDialog === 'HUM' && modoInput === 'HUM' ? clickHumedad(9) : clickNums(9)"><span>9</span></v-btn>
 												</v-col>
 												<v-col align="center" cols="12" class="pa-1">
-													<v-btn rounded height="50" width="170" class="teal lighten-4 ml-4 mr-4" @click="clickNums(4)">
-														<span>4</span>
-													</v-btn>
-													<v-btn rounded height="50" width="170" class="teal lighten-4 ml-4 mr-4" @click="clickNums(5)">
-														<span>5</span>
-													</v-btn>
-													<v-btn rounded height="50" width="170" class="teal lighten-4 ml-4 mr-4" @click="clickNums(6)">
-														<span>6</span>
-													</v-btn>
+													<v-btn rounded height="50" width="170" class="blue lighten-4 ml-4 mr-4" @click="modoDialog === 'HUM' && modoInput === 'HUM' ? clickHumedad(4) : clickNums(4)"><span>4</span></v-btn>
+													<v-btn rounded height="50" width="170" class="blue lighten-4 ml-4 mr-4" @click="modoDialog === 'HUM' && modoInput === 'HUM' ? clickHumedad(5) : clickNums(5)"><span>5</span></v-btn>
+													<v-btn rounded height="50" width="170" class="blue lighten-4 ml-4 mr-4" @click="modoDialog === 'HUM' && modoInput === 'HUM' ? clickHumedad(6) : clickNums(6)"><span>6</span></v-btn>
 												</v-col>
 												<v-col align="center" cols="12" class="pa-1">
-													<v-btn rounded height="50" width="170" class="teal lighten-4 ml-4 mr-4" @click="clickNums(1)">
-														<span>1</span>
-													</v-btn>
-													<v-btn rounded height="50" width="170" class="teal lighten-4 ml-4 mr-4" @click="clickNums(2)">
-														<span>2</span>
-													</v-btn>
-													<v-btn rounded height="50" width="170" class="teal lighten-4 ml-4 mr-4" @click="clickNums(3)">
-														<span>3</span>
-													</v-btn>
+													<v-btn rounded height="50" width="170" class="blue lighten-4 ml-4 mr-4" @click="modoDialog === 'HUM' && modoInput === 'HUM' ? clickHumedad(1) : clickNums(1)"><span>1</span></v-btn>
+													<v-btn rounded height="50" width="170" class="blue lighten-4 ml-4 mr-4" @click="modoDialog === 'HUM' && modoInput === 'HUM' ? clickHumedad(2) : clickNums(2)"><span>2</span></v-btn>
+													<v-btn rounded height="50" width="170" class="blue lighten-4 ml-4 mr-4" @click="modoDialog === 'HUM' && modoInput === 'HUM' ? clickHumedad(3) : clickNums(3)"><span>3</span></v-btn>
 												</v-col>
-												<v-col align="center" cols="12" class="pa-1 mb-5">
-													<v-btn rounded height="50" width="170" class="teal lighten-4 ml-4 mr-4" @click="deleteNums()">
-														<v-icon>mdi-arrow-left</v-icon>
-													</v-btn>
-													<v-btn rounded height="50" width="170" class="teal lighten-4 ml-4 mr-4" @click="clickNums(0)">
-														<span>0</span>
-													</v-btn>
-													<v-btn rounded height="50" width="170" class="teal lighten-4 ml-4 mr-4" @click="okNums()" @keydown.enter="okNums()" >
-														<code-btn rounded height="50" width="170" class="teal lighten-4 ml-4 mr-4" :code="toolClickTemperature == 4 ? `M140 S${parseInt(cadenaNum)} R${parseInt(cadenaNum)}` : toolClickTemperature == 20 ? `M141 S${parseInt(cadenaNum)} R${parseInt(cadenaNum)}` : `M104 S${parseInt(cadenaNum)} T${toolClickTemperature}`" :disabled="isNaN(parseInt(cadenaNum)) || parseInt(cadenaNum) < getMinValue() || parseInt(cadenaNum) > getMaxValue()">
-															<span>OK</span>
-														</code-btn>
-													</v-btn>
+												<v-col align="center" cols="12" class="pa-1 mb-3">
+													<v-btn rounded height="50" width="170" class="blue lighten-4 ml-4 mr-4" @click="modoDialog === 'HUM' && modoInput === 'HUM' ? deleteHumedad() : deleteNums()"><v-icon>mdi-arrow-left</v-icon></v-btn>
+													<v-btn rounded height="50" width="170" class="blue lighten-4 ml-4 mr-4" @click="modoDialog === 'HUM' && modoInput === 'HUM' ? clickHumedad(0) : clickNums(0)"><span>0</span></v-btn>
+													<v-btn rounded height="50" width="170" class="blue lighten-4 ml-4 mr-4" @click="modoDialog === 'HUM' && modoInput === 'HUM' ? okHumedad() : okNums()"><span>OK</span></v-btn>
 												</v-col>
+
 											</v-row>
-											<v-dialog v-model="showTemperatureOutOfRangeDialog" persistent width="480">
-												<v-card class="blue lighten-5 mt-3 mb-3 mr-5">
-													<v-card-title>
-														<span class="headline">{{ $t('generic.warning') }}</span>
-													</v-card-title>
-													<v-card-text>
-														{{ $t('domotek.varios.temp_out') }}
-													</v-card-text>
-													<v-card-actions>
-														<v-spacer></v-spacer>
-														<v-btn color="primary" @click="showTemperatureOutOfRangeDialog = false">OK</v-btn>
-													</v-card-actions>
-												</v-card>
-											</v-dialog>
-										</v-col>
-										<v-col cols="">
-											<!-- max: {{heaterTools[toolClickTemperature == 4 ? 0: toolClickTemperature + 1].max}} -->
-											<!-- <br> -->
-											<!-- min: -->
 										</v-col>
 									</v-row>
+
+									<!-- Dialog temperatura fuera de rango -->
+									<v-dialog v-model="showTemperatureOutOfRangeDialog" persistent width="480">
+										<v-card class="blue lighten-5 mt-3 mb-3 mr-5">
+											<v-card-title><span class="headline">{{ $t('generic.warning') }}</span></v-card-title>
+											<v-card-text>{{ $t('domotek.varios.temp_out') }}</v-card-text>
+											<v-card-actions>
+												<v-spacer></v-spacer>
+												<v-btn color="primary" @click="showTemperatureOutOfRangeDialog = false">OK</v-btn>
+											</v-card-actions>
+										</v-card>
+									</v-dialog>
+								</v-card>
+							</v-dialog>
+							<!-- Dialog miniclima activo -->
+							<v-dialog v-model="showMiniClimaWarning" persistent width="480">
+								<v-card class="blue lighten-5">
+									<v-card-title>
+										<span class="headline">{{ $t('generic.warning') }}</span>
+									</v-card-title>
+									<v-card-text>
+										{{ $t('domotek.varios.RH_enabled') }}
+									</v-card-text>
+									<v-card-actions>
+										<v-spacer></v-spacer>
+										<v-btn color="red lighten-3" rounded @click="stopHumedad(); showMiniClimaWarning = false; modoInput = 'TEMP'">
+											<v-icon>mdi-stop</v-icon> {{ $t('domotek.varios.OffAndContinue') }}
+										</v-btn>
+										<v-btn color="primary" @click="showMiniClimaWarning = false">
+											{{ $t('generic.cancel') }}
+										</v-btn>
+									</v-card-actions>
+								</v-card>
+							</v-dialog>
+							<!-- Dialog humedad fuera de rango -->
+							<v-dialog v-model="showHumidityOutOfRangeDialog" persistent width="480">
+								<v-card class="blue lighten-5 mt-3 mb-3 mr-5">
+									<v-card-title>
+										<span class="headline">{{ $t('generic.warning') }}</span>
+									</v-card-title>
+									<v-card-text>
+										{{ $t('domotek.varios.hum_out') }}
+									</v-card-text>
+									<v-card-actions>
+										<v-spacer></v-spacer>
+										<v-btn color="primary" @click="showHumidityOutOfRangeDialog = false">OK</v-btn>
+									</v-card-actions>
 								</v-card>
 							</v-dialog>
 							<v-dialog v-model="marcadorDrum">
-								<v-btn @click="marcadorDrum = false" x-large block class="blue lighten-3">
-									<v-icon x-large>mdi-close</v-icon>
+								<v-btn @click="marcadorDrum = false" large block class="blue lighten-3">
+									<v-icon large>mdi-close</v-icon>
 								</v-btn>
-								<v-card class="blue lighten-5 mt-3 mb-3 mr-5">
+								<v-card class="blue lighten-5 mt-2 mb-2 mr-3">
 									<v-row class="ma-0">
 										<v-col class="ma-1" cols="12">
 											<v-row class="ma-0">
-												<v-col align="center" cols="20" class="ma-2 clsVcol">
+												<v-col align="center" cols="20" class="ma-1 clsVcol">
 													<v-row>
-														<v-col cols="4" class="mt-3 clsTools">
-															<!-- Botón de stop/play -->
-															<v-btn v-if="getDrumSpeedSet() !== 0" class="clsvbtn2" width="80px" @click="stopDrum()" rounded>
+														<v-col cols="4" class="mt-2 clsTools">
+															
+															<v-btn v-if="getDrumSpeedSet() !== 0" class="clsvbtn2" width="70px" @click="stopDrum()" rounded color="red lighten-3">
 																<v-icon>mdi-stop</v-icon>
 															</v-btn>
-															<v-btn v-else class="clsvbtn2" width="80px" @click="onPlayRPM()" rounded>
+															<v-btn v-else class="clsvbtn2" width="70px" @click="onPlayRPM()" rounded color="green lighten-3">
 																<v-icon>mdi-play</v-icon>
 															</v-btn>
 														</v-col>
-														<v-col cols="4" class="pa-2">
-															<!-- Campo de entrada para el RPM -->
-															<v-text-field v-model="cadenaNum" readonly outlined label="RPM" ref="cadenaNumInput" @keydown.enter="onChangeRPM(cadenaNum)"></v-text-field>
-														</v-col>														
-														<v-col cols="4" class="mt-3 clsTools">
+														
+														<v-col cols="4" class="pa-1">
+															<v-text-field v-model="cadenaNum" readonly outlined dense label="RPM" ref="cadenaNumInput" @keydown.enter="onChangeRPM(cadenaNum)"></v-text-field>
+														</v-col>
+														<v-col cols="4" class="mt-2 clsTools">
 															<v-row>
 																<!-- <v-col cols="12" class="text-center"> -->
-																	<!-- Mostrar RPM actual -->
-																	<!-- {{ $display(drumSpeed, 0, $t('generic.rpm')) }}
-																</v-col> -->
-																<v-col cols="12" class="text-center">																	
+																	<!-- {{ $display(drumSpeed, 0, $t('generic.rpm')) }} -->
+																<!-- </v-col> -->
+																<v-col cols="12" class="text-center">
 																	<span>max: {{ this.RPM_max }}</span>
 																</v-col>
 																<v-col cols="12" class="text-center">
@@ -735,53 +900,51 @@
 															</v-row>
 														</v-col>
 													</v-row>
-												</v-col>
-
-												<!-- Teclado de botones -->
+												</v-col>												
 												<v-col align="center" cols="12" class="pa-1">
-													<v-btn rounded height="50" width="170" class="teal lighten-4 ml-4 mr-4"  @click="clickNums(7)">
+													<v-btn rounded height="40" width="140" class="blue lighten-4 mx-2" @click="clickNums(7)">
 														<span>7</span>
 													</v-btn>
-													<v-btn rounded height="50" width="170" class="teal lighten-4 ml-4 mr-4"  @click="clickNums(8)">
+													<v-btn rounded height="40" width="140" class="blue lighten-4 mx-2" @click="clickNums(8)">
 														<span>8</span>
 													</v-btn>
-													<v-btn rounded height="50" width="170" class="teal lighten-4 ml-4 mr-4" @click="clickNums(9)">
+													<v-btn rounded height="40" width="140" class="blue lighten-4 mx-2" @click="clickNums(9)">
 														<span>9</span>
 													</v-btn>
 												</v-col>
 												<v-col align="center" cols="12" class="pa-1">
-													<v-btn rounded height="50" width="170" class="teal lighten-4 ml-4 mr-4" @click="clickNums(4)">
+													<v-btn rounded height="40" width="140" class="blue lighten-4 mx-2" @click="clickNums(4)">
 														<span>4</span>
 													</v-btn>
-													<v-btn rounded height="50" width="170" class="teal lighten-4 ml-4 mr-4" @click="clickNums(5)">
+													<v-btn rounded height="40" width="140" class="blue lighten-4 mx-2" @click="clickNums(5)">
 														<span>5</span>
 													</v-btn>
-													<v-btn rounded height="50" width="170" class="teal lighten-4 ml-4 mr-4" @click="clickNums(6)">
+													<v-btn rounded height="40" width="140" class="blue lighten-4 mx-2" @click="clickNums(6)">
 														<span>6</span>
 													</v-btn>
 												</v-col>
 												<v-col align="center" cols="12" class="pa-1">
-													<v-btn rounded height="50" width="170" class="teal lighten-4 ml-4 mr-4" @click="clickNums(1)">
+													<v-btn rounded height="40" width="140" class="blue lighten-4 mx-2" @click="clickNums(1)">
 														<span>1</span>
 													</v-btn>
-													<v-btn rounded height="50" width="170" class="teal lighten-4 ml-4 mr-4" @click="clickNums(2)">
+													<v-btn rounded height="40" width="140" class="blue lighten-4 mx-2" @click="clickNums(2)">
 														<span>2</span>
 													</v-btn>
-													<v-btn rounded height="50" width="170" class="teal lighten-4 ml-4 mr-4" @click="clickNums(3)">
+													<v-btn rounded height="40" width="140" class="blue lighten-4 mx-2" @click="clickNums(3)">
 														<span>3</span>
 													</v-btn>
-												</v-col>
-												<v-col align="center" cols="12" class="pa-1 mb-5">
-													<v-btn rounded height="50" width="170" class="teal lighten-4 ml-4 mr-4" @click="deleteNums()">
+												</v-col>												
+												<v-col align="center" cols="12" class="pa-1 mb-3">
+													<v-btn rounded height="40" width="140" class="blue lighten-4 mx-2" @click="deleteNums()">
 														<v-icon>mdi-arrow-left</v-icon>
 													</v-btn>
-													<v-btn rounded height="50" width="170" class="teal lighten-4 ml-4 mr-4" @click="clickNums(0)">
+													<v-btn rounded height="40" width="140" class="blue lighten-4 mx-2" @click="clickNums(0)">
 														<span>0</span>
 													</v-btn>
-													<v-btn rounded height="50" width="170" class="teal lighten-4 ml-4 mr-4" @click="onChangeRPM(cadenaNum)">
-														<code-btn rounded height="50" width="170" class="teal lighten-4 ml-4 mr-4" :disabled="isNaN(parseInt(cadenaNum)) || parseInt(cadenaNum) < this.RPM_min || parseInt(cadenaNum) > this.RPM_max" >
+													<v-btn rounded height="40" width="140" class="blue lighten-4 mx-2" @click="onChangeRPM(cadenaNum)">
+														<code-btn rounded height="40" width="140" class="blue lighten-4" :disabled="isNaN(parseInt(cadenaNum)) || parseInt(cadenaNum) < this.RPM_min || parseInt(cadenaNum) > this.RPM_max">
 															<span>OK</span>
-														</code-btn>																											
+														</code-btn>
 													</v-btn>
 												</v-col>
 											</v-row>
@@ -789,6 +952,7 @@
 									</v-row>
 								</v-card>
 							</v-dialog>
+
 							<v-dialog v-model="showRPMOutOfRangeDialog" persistent width="480">
 								<v-card class="blue lighten-5 mt-3 mb-3 mr-5">
 								<v-card-title>
@@ -808,6 +972,26 @@
 								<v-col cols="12" align="center" class="ma-0 pa-0">
 									<coaxial-panel v-on:close-dialog="closeDialog"></coaxial-panel> 
 								</v-col>
+							</v-dialog>
+
+							<v-dialog v-model="showPltfRefUnreachableDialog" persistent width="480">
+								<v-card class="blue lighten-5 mt-3 mb-3 mr-5">
+									<v-card-title>
+										<span class="headline">{{ $t('generic.warning') }}</span>
+									</v-card-title>
+									<v-card-text style="white-space: pre-line;">
+										{{ pltfRefUnreachableMsg }}
+									</v-card-text>
+									<v-card-actions>
+										<v-spacer></v-spacer>
+										<v-btn color="grey" text @click="cancelarPltfRefUnreachable()">
+											{{ $t('generic.cancel') }}
+										</v-btn>
+										<v-btn color="primary" @click="setPltfRefToMinReachable()">
+											{{ $t('domotek.varios.cool_to_minimum', { min: pltfRefMinReachable }) }}
+										</v-btn>
+									</v-card-actions>
+								</v-card>
 							</v-dialog>
 
 							
@@ -868,7 +1052,7 @@
 					<!-- <v-btn v-show="!camaClick" v-for="registro in jTools" :key="registro.idFam" class="vbtn1 ma-2 blue lighten-5" @click="ChangeSelected(registro.idTool)" rounded>{{registro.nombreTool}}</v-btn>	 -->
 					
 					
-					<v-btn :color="(registro.idTool === -1) ? 'blue lighten-5' : 'primary'" active-class="no-active" v-show="!camaClick" v-for="registro in filterPadres" :key="registro.idPadre" class="vbtn1 ma-1" @click="ChangeSelectedFam(registro.idTool, registro.idHijo)" rounded>
+					<v-btn :color="(registro.idTool === -1) ? 'blue lighten-5' : 'primary'" active-class="no-active" v-show="!camaClick" v-for="registro in filterPadresPorTool" :key="registro.idPadre" class="vbtn1 ma-1" @click="ChangeSelectedFam(registro.idTool, registro.idHijo)" rounded>
 						<!-- <div>{{registro.titulo}}</div> -->
 						<!-- <span style="white-space: normal;">{{registro.titulo}}</span>-->
 						<span v-html="replaceFilter(registro.titulo)"></span>
@@ -905,7 +1089,7 @@
 
 				</v-row>
 		</v-col>
-		<v-col cols="12" v-if="$store.state.nivelUsuario >= 2">
+		<v-col cols="12" v-if="$store.state.nivelUsuario >= 3">
 			<tools-file-list></tools-file-list>
 		</v-col>
 		<v-col cols="12" class="red pa-0 ma-0">
@@ -1015,6 +1199,7 @@ export default {
 			arrayNameTools: this.nameTool0,
 			toolClick: false,
 			camaClick: false,
+			chamberTimeout: null,
 			ClickToolAnterior: 0,
 			dialog: false,
 			dialogBed: false,
@@ -1030,9 +1215,39 @@ export default {
 			marcadorMix: false,
 			showTemperatureOutOfRangeDialog: false,
 			showRPMOutOfRangeDialog : false,
-			RPM_min: 300,
+			RPM_min: 0,
 			RPM_max: 4000,
+			toolCalibrado: {},   
+			dialogOffsetsVisible: false, 
+			offsetTexto: '',  
+			offsetTitulo: '',
+			currentTool: null ,
 			toolClickTemperature: null,
+			marcadorHumedad: false,
+			humedad: "0",
+			HUMIDITY_min: 15,
+			HUMIDITY_max: 85,
+			showHumidityOutOfRangeDialog: false,
+			humedadEncendida: false,
+			//humedadSetPoint: "--",
+			controlHumedadActivo: false,
+			controlHumedadInterval: null,
+			controlHumedadTimeout: null,
+			showMiniClimaWarning: false,
+			modoInput: 'HUM', // 'HUM' o 'TEMP'
+			modoDialog: 'HEAT', // 'HEAT' o 'HUM'
+			// --- Potencia PLTF-REF según conexión a Chamber ---
+			pltfRefPowerFull: 1,      // M307 H0 S1  (100%)
+			pltfRefPowerHalf: 0.5,    // M307 H0 S0.5 (50%)
+			pltfRefPowerDelay: 3000,  // ms de espera antes de aplicar la potencia (ajustable)
+			// --- Deltas alcanzables (temperatura Chamber - delta), confirmados ---
+			pltfRefDeltaConnected: 21, // delta a 100% (conectada a Chamber)
+			pltfRefDeltaCell: 18,      // delta a 50% (modo célula, no conectada a Chamber)
+
+			// --- Dialog de aviso "temperatura no alcanzable" ---
+			showPltfRefUnreachableDialog: false,
+			pltfRefUnreachableMsg: '',
+			pltfRefMinOverride: null, // mínimo temporal tras pulsar Cancelar en el aviso; null = usa el valor de hardware (~5°C)
 			sHijo: "",
 			filterBy: [""],
 			retTool0name: "",
@@ -1040,7 +1255,7 @@ export default {
 			retTool2name: "",
 			retTool3name: "",
 			rpmOptions: ['300', '400', '500', '1000', '1500', '2000', '2500', '3000', '3500', '4000'],
-    		item: null,
+			item: null,
 			//slider: 0.50,
 			
 			jTree: [
@@ -1049,7 +1264,10 @@ export default {
 				{idPadre: "SYRINGE",idHijo: "SYR", titulo: i18n.t('domotek.toolNames.SYRINGE_STD'), idTool: -1 },
 				{idPadre: "SYRINGE",idHijo: "SYR-HEAT", titulo: i18n.t('domotek.toolNames.SYRINGE_HEAT'), idTool: -1 },
 				{idPadre: "SYRINGE",idHijo: "SYR-ES", titulo: i18n.t('domotek.toolNames.SYRINGE_ES'), idTool: -1 },
-				// {idPadre: "SYRINGE",idHijo: "COAX", titulo: i18n.t('domotek.toolNames.SYRINGE_COAX'), idTool: -1 },
+				{idPadre: "SYRINGE",idHijo: "COAX", titulo: i18n.t('domotek.toolNames.SYRINGE_COAX'), idTool: -1 },	//	2026/10/08 Gorka, Lo he escondido
+				//{idPadre: "SYRINGE",idHijo: "", titulo:i18n.t('domotek.toolNames.SYRINGE_EMD'), idTool: 11 },		//	2026/02/19 Gorka, Lo he escondido
+				//{idPadre: "SYR-EMD",idHijo: "", titulo:i18n.t('domotek.toolNames.SYRINGE_EMD'), idTool: 11 },		//	2026/02/19 Gorka, Lo he escondido
+				//{idPadre: "SYR-EMD",idHijo: "", titulo:i18n.t('domotek.toolNames.CHANGE'), idTool: -1 },			//	2026/02/19 Gorka, Lo he escondido
 				{idPadre: "SYRINGE",idHijo: "", titulo: i18n.t('domotek.toolNames.BACK'), idTool: -1 },
 				{idPadre: "SYR",idHijo: "SYR 10ML", titulo: i18n.t('domotek.toolNames.SYRINGE_STD')+ " 10ML", idTool: 1 },
 				{idPadre: "SYR 10ML",idHijo: "", titulo: i18n.t('domotek.toolNames.SYRINGE_STD')+ " 10ML", idTool: 1 },
@@ -1066,13 +1284,16 @@ export default {
 				{idPadre: "SYR-ES 10ML",idHijo: "", titulo: i18n.t('domotek.toolNames.CHANGE'), idTool: -1 },
 				//{idPadre: "SYR-ES",idHijo: "", titulo: i18n.t('domotek.toolNames.SYRINGE_ES')+" 3ML", idTool: -1 },	 //	2025/01/13 Gorka, Lo he escondido
 				{idPadre: "SYR-ES",idHijo: "", titulo: i18n.t('domotek.toolNames.BACK'), idTool: -1 },	
-				// {idPadre: "COAX",idHijo: "COAX 10ML", titulo:  i18n.t('domotek.toolNames.SYRINGE_COAX')+" 10ML", idTool: 9 },
-				// {idPadre: "COAX 10ML",idHijo: "", titulo: i18n.t('domotek.toolNames.SYRINGE_COAX')+" 10ML", idTool: 9 },		
-				// {idPadre: "COAX",idHijo: "", titulo: i18n.t('domotek.toolNames.BACK'), idTool: -1 },	
+				{idPadre: "COAX",idHijo: "COAX 10ML", titulo:  i18n.t('domotek.toolNames.SYRINGE_COAX')+" 10ML", idTool: 9 },		//	2026/10/08 Gorka, Lo he escondido
+				{idPadre: "COAX 10ML",idHijo: "", titulo: i18n.t('domotek.toolNames.SYRINGE_COAX')+" 10ML", idTool: 9 },		//	2026/10/08 Gorka, Lo he escondido	
+				{idPadre: "COAX",idHijo: "", titulo: i18n.t('domotek.toolNames.BACK'), idTool: -1 },		//	2026/10/08 Gorka, Lo he escondido
 				{idPadre: "",idHijo: "FILAMENT", titulo: i18n.t('domotek.toolNames.THERMOPLASTICS')+ "", idTool: -1 },
 				{idPadre: "FILAMENT",idHijo: "FIL", titulo: i18n.t('domotek.toolNames.FIL'), idTool: 4 },
 				{idPadre: "FIL",idHijo: "", titulo: i18n.t('domotek.toolNames.FIL'), idTool: 4 },
 				{idPadre: "FIL",idHijo: "", titulo:i18n.t('domotek.toolNames.CHANGE'), idTool: -1 },
+				//{idPadre: "FILAMENT",idHijo: "FIL-HT", titulo: i18n.t('domotek.toolNames.FIL-HT'), idTool: 5 },	//	2026/10/08 Gorka, Lo he escondido
+				//{idPadre: "FIL-HT",idHijo: "", titulo: i18n.t('domotek.toolNames.FIL-HT'), idTool: 5 },	//	2026/10/08 Gorka, Lo he escondido
+				//{idPadre: "FIL-HT",idHijo: "", titulo:i18n.t('domotek.toolNames.CHANGE'), idTool: -1 },	//	2026/10/08 Gorka, Lo he escondido
 				{idPadre: "FILAMENT",idHijo: "UPE", titulo: i18n.t('domotek.toolNames.UPE'), idTool: 6 },
 				{idPadre: "UPE",idHijo: "", titulo: i18n.t('domotek.toolNames.UPE'), idTool: 6 },
 				{idPadre: "UPE",idHijo: "", titulo:i18n.t('domotek.toolNames.CHANGE'), idTool: -1 },
@@ -1088,11 +1309,13 @@ export default {
 				{idPadre: "UV-405",idHijo: "", titulo:i18n.t('domotek.toolNames.UV')+"-405", idTool: 8 },
 				{idPadre: "UV-405",idHijo: "", titulo:i18n.t('domotek.toolNames.CHANGE'), idTool: -1 },
 				{idPadre: "UV",idHijo: "", titulo:i18n.t('domotek.toolNames.BACK'), idTool: -1 },
-				{idPadre: "",idHijo: "UTILITY", titulo:i18n.t('domotek.toolNames.UTILITY'), idTool: -1 },
-				{idPadre: "UTILITY",idHijo: "AUTOCAL", titulo: i18n.t('domotek.toolNames.AUTOCAL'), idTool: 15 },
-				{idPadre: "AUTOCAL",idHijo: "", titulo:i18n.t('domotek.toolNames.AUTOCAL'), idTool: 15 },
-				{idPadre: "AUTOCAL",idHijo: "", titulo:i18n.t('domotek.toolNames.CHANGE'), idTool: -1 },
-				{idPadre: "UTILITY",idHijo: "", titulo:i18n.t('domotek.toolNames.BACK'), idTool: -1 },
+				// {idPadre: "",idHijo: "UTILITY", titulo:i18n.t('domotek.toolNames.UTILITY'), idTool: -1 },
+				// {idPadre: "UTILITY",idHijo: "AUTOCAL", titulo: i18n.t('domotek.toolNames.AUTOCAL'), idTool: 15 },
+				// {idPadre: "AUTOCAL",idHijo: "", titulo:i18n.t('domotek.toolNames.AUTOCAL'), idTool: 15 },
+				// {idPadre: "AUTOCAL",idHijo: "", titulo:i18n.t('domotek.toolNames.CHANGE'), idTool: -1 },
+				// {idPadre: "UTILITY",idHijo: "", titulo:i18n.t('domotek.toolNames.BACK'), idTool: -1 },
+				{idPadre: "",idHijo: "AUTOCAL", titulo:i18n.t('domotek.toolNames.AUTOCAL'), idTool: 15 },
+
 			],
 			
 			jBeds: [
@@ -1113,6 +1336,7 @@ export default {
 			heaterTools: state => state.machine.model.heat.heaters,
 			//miMachineModel: state => state.machine.model.global.machineModel,
 			nameHeaters: state => state.machine.model.sensors,
+			move: state => state.machine.model.move,
 		}),
 		...mapState('machine/model', {
 			boards: state => state.boards,
@@ -1129,6 +1353,26 @@ export default {
 			return this.jTree.filter(p => this.filterBy.includes(p.idPadre));
 		},
 		
+		filterPadresPorTool() {
+			return this.filterPadres.filter(registro => {
+				// Solenoide oculto en T1 y T2 con chamber
+				if (
+					this.chamberMode === true &&
+					registro.idTool === 11 &&
+					(this.ClickToolAnterior === 1 || this.ClickToolAnterior === 2)
+				) {
+					return false
+				}
+				// Coaxial no disponible en T1 y T2
+				if (
+					registro.idHijo === 'COAX' &&
+					(this.ClickToolAnterior === 1 || this.ClickToolAnterior === 2)
+				) {
+					return false
+				}
+				return true
+			})
+		},
 		
 		pageHeight () {
 			return document.body.scrollHeight;
@@ -1159,6 +1403,7 @@ export default {
 		Bed: {
 			get() { return (this.$store.state.machine.model.global.Bed);},
 		},
+	
 		SecuenciaT0: {
 			get() { return (this.$store.state.machine.model.global.SecuenciaT0);},
 		},
@@ -1173,6 +1418,18 @@ export default {
 		},
 		SecuenciaBed: {
 			get() { return (this.$store.state.machine.model.global.SecuenciaBed);},
+		},
+		T0CAL() {
+			return this.$store.state.machine.model.global.T0CAL;
+		},
+		T1CAL() {
+			return this.$store.state.machine.model.global.T1CAL;
+		},
+		 T2CAL() {
+			return this.$store.state.machine.model.global.T2CAL;
+		},
+		T3CAL() {
+			return this.$store.state.machine.model.global.T3CAL;
 		},
 	// nameTools[0].name
 	nameTools0name: {
@@ -1293,6 +1550,15 @@ export default {
 					}
 			}
 		},
+		miniclima_capable: {
+			get() {
+				try {
+					return this.$store.state.machine.model.global.miniclima_capable;
+				} catch {
+					return false;
+				}
+			}
+		},
 		doorStateOpen: {
 			get() {
 					try {
@@ -1303,10 +1569,6 @@ export default {
 					}
 			}
 		},
-		
-
-
-
 		bedSelected: {
 			get() {
 					try {
@@ -1386,6 +1648,71 @@ export default {
 			get() {
 				return this.$store.state.machine.model.global.Mew_Capable},
 		},
+		miniclima_rh: {
+			get() {
+				try {
+					return this.$store.state.machine.model.global.miniclima_rh;
+				} catch (error) {
+					return "--";
+				}
+			}
+		},
+		chamberTemp: {
+			get() {
+				try {
+					return this.$store.state.machine.model.heat.heaters[20].current;
+				} catch { return 20; }
+			}
+		},
+		miniclima_on: {
+			get() {
+				try {
+					return this.$store.state.machine.model.global.miniclima_on;
+				} catch {
+					return false;
+				}
+			}
+		},
+		miniclima_setPoint: {
+			get() {
+				try {
+					return this.$store.state.machine.model.global.miniclima_setPoint;
+				} catch {
+					return 0;
+				}
+			}
+		},
+
+		// Temperatura mínima realmente alcanzable ahora mismo, según sensor de Chamber
+		// Delta aplicable según si está o no conectada al Chamber
+		pltfRefDelta: {
+			get() {
+				return this.chamberMode ? this.pltfRefDeltaConnected : this.pltfRefDeltaCell;
+			}
+		},
+
+		// Temperatura mínima realmente alcanzable ahora mismo, según sensor de Chamber
+		pltfRefMinReachable: {
+			get() {
+				return Math.ceil(this.chamberTemp - this.pltfRefDelta);   // <-- CAMBIADO: Math.ceil en vez de Math.round(...*10)/10
+			}
+		},
+		allAxesHomed () {
+			if (this.modeloMaquina === '2A') {
+				return this.move.axes[0].homed &&
+						this.move.axes[1].homed &&
+						this.move.axes[2].homed &&
+						this.move.axes[3].homed
+				}
+
+			return this.move.axes[0].homed &&
+				this.move.axes[1].homed &&
+				this.move.axes[2].homed &&
+				this.move.axes[3].homed &&
+				this.move.axes[4].homed &&
+				this.move.axes[5].homed &&
+				this.move.axes[6].homed
+		},
 
 		
 
@@ -1396,6 +1723,7 @@ export default {
 			this.DialogCalibration = false;
 			this.marcadorMix = false;
 			this.marcador = false;
+			this.cadenaNum = "0";
 		},
 		  
 		StartSaveSettings(){
@@ -1409,6 +1737,79 @@ export default {
 			
 			//this.codigo += 'M29' + '\n';
 		},
+		
+		async showToolOffsets(toolNumber) {
+			try {
+				const response = await this.sendCode({ code: `G10 P${toolNumber}` });
+
+				// Mapeo de etiquetas y ejes
+				const toolAxisMap = {
+				0: { label2: 'Y1: ', label3: 'Z1: ', secondAxisKey: 'Y', zOrAKey: 'Z' },
+				1: { label2: 'Y2: ', label3: 'Z1: ', secondAxisKey: 'U', zOrAKey: 'Z' },
+				2: { label2: 'Y3: ', label3: 'Z2: ', secondAxisKey: 'V', zOrAKey: 'A' },
+				3: { label2: 'Y4: ', label3: 'Z2: ', secondAxisKey: 'W', zOrAKey: 'A' }
+				};
+
+				const axisConfig = toolAxisMap[toolNumber];
+
+				const x = response.match(/X(-?\d+\.\d+)/)?.[1];
+				const secondAxis = response.match(new RegExp(`${axisConfig.secondAxisKey}(-?\\d+\\.\\d+)`))?.[1];
+				const zOrA = response.match(new RegExp(`${axisConfig.zOrAKey}(-?\\d+\\.\\d+)`))?.[1];
+
+				const displayText =
+				`X: ${x ?? 'N/A'}\n` +
+				`${axisConfig.label2} ${secondAxis ?? 'N/A'}\n` +
+				`${axisConfig.label3} ${zOrA ?? 'N/A'}`;
+
+				// ✅ Usar directamente T0CAL, T1CAL, etc.
+				const calibrado = this[`T${toolNumber}CAL`];
+
+				this.offsetTitulo = calibrado
+				? this.$t('panel.tools.toolCalibrado')
+				: this.$t('panel.tools.toolNoCalibrado');
+
+				this.offsetTexto = displayText;
+			} catch (err) {
+				this.offsetTitulo = '❌ Error al obtener offsets';
+				this.offsetTexto = '';
+			}
+
+			this.dialogOffsetsVisible = true;
+		},
+		
+		async showPlatformOffsets() {
+			try {
+				const response = await this.sendCode({ code: 'M208' });
+
+				// Extrae los límites para Z y A
+				const zMatch = response.match(/Z(-?\d+\.?\d*):(-?\d+\.?\d*)/);
+				const aMatch = response.match(/A(-?\d+\.?\d*):(-?\d+\.?\d*)/);
+
+				const zMin = zMatch ? zMatch[1] : 'N/A';
+				const zMax = zMatch ? zMatch[2] : 'N/A';
+				const aMin = aMatch ? aMatch[1] : 'N/A';
+				const aMax = aMatch ? aMatch[2] : 'N/A';
+
+				// const displayText =
+				// `Puente izquierdo (Z):\nMínimo: ${zMin}\nMáximo: ${zMax}\n\n` +
+				// `Puente derecho (A):\nMínimo: ${aMin}\nMáximo: ${aMax}`;
+				const displayText = this.$t('panel.tools.platformOffsetsText', {
+					zMin,
+					zMax,
+					aMin,
+					aMax,
+					});
+
+				this.offsetTitulo = this.$t('panel.tools.platformOffsets'); // o un texto como "Offsets de la plataforma"
+				this.offsetTexto = displayText;
+			} catch (err) {
+				this.offsetTitulo = '❌ Error al obtener offsets de la plataforma';
+				this.offsetTexto = '';
+			}
+
+			this.dialogOffsetsVisible = true;
+		},
+
 		
 		NombreTool(numeroTool){
 			if(numeroTool === 0) {
@@ -1533,6 +1934,13 @@ export default {
 					this.numSelected = 0;
 					this.filterBy =["SYR-ES 10ML"];
 					break;
+				
+					//solenoide - Electro Magnetic Droplet
+				case "SYR-EMD":
+					this.numSelected = 11;
+					this.numSelected = 0;
+					this.filterBy =["SYR-EMD"];
+					break;
 					//Filamento
 				case "FIL":
 					this.numSelected = 4;
@@ -1638,6 +2046,9 @@ export default {
 				case 10:
 					this.codigo += '"/tools/T'+ this.numTool +'/10_UPE_ADV.g"';
 					break;	
+				case 11:
+					this.codigo += '"/tools/T'+ this.numTool +'/11_Electro_Magnetic_Droplet.g"';
+					break;	
 				case 15:
 					this.codigo += '"/tools/T'+ this.numTool +'/15_Automatic_Calibration_Module.g"';
 					break;
@@ -1686,6 +2097,7 @@ export default {
 					break;
 				case 1:
 					this.codigo='"/tools/Bed/Frio.g"';
+					this.setPltfRefPower(); 
 					break;
 				case 2:
 					this.codigo='"/tools/Bed/MEW.g"';
@@ -1704,6 +2116,16 @@ export default {
 
 		},
 		AceptaTool(pnumero,pnumcodigo){
+			if (pnumcodigo == 9) {
+				if (!this.allAxesHomed) {
+					const msg = this.$t('domotek.varios.axesNotHomed');
+					const title = this.$t('domotek.varios.axesNotHomedTitle');
+					this.sendCode({ code: `M291 P"${msg}" R"${title}" S1` });
+					return;
+				}
+				this.sendCode({ code: `M98 P"/tools/T${pnumero}/09_Coaxial.g"`, log: true });
+				return;
+			}
 			/* console.info(`Aceptamos el Tool`);
 			*/
 			switch (pnumero) {
@@ -1760,7 +2182,7 @@ export default {
 			//tool 0
 			this.secuencia += "set global.T0  = "
 			if(pnumero==0){
-				if (pnumcodigo != 15 && pnumcodigo != 3 && pnumcodigo != 7 && pnumcodigo != 8){
+				if (pnumcodigo != 15 && pnumcodigo != 3 && pnumcodigo != 7 && pnumcodigo != 8 && pnumcodigo != 11){
 					this.secuencia += "0" + '\n';	
 				}
 				else{
@@ -1772,7 +2194,7 @@ export default {
 			}
 			this.secuencia += "set global.SecuenciaT0  = "
 			if(pnumero==0){
-				if (pnumcodigo != 15 && pnumcodigo != 3 && pnumcodigo != 7 && pnumcodigo != 8){
+				if (pnumcodigo != 15 && pnumcodigo != 3 && pnumcodigo != 7 && pnumcodigo != 8 && pnumcodigo != 11){
 					this.secuencia += '"/tools/T'+ pnumero +'/00_Empty.g"'+ '\n';	
 				}
 				else{
@@ -1785,7 +2207,7 @@ export default {
 			//tool 1
 			this.secuencia += "set global.T1  = "
 			if(pnumero==1){
-				if (pnumcodigo != 15 && pnumcodigo != 3 && pnumcodigo != 7 && pnumcodigo != 8){
+				if (pnumcodigo != 15 && pnumcodigo != 3 && pnumcodigo != 7 && pnumcodigo != 8 && pnumcodigo != 11){
 					this.secuencia += "0" + '\n';	
 				}
 				else{
@@ -1797,7 +2219,7 @@ export default {
 			}
 			this.secuencia += "set global.SecuenciaT1  = "
 			if(pnumero==1){
-				if (pnumcodigo != 15 && pnumcodigo != 3 && pnumcodigo != 7 && pnumcodigo != 8){
+				if (pnumcodigo != 15 && pnumcodigo != 3 && pnumcodigo != 7 && pnumcodigo != 8 && pnumcodigo != 11){
 					this.secuencia += '"/tools/T'+ pnumero +'/00_Empty.g"'+ '\n';	
 				}
 				else{
@@ -1810,7 +2232,7 @@ export default {
 			//tool 2
 			this.secuencia += "set global.T2  = "
 			if(pnumero==2){
-				if (pnumcodigo != 15 && pnumcodigo != 3 && pnumcodigo != 7 && pnumcodigo != 8){
+				if (pnumcodigo != 15 && pnumcodigo != 3 && pnumcodigo != 7 && pnumcodigo != 8 && pnumcodigo != 11){
 					this.secuencia += "0" + '\n';	
 				}
 				else{
@@ -1822,7 +2244,7 @@ export default {
 			}
 			this.secuencia += "set global.SecuenciaT2  = "
 			if(pnumero==2){
-				if (pnumcodigo != 15 && pnumcodigo != 3 && pnumcodigo != 7 && pnumcodigo != 8){
+				if (pnumcodigo != 15 && pnumcodigo != 3 && pnumcodigo != 7 && pnumcodigo != 8 && pnumcodigo != 11){
 					this.secuencia += '"/tools/T'+ pnumero +'/00_Empty.g"'+ '\n';	
 				}
 				else{
@@ -1835,7 +2257,7 @@ export default {
 			//tool 3
 			this.secuencia += "set global.T3  = "
 			if(pnumero==3){
-				if (pnumcodigo != 15 && pnumcodigo != 3 && pnumcodigo != 7 && pnumcodigo != 8){
+				if (pnumcodigo != 15 && pnumcodigo != 3 && pnumcodigo != 7 && pnumcodigo != 8 && pnumcodigo != 6 && pnumcodigo != 11){
 					this.secuencia += "0" + '\n';	
 				}
 				else{
@@ -1847,7 +2269,7 @@ export default {
 			}
 			this.secuencia += "set global.SecuenciaT3  = "
 			if(pnumero==3){
-				if (pnumcodigo != 15 && pnumcodigo != 3 && pnumcodigo != 7 && pnumcodigo != 8){
+				if (pnumcodigo != 15 && pnumcodigo != 3 && pnumcodigo != 7 && pnumcodigo != 8 && pnumcodigo != 6 && pnumcodigo != 11){
 					this.secuencia += '"/tools/T'+ pnumero +'/00_Empty.g"'+ '\n';	
 				}
 				else{
@@ -1866,55 +2288,47 @@ export default {
 		change(){
 			this.cambiarMenu;
 		},
-		//----Cambios Gorka---
 		// Funcion para obtener el valor mas alto de la temperatura permitida
 		getMaxValue() {
 			return this.heaterTools[this.toolClickTemperature === 4 ? 0 : this.toolClickTemperature === 20 ? 20 : this.toolClickTemperature + 1].max - 10;
 		},
 		getMinValue() {
-			if( this.toolClickTemperature == 4 && this.nameCama.analog[0].name == "PLTF-REF"){
-				return this.heaterTools[this.toolClickTemperature == 4 ? 0 : this.toolClickTemperature == 20 ? 20 : this.toolClickTemperature+1].min + 278.1;
-			}else{
-				return this.tempAmbiente;
+			if (this.toolClickTemperature == 4 && this.nameCama.analog[0].name == "PLTF-REF") {
+				return this.pltfRefMinOverride !== null ? this.pltfRefMinOverride : (this.heaterTools[0].min + 278.1);
 			}
-			
+			const toolName = this.NombreTool(this.toolClickTemperature);
+			if (toolName === 'FIL' || toolName === 'UPE' || toolName === 'FIL-HT') {
+				return 60;
+			}
+			return this.tempAmbiente;
 		},
 
-
-		// clickNums(num) {
-		// 	if (this.cadenaNum === "0") {
-		// 		this.cadenaNum = ""; // Elimina el cero inicial
-		// 	}
-
-		// 	const newValue = parseInt(this.cadenaNum + num, 10);
-		// 	if (newValue >= 0 && newValue <= this.getMaxValue()) { // Usa this.getMaxValue() directamente
-		// 			this.cadenaNum += "" + num;								
-		// 	}
-    	// },
-		
 		clickNums(num) {
-			const inputField = this.$refs.cadenaNumInput.$el.querySelector('input'); // Referencia al input
-			const cursorPosition = inputField.selectionStart; // Obtén la posición del cursor
+			const inputField = this.$refs.cadenaNumInput.$el.querySelector('input');
+
+			// Detectar si es un dispositivo táctil
+			const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+
+			// Determinar posición del cursor
+			let cursorPosition = isTouch ? this.cadenaNum.length : inputField.selectionStart;
 
 			if (this.cadenaNum === "0") {
 				this.cadenaNum = "";
+				cursorPosition = 0; // reset si estaba solo un cero
 			}
 
-			if (cursorPosition !== null && cursorPosition !== undefined) {
-				const beforeCursor = this.cadenaNum.slice(0, cursorPosition);
-				const afterCursor = this.cadenaNum.slice(cursorPosition);
+			const beforeCursor = this.cadenaNum.slice(0, cursorPosition);
+			const afterCursor = this.cadenaNum.slice(cursorPosition);
 
-				// Inserta el número en la posición del cursor
-				this.cadenaNum = `${beforeCursor}${num}${afterCursor}`;
+			// Insertar el número
+			this.cadenaNum = `${beforeCursor}${num}${afterCursor}`;
 
-				// Ajusta el cursor después de la inserción
-				this.$nextTick(() => {
-				inputField.setSelectionRange(cursorPosition + 1, cursorPosition + 1);
-				});
-			} else {
-				// Si no hay posición del cursor (caso raro), agrega al final
-				this.cadenaNum += `${num}`;
-			}
+			// Ajustar el cursor
+			this.$nextTick(() => {
+				const newPos = cursorPosition + 1;
+				inputField.setSelectionRange(newPos, newPos);
+				inputField.focus(); // Asegura que el cursor se vea en touch
+			});
 		},
 		
 		//Funcion para borrar con el boton de la pantalla
@@ -1937,9 +2351,9 @@ export default {
 				}
 
 				// Ajusta la posición del cursor
-				// this.$nextTick(() => {
-				// 	inputField.setSelectionRange(cursorPos -1 , cursorPos - 1);
-				// });
+				//this.$nextTick(() => {
+				//	inputField.setSelectionRange(cursorPos -1 , cursorPos - 1);
+				//});
 				
 			}
 		},
@@ -1965,39 +2379,136 @@ export default {
 				});
 			}
 		},
-		handleOffButton(){
+		handleOffButton() {
+			const tool = this.toolClickTemperature;
+
+			if (tool === 4) {
+				this.sendCode({ code: `M140 S0 R0` });
+				setTimeout(() => {
+					this.sendCode({ code: `M140 S-273.15` });
+				}, 100);
+
+			} else if (tool === 20) {
+				this.sendCode({ code: `M141 S0 R0` });
+				setTimeout(() => {
+					this.sendCode({ code: `M141 S-273.15` });
+					this.sendCode({ code: `M98 P"0:/macros/On-Off_CHAMBER_FAN/off.g"` });
+				}, 100);
+
+			} else {
+				this.sendCode({ code: `G10 P${tool} S0 R0` });
+				setTimeout(() => {
+					this.sendCode({ code: `M568 P${tool} A0` });
+				}, 100);
+			}
+
+			const index = tool === 4 ? 0 : tool === 20 ? 20 : tool + 1;
+
+			// Actualización local en Vue para que la interfaz cambie al instante
+			if (this.heaterTools[index]) {
+				this.$set(this.heaterTools, index, {
+					...this.heaterTools[index],
+					active: 0,
+					standby: 0,
+					state: 'off'
+				});
+			}
+
+			if (this.chamberTimeout) {
+				clearTimeout(this.chamberTimeout);
+				this.chamberTimeout = null;
+			}
+
 			this.marcador = false;
 			this.marcadorDrum = false;
 			this.marcadorMix = false;
 			this.cadenaNum = "0";
 		},
+		handleFixButton() {
+			const tool = this.toolClickTemperature;
+			const heaterIndex = tool === 4 ? 0 : tool === 20 ? 20 : tool + 1;
 
-		// okNums(){
-		// 	this.marcador = false;
-		// 	this.marcadorDrum = false;
-		// 	this.marcadorMix = false;
-		// 	this.cadenaNum = "0";
-		// },
+			this.sendCode({ code: `M562 P${heaterIndex}` });
+
+			// Actualización local en Vue para que la interfaz cambie al instante
+			if (this.heaterTools[heaterIndex]) {
+				this.$set(this.heaterTools, heaterIndex, {
+					...this.heaterTools[heaterIndex],
+					active: 0,
+					standby: 0,
+					state: 'off'
+				});
+			}
+
+			this.marcador = false;
+			this.marcadorDrum = false;
+			this.marcadorMix = false;
+			this.cadenaNum = "0";
+		},
+		
+
 		okNums() {
-			const value = parseInt(this.cadenaNum, 10); // Convierte la cadena a un número
-			
-			// Verifica si el valor es un número
+			const value = parseInt(this.cadenaNum, 10); // Convierte la cadena a número
+
+			// Verifica si el valor es un número válido
 			if (isNaN(value)) {
 				this.sendCode({ code: `M118 P0 S"Valor no válido"` });
 				return;
 			}
-			// Verifica si el valor es mayor que el máximo permitido
+
+			// Verifica si el valor está dentro del rango
 			if (value < this.getMinValue() || value > this.getMaxValue()) {
 				this.showTemperatureOutOfRangeDialog = true;
-				this.sendCode({ code: `M118 P0 S"Temperature out of range" L1` });
+				const msg = this.$t('domotek.varios.temp_out');
+				this.sendCode({ code: `M118 P0 S"${msg}" L1` });
 				return;
 			}
+
+			// --- AÑADIDO: comprobación de alcanzabilidad real para PLTF-REF ---
+			if (this.toolClickTemperature === 4 && this.nameCama.analog[0].name === "PLTF-REF") {
+				if (value < this.pltfRefMinReachable) {
+					this.pltfRefUnreachableMsg = this.$t('domotek.varios.pltfref_unreachable', {
+						value: value,
+						ambient: this.chamberTemp.toFixed(1),
+						min: this.pltfRefMinReachable
+					});
+					this.showPltfRefUnreachableDialog = true;
+					this.sendCode({ code: `M118 P0 S"${this.pltfRefUnreachableMsg}" L1` });
+					return; // no se envía el comando, igual que en el aviso de rango
+				}
+			}
+			// --- FIN AÑADIDO ---
+
+			// Si es la chamber (tool 20), prepara timeout cancelable
+			if (this.toolClickTemperature === 20) {
+				const startTemp = this.heaterTools[20].current;
+
+				// Cancela timeout previo si existía
+				if (this.chamberTimeout) {
+				clearTimeout(this.chamberTimeout);
+				this.chamberTimeout = null;
+				}
+
+				// Crea un nuevo timeout
+				this.chamberTimeout = setTimeout(() => {
+				const currentTemp = this.heaterTools[20].current;
+
+				if (currentTemp < startTemp + 1) {
+					const msg = this.$t('panel.tools.chamberNotHeating');
+					this.sendCode({ code: `M291 P"${msg}" R"Chamber" S2` });
+					this.sendCode({ code: `M118 P0 S"${msg}"` });
+				}
+
+				this.chamberTimeout = null; // limpia referencia
+				}, 60000); // 1 minuto
+			}
+
+			// Continuar con flujo normal
 			this.sendTempKeyboard();
 			this.marcador = false;
 			this.marcadorDrum = false;
 			this.marcadorMix = false;
 			this.cadenaNum = "0";
-			
 		},
 
 		sendTempKeyboard() {
@@ -2007,6 +2518,7 @@ export default {
 				this.sendCode({code: `M140 S${num} R${num}`});
 			} else if (this.toolClickTemperature === 20) {
 				this.sendCode({code:`M141 S${num} R${num}`});
+				this.sendCode({ code: `M98 P"0:/macros/On-Off_CHAMBER_FAN/on.g"` });
 			} else {
 				this.sendCode({code:`M104 S${num} T${this.toolClickTemperature}`});
 			}	
@@ -2014,6 +2526,17 @@ export default {
 
 		handleKeyPress(event) {
 			const key = event.key;
+			if (this.marcador && this.modoInput === 'HUM') {
+				const key = event.key;
+				if (!isNaN(key) && key >= 0 && key <= 9) {
+					this.clickHumedad(parseInt(key));
+				} else if (key === "Backspace") {
+					this.deleteHumedad();
+				} else if (key === "Enter") {
+					this.okHumedad();
+				}
+				return;
+			}
 			const inputField = this.$refs.cadenaNumInput.$el.querySelector('input'); // Referencia al campo de texto
 			const cursorPosition = inputField.selectionStart; // Obtener la posición del cursor
 
@@ -2057,9 +2580,15 @@ export default {
 			//event.preventDefault();
 		},
 
-    	//------- Fin cambios Gorka -------
+
 		keyboardScreen(toolTemperature){
-			this.sendCode({code: `set global.TSeleccionado = ${toolTemperature}`, log: false});			
+			if (toolTemperature === 20 && this.miniclima_capable) {
+				this.modoDialog = 'HUM';
+			} else {
+				this.modoDialog = 'HEAT';
+			}
+			this.cadenaNum = "0";
+			this.sendCode({code: `set global.TSeleccionado = ${toolTemperature}`, log: false});
 			this.toolClickTemperature = toolTemperature;
 			this.marcador = true;
 		},
@@ -2131,15 +2660,7 @@ export default {
 		getDrumSpeedSet() {
 			return this.$store.state.machine.model.global.rpmRodilloSet ;
 		},
-		//cambios Gorka para validar rango de RPM
-		// onChangeRPM(entry) {
-		// 	if (typeof entry === 'string' && entry.trim()) {
-		// 		this.sendCode(`set global.rpmRodillo = 0`);
-		// 		this.sendCode(`set global.rpmRodilloSet = ${entry}`);
-		// 		this.sendCode(`M118 P2 L1 S"##R#${entry}##"`);
-
-		// 	}
-		// },
+		
 		validateKeydown(event) {
 			const keyCode = event.keyCode;
 			// Permitir: backspace, delete, tab, enter y flechas
@@ -2157,7 +2678,7 @@ export default {
 				event.preventDefault();
 			}
 		},// Bloquear teclas no numéricas
-      
+	  
 		onChangeRPM(entry) {
 			// Verifica que el valor sea una cadena válida y que no esté vacío
 			if (typeof entry === 'string' && entry.trim()) {
@@ -2171,42 +2692,235 @@ export default {
 				this.sendCode(`M118 P2 L1 S"##R#${rpmValue}##"`);
 				}
 			}
-		},
-		// onPlayRPM() {
-		// 	if (typeof this.$refs.RPMS.value === 'string' && this.$refs.RPMS.value.trim()) {
-		// 		this.sendCode(`set global.rpmRodillo = 0`);
-		// 		this.sendCode(`set global.rpmRodilloSet = ${this.$refs.RPMS.value}`);
-		// 		this.sendCode(`M118 P2 L1 S"##R#${this.$refs.RPMS.value}##"`);
-
-		// 	}
-		// },	
+		},		
 		onPlayRPM() {
-			// Verifica que el valor sea una cadena válida y que no esté vacío
-			if (typeof this.$refs.RPMS.value === 'string' && this.$refs.RPMS.value.trim()) {
-				let rpmValue = parseInt(this.$refs.RPMS.value); 
-				if (rpmValue < this.RPM_min || rpmValue > this.RPM_max) {
-				this.sendCode({ code: `M118 P0 S"RPM fuera de rango" L1` });
-				} else {
-				this.sendCode(`set global.rpmRodillo = 0`);
-				this.sendCode(`set global.rpmRodilloSet = ${rpmValue}`);
-				this.sendCode(`M118 P2 L1 S"##R#${rpmValue}##"`);
-				}
+			const input = this.cadenaNum?.toString().trim();
+			const rpmValue = parseInt(input);
+
+			if (!input || isNaN(rpmValue)) {
+				this.sendCode({ code: `M118 P0 S"RPM inválido o vacío" L1` });
+				return;
 			}
-		},	
+
+			if (rpmValue < this.RPM_min || rpmValue > this.RPM_max) {
+				this.sendCode({ code: `M118 P0 S"RPM fuera de rango" L1` });
+				this.showRPMOutOfRangeDialog = true;
+				return;
+			}
+
+			this.sendCode(`set global.rpmRodillo = ${rpmValue}`);
+			this.sendCode(`set global.rpmRodilloSet = ${rpmValue}`);
+			this.sendCode(`M118 P2 L1 S"##R#${rpmValue}##"`);
+		},
+
 		stopDrum() {
 			this.sendCode(`set global.rpmRodillo = 0`);
 			this.sendCode(`set global.rpmRodilloSet = 0`);
 			this.sendCode(`M118 P2 L1 S"##S#500##"`);
-			this.$refs.RPMS.reset()
+			//this.$refs.RPMS.reset()
+		},
+		clickHumedad(num) {
+			if (this.humedad === "0") this.humedad = "";
+			this.humedad = `${this.humedad}${num}`;
+		},
+
+		deleteHumedad() {
+			this.humedad = this.humedad.substring(0, this.humedad.length - 1);
+			if (this.humedad.length === 0) this.humedad = "0";
+		},
+		startHumedad() {
+			this.okHumedad();
+		},
+
+		okHumedad() {
+			const value = parseInt(this.humedad, 10);
+			if (isNaN(value) || value < this.HUMIDITY_min || value > this.HUMIDITY_max) {
+				this.showHumidityOutOfRangeDialog = true;
+				return;
+			}
+
+			this.sendCode({ code: `set global.miniclima_setPoint = ${value}` });
+
+			if (!this.miniclima_on) {
+				this.sendCode({ code: `set global.miniclima_on = true` });
+				this.sendCode({ code: `M118 S"HUM:start"` });
+			}
+			this.sendCode({ code: `M118 S"HUM:#setPoint00${value}"` });
+
+			this.controlHumedadActivo = true;
+			if (this.controlHumedadInterval) clearInterval(this.controlHumedadInterval);
+			if (this.controlHumedadTimeout) clearTimeout(this.controlHumedadTimeout);
+
+			this.controlHumedadTimeout = setTimeout(() => {
+				if (!this.controlHumedadActivo) return;
+				this.controlHumedad();
+				this.controlHumedadInterval = setInterval(() => {
+					if (!this.controlHumedadActivo) return;
+					this.controlHumedad();
+				}, 30000);
+			}, 5000);
+
+			this.marcador = false;
+			this.humedad = "0";
+		},
+
+		stopHumedad() {
+			// Parar timeout inicial
+			if (this.controlHumedadTimeout) {
+				clearTimeout(this.controlHumedadTimeout);
+				this.controlHumedadTimeout = null;
+			}
+			// Parar intervalo
+			if (this.controlHumedadInterval) {
+				clearInterval(this.controlHumedadInterval);
+				this.controlHumedadInterval = null;
+			}
+			this.controlHumedadActivo = false;
+
+			// Apagar miniclima
+			this.sendCode({ code: `M118 S"HUM:stop"` });
+			//this.humedadEncendida = false;
+			//this.humedadSetPoint = "--";
+			this.sendCode({ code: `set global.miniclima_on = false` });
+			this.sendCode({ code: `set global.miniclima_setPoint = 0` });
+
+			// Apagar chamber
+			this.sendCode({ code: `M141 S0 R0` });
+			setTimeout(() => { this.sendCode({ code: `M141 S-273.15` }); }, 100);
+
+			this.marcador = false;
+			this.humedad = "0";
+			
+			// Restaurar ventilador a estado por defecto (encendido)
+			this.sendCode({ code: `M98 P"0:/macros/On-Off_CHAMBER_FAN/on.g"` });
+		},
+
+		calcularTempChamberParaHR(hrTarget) {
+			const hrActual = parseFloat(this.miniclima_rh);
+			const tActual = parseFloat(this.chamberTemp);
+
+			console.log(`calcularTempChamberParaHR → hrActual: ${hrActual}, tActual: ${tActual}, hrTarget: ${hrTarget}`);
+
+			if (isNaN(hrActual) || isNaN(tActual) || hrActual <= 0 || hrTarget <= 0) {
+				console.log('calcularTempChamberParaHR → datos no válidos, return null');
+				return null;
+			}
+
+			const psatActual = 6.1078 * Math.exp(17.27 * tActual / (tActual + 237.3));
+			const pAbs = (hrActual / 100) * psatActual;
+			const psatTarget = pAbs / (hrTarget / 100);
+			const logVal = Math.log(psatTarget / 6.1078);
+			const tNecesaria = 237.3 * logVal / (17.27 - logVal);
+
+			console.log(`calcularTempChamberParaHR → tNecesaria: ${Math.round(tNecesaria)}°C`);
+
+			return Math.round(tNecesaria);
+		},
+		controlHumedad() {
+			const hrTarget = parseInt(this.miniclima_setPoint);
+			const hrActual = parseFloat(this.miniclima_rh);
+			if (isNaN(hrTarget) || isNaN(hrActual)) return;
+			const margen = 2;
+
+			if (hrActual > hrTarget + margen) {
+				// HR demasiado alta → bajar con chamber
+				const tempNecesaria = this.calcularTempChamberParaHR(hrTarget);
+				if (tempNecesaria === null) return;
+				if (tempNecesaria >= 20 && tempNecesaria <= 55) {
+					this.sendCode({ code: `M98 P"0:/macros/On-Off_CHAMBER_FAN/on.g"` });
+					if (Math.abs(this.chamberTemp - tempNecesaria) > 2) {
+						this.sendCode({ code: `M141 S${tempNecesaria} R${tempNecesaria}` });
+					}
+				} else if (tempNecesaria < 20) {
+					this.sendCode({ code: `M98 P"0:/macros/On-Off_CHAMBER_FAN/off.g"` });
+					this.sendCode({ code: `M141 S0 R0` });
+					setTimeout(() => { this.sendCode({ code: `M141 S-273.15` }); }, 100);
+				} else {
+					this.sendCode({ code: `M98 P"0:/macros/On-Off_CHAMBER_FAN/on.g"` });
+					this.sendCode({ code: `M141 S55 R55` });
+				}
+
+			} else if (hrActual < hrTarget - margen) {
+				// HR demasiado baja → ventilador apagado, chamber apagada, dejar subir sola
+				this.sendCode({ code: `M98 P"0:/macros/On-Off_CHAMBER_FAN/off.g"` });
+				this.sendCode({ code: `M141 S0 R0` });
+				setTimeout(() => { this.sendCode({ code: `M141 S-273.15` }); }, 100);
+
+			}
+			// Dentro del margen → no hacer nada en ningún caso
+		},
+		switchToTemp() {
+			if (this.miniclima_on) {
+				this.showMiniClimaWarning = true;
+			} else {
+				this.modoInput = 'TEMP';
+			}
+		},
+		// Aplica la potencia de la PLTF-REF de forma INMEDIATA, sin espera.
+		// Se usa cuando se detecta un cambio de conexión a Chamber (punto 6).
+		applyPltfRefPower() {
+			const s = this.chamberMode ? this.pltfRefPowerFull : this.pltfRefPowerHalf;
+			this.sendCode({ code: `M307 H0 S${s}`, log: true });
+		},
+
+		// Programa el cambio de potencia CON ESPERA (pltfRefPowerDelay).
+		// Se usa al configurar/seleccionar la plataforma PLTF-REF (punto 4).
+		setPltfRefPower() {
+			// Si ya había un cambio de potencia pendiente, lo cancelamos y reprogramamos
+			if (this.pltfRefPowerTimeout) {
+				clearTimeout(this.pltfRefPowerTimeout);
+				this.pltfRefPowerTimeout = null;
+			}
+
+			this.pltfRefPowerTimeout = setTimeout(() => {
+				this.applyPltfRefPower();
+				this.pltfRefPowerTimeout = null;
+			}, this.pltfRefPowerDelay);
+		},
+		// Aplica directamente la temperatura mínima alcanzable calculada, y cierra los diálogos
+		setPltfRefToMinReachable() {
+			this.cadenaNum = String(this.pltfRefMinReachable);
+			this.sendTempKeyboard();
+			this.showPltfRefUnreachableDialog = false;
+			this.marcador = false;
+			this.marcadorDrum = false;
+			this.marcadorMix = false;
+			this.cadenaNum = "0";
+		},
+		cancelarPltfRefUnreachable() {
+			this.pltfRefMinOverride = this.pltfRefMinReachable; // el mínimo pasa a ser el real (delta), no el de hardware
+			this.showPltfRefUnreachableDialog = false;
 		},
 	},
 	mounted() {
 		this.$vuetify.goTo(0);
-		window.addEventListener("keydown", this.handleKeyPress); // Agregar listener de teclado -- Gorka
+		window.addEventListener("keydown", this.handleKeyPress); // Agregar listener de teclado -- 
+
+	},
+	watch: {
+		marcador(val) {
+			if (!val) {
+				this.cadenaNum = "0";
+				this.pltfRefMinOverride = null; // vuelve a 5 al cerrar
+			}
+		},
+		chamberMode: {
+			handler(newVal) {
+				console.log(`ChamberMode cambió a: ${newVal}. Plataforma actual: ${this.bedSelected}`);	
+				// CORRECCIÓN: Si la cama seleccionada es 'C', aplicamos el cambio de potencia
+				if (this.bedSelected === 'C') {
+					this.applyPltfRefPower(newVal); 
+				}
+			},
+			deep: true
+		},
 	},
 	beforeDestroy() {
-        window.removeEventListener("keydown", this.handleKeyPress); // Eliminar listener de teclado -- Gorka
-    }
+		window.removeEventListener("keydown", this.handleKeyPress);
+		if (this.controlHumedadTimeout) clearTimeout(this.controlHumedadTimeout);
+		if (this.controlHumedadInterval) clearInterval(this.controlHumedadInterval);
+		if (this.pltfRefPowerTimeout) clearTimeout(this.pltfRefPowerTimeout); // <-- AÑADIDO
+	},
 }
 </script>
 

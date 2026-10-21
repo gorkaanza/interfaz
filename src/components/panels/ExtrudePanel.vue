@@ -61,7 +61,7 @@
 					{{ $t('panel.extrude.feedrate', ['mm/s']) }}
 					</p>
 					<v-btn-toggle v-model="feedrate" mandatory class="d-flex blue lighten-5" rounded color="teal">
-						<v-btn v-for="(savedFeedrate, index) in extruderFeedrates" :key="index" :value="savedFeedrate" :disabled="uiFrozen" @contextmenu.prevent="editFeedrate(index)" class="flex-grow-1">
+						<v-btn v-for="(savedFeedrate, index) in currentFeedrates" :key="index" :value="savedFeedrate" :disabled="uiFrozen" @contextmenu.prevent="editFeedrate(index)" class="flex-grow-1">
 							{{ savedFeedrate }}
 						</v-btn>
 					</v-btn-toggle>
@@ -95,7 +95,7 @@ export default {
 		...mapGetters(['uiFrozen']),
 		...mapState('machine/model', ['heat', 'sensors', 'state']),
 		...mapGetters('machine/model', ['currentTool']),
-		...mapState('machine/settings', ['extruderAmounts', 'extruderFeedrates']),
+		...mapState('machine/settings', ['extruderAmounts', 'extruderFeedrates', 'syrFeedrates']),
 		...mapState({
 			nameCama: state => state.machine.model.sensors,
 			nameTools: state => state.machine.model.tools,
@@ -180,7 +180,7 @@ export default {
 							}
 					} catch (error) {
 							console.log(`error toolsActive0state`);
-							return "inactive";							
+							return "active";							
 					}
 			}
 		}, 
@@ -207,7 +207,7 @@ export default {
 							}
 					} catch (error) {
 							console.log(`error toolsActive0state`);
-							return "inactive";							
+							return "active";							
 					}
 			}
 		}, 
@@ -224,7 +224,7 @@ export default {
 							}
 					} catch (error) {
 							console.log(`error toolsActive0state`);
-							return "inactive";							
+							return "active";							
 					}
 			}
 		}, 
@@ -241,7 +241,7 @@ export default {
 							
 					} catch (error) {
 							console.log(`error toolsActive1state`);
-							return "inactive";							
+							return "active";							
 					}
 			}
 		}, 
@@ -258,7 +258,7 @@ export default {
 							
 					} catch (error) {
 							console.log(`error toolsActive2state`);
-							return "inactive";							
+							return "active";							
 					}
 			}
 		}, 
@@ -307,10 +307,18 @@ export default {
 							
 					} catch (error) {
 							console.log(`error toolsActive3state`);
-							return "inactive";							
+							return "active";							
 					}
 			}
 		}, 
+		currentFeedrates() {
+			const syrTools = ["SYR-ES", "SYR", "SYR-HEAT", "COAX(P)"];
+			if (syrTools.includes(this.toolsActiveName)) {
+				return this.syrFeedrates; // usamos los nuevos valores
+			} else {
+				return this.extruderFeedrates; // valores normales
+			}
+		}
 
 
 	},

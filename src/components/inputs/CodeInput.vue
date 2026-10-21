@@ -76,11 +76,24 @@ export default {
 				this.wasFocused = true;
 			}
 		},
-		change(value) {
+		change2(value) {
 			if ((value === "D500")||(value === "d500"))  {
 				this.cambiarUsuario;
 				
 			}
+			if (value && !(value instanceof String)) {
+				this.code = value.value;
+			}
+		},
+		change(value) {
+			if ((value === "D500")||(value === "d500"))  {
+				this.$store.commit('cambiarUsuario', 'D500');
+			}
+
+			if ((value === "E500")||(value === "e500"))  {
+				this.$store.commit('cambiarUsuario', 'E500');
+			}
+
 			if (value && !(value instanceof String)) {
 				this.code = value.value;
 			}
@@ -153,9 +166,9 @@ export default {
 						// Automatically remember successful codes
 
 						//prevenimos que se almacene comando domotek
-						if((codeToSend.toUpperCase().trim() != "D500")) {
+						if((codeToSend.toUpperCase().trim() != "D500") && (codeToSend.toUpperCase().trim() != "E500")) {
 							//console.info(`---------------------------`);
-							//console.info(`- Añadimos ultimo comando -`);
+							//console.info(`- Aï¿½adimos ultimo comando -`);
 							//console.info(`> ` + codeToSend.trim());
 							//console.info(`---------------------------`);
 							this.addLastSentCode(codeToSend.trim());

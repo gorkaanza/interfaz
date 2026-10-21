@@ -47,6 +47,9 @@ export default function(connector, pluginSettingFields) {
 			toolChangeMacros: [ToolChangeMacro.free, ToolChangeMacro.pre, ToolChangeMacro.post],
 			extruderAmounts: [100, 50, 20, 10, 5, 1],	// mm
 			extruderFeedrates: [30, 15, 10, 5, 1],		// mm/s
+			syrFeedrates: [10, 5, 1, 0.5],
+			//syrFeedrates: [2, 1, 0.5, 0.25, 0.1],		// mm/s
+			
 			temperatures: {
 				tool: {
 					active: [250, 235, 220, 205, 195, 160, 120, 100, 0],
@@ -282,6 +285,12 @@ export default function(connector, pluginSettingFields) {
 						}
 					}
 					delete payload.moveSteps;
+				}
+				// Migración de valores antiguos de jeringa
+				if (payload.syrFeedrates !== undefined) {
+					if (payload.syrFeedrates.length === 5) {
+						payload.syrFeedrates = [10, 5, 1, 0.5];
+					}
 				}
 				patch(state, payload, true);
 			},

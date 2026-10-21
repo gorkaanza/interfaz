@@ -966,7 +966,7 @@ export default {
 			
 		},
 		error: {
-			toolAgotado: "Error, Tool desconectado o sin material"
+			toolAgotado: "Tool desconectado o sin material"
 
 		}
 	}

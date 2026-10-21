@@ -83,7 +83,8 @@ table.extra tr > td:first-child {
 								<!-- Tool Name -->
 								<th v-if="toolHeaterIndex === 0" :rowspan="Math.max(1, tool.heaters.length)" class="pl-2" :class="{ 'pt-2 pb-2' : !tool.heaters.length && !toolHeater }">
 									<a href="javascript:void(0)" @click="toolClick(tool)">
-										{{ tool.name || $t('panel.tools.tool', [tool.number+1]) }}
+										<!-- {{ tool.name || $t('panel.tools.tool', [tool.number+1]) }} -->
+										{{ (global && global[`T${tool.number}Name`]) ? global[`T${tool.number}Name`] : (tool.name || $t('panel.tools.tool', [tool.number+1])) }}
 									</a>
 									<br>
 									<span class="font-weight-regular caption">
@@ -454,7 +455,7 @@ export default {
 	computed: {
 		...mapGetters(['isConnected', 'uiFrozen']),
 		...mapGetters('machine/settings', ['toolChangeParameter']),
-		...mapState('machine/model', ['heat', 'move', 'sensors', 'state', 'spindles', 'tools']),
+		...mapState('machine/model', ['heat', 'move', 'sensors', 'state', 'spindles', 'tools', 'global']),
 		...mapState('machine/settings', ['displayedExtraTemperatures']),
 		...mapState('settings', ['darkTheme']),
 		canTurnEverythingOff() {
@@ -745,7 +746,7 @@ export default {
 			this.sendCode(code);
 		},
 
-		getToolHeaters(tool) {
+		getToolHeaters2(tool) {
 			var resultado ;
 			try {
 				const toolHeaters = tool.heaters
@@ -760,6 +761,63 @@ export default {
 				}
 			return resultado;
 			
+		},
+		getToolHeaters(tool) {
+			try {
+				const coaxial = this.isCoaxial(tool.number);
+				const type = coaxial ? this.getCoaxialType(tool.number) : null;
+
+				const toolHeaters = tool.heaters
+					.filter(i => {
+						// Tool 1 (index 0): ignorar heater 11 para no chocar con SYR-EMD (ID 11)
+						if (tool.number === 0 && i === 11) return false;
+						return i >= 0 && i < this.heat.heaters.length;
+					})
+					.map(i => this.heat.heaters[i])
+					.filter(h => {
+						if (!h) return false;
+
+						// No coaxial → se acepta tal cual
+						if (!coaxial) return true;
+
+						const sensor = this.sensors.analog[h.sensor];
+						if (!sensor || !sensor.name || !type) return false;
+
+						const name = sensor.name.toLowerCase().trim();
+						return type === 'primary'
+							? /^primary\b/.test(name)
+							: /^secondary\b/.test(name);
+					});
+
+				return toolHeaters.length ? toolHeaters : [null];
+
+			} catch (e) {
+				console.warn('Error en getToolHeaters:', e);
+				return [null];
+			}
+		},
+		isCoaxial(toolNumber) {
+			const coaxPairs = [
+				{ primary: 0, secondary: 1 },
+				{ primary: 3, secondary: 2 }  
+			];
+			return coaxPairs.some(pair =>
+				(pair.primary === toolNumber || pair.secondary === toolNumber) &&
+				this['T' + pair.primary] === 9 &&
+				this['T' + pair.secondary] === 9
+			);
+		},
+
+		getCoaxialType(toolNumber) {
+			const coaxPairs = [
+				{ primary: 0, secondary: 1 },
+				{ primary: 3, secondary: 2 }  
+			];
+			const pair = coaxPairs.find(p =>
+				p.primary === toolNumber || p.secondary === toolNumber
+			);
+			if (!pair) return null;
+			return (pair.primary === toolNumber) ? 'primary' : 'secondary';
 		},
 		toolHeaterClick(tool, heater) {
 			if (!this.isConnected) {

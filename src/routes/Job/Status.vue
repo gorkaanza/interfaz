@@ -58,6 +58,11 @@
 				<clean-panel v-on:close-dialog="closeDialog"></clean-panel>
 			</v-col>
 		</v-dialog>
+		<v-dialog v-model="DialogEMD" fullscreen hide-overlay>
+			<v-col cols="12" align="center" class="ma-0 pa-0">
+				<emd-panel v-on:close-dialog="closeDialog"></emd-panel>
+			</v-col>
+		</v-dialog>
 		<v-dialog v-model="DialogTmp" fullscreen hide-overlay>
 			<v-col cols="12" align="center" class="ma-0 pa-0">
 				<temp-panel v-on:close-dialog="closeDialog"></temp-panel>
@@ -174,15 +179,26 @@
 							</v-row>
 						</v-btn>
 					</v-col>
-					<v-col v-if="CLCapable" cols="3" align="center">
+					<!-- <v-col v-if="CLCapable" cols="3" align="center">
 						<v-btn @click="DialogClean = true" icon>
 							<v-row no-gutters>
 								<v-col class="mt-5" cols="12" align="center">
-									<!-- <v-img  src="@/assets/uv-ray.svg" contain max-height="45" max-width="45"></v-img> -->
 									<v-icon x-large > mdi-brush-variant </v-icon>
 								</v-col>
 								<v-col class="mt-4">
 									<span>{{ $t('domotek.jobs.clean') }}</span>
+								</v-col>
+							</v-row>
+						</v-btn>
+					</v-col> -->
+					<v-col v-if="EMDCapable" cols="3" align="center">
+						<v-btn @click="MuestraEMD" icon>
+							<v-row no-gutters>
+								<v-col class="mt-5" cols="12" align="center">
+									<v-icon x-large > mdi-magnet-on </v-icon>
+								</v-col>
+								<v-col class="mt-4">
+									<span>{{ $t('domotek.jobs.EMD') }}</span>
 								</v-col>
 							</v-row>
 						</v-btn>
@@ -208,16 +224,16 @@
 					<v-col cols="2" align="center" style="padding: 6px;" v-if="nameTools.length > 0 ">
 						<v-icon class="ma-0">mdi-tray</v-icon>: {{heaterTools[0].current.toFixed(1) == -273.1 || heaterTools[0].current == -273.15? "--": heaterTools[0].current.toFixed(1)}}
 					</v-col>
-					<v-col cols="2" align="center" style="padding: 6px;" v-if="nameTools.length = 1"> 
+					<v-col cols="2" align="center" style="padding: 6px;" v-if="nameTools.length >= 1"> 
 						{{ $t('domotek.tools.T0Mini') }}<v-icon>mdi-printer-3d-nozzle</v-icon>: {{heaterTools[1].current.toFixed(1) == -273.1 || heaterTools[1].current == -273.15? "--": heaterTools[1].current.toFixed(1)}}
 					</v-col>
-					<v-col cols="2" align="center" style="padding: 6px;" v-if="nameTools.length = 2"> 
+					<v-col cols="2" align="center" style="padding: 6px;" v-if="nameTools.length >= 2"> 
 						{{ $t('domotek.tools.T1Mini') }}<v-icon>mdi-printer-3d-nozzle</v-icon>: {{heaterTools[2].current.toFixed(1) == -273.1 || heaterTools[2].current == -273.15? "--": heaterTools[2].current.toFixed(1)}}
 					</v-col>
-					<v-col cols="2" align="center" style="padding: 6px;" v-if="nameTools.length = 3">
+					<v-col cols="2" align="center" style="padding: 6px;" v-if="nameTools.length >= 3">
 						{{ $t('domotek.tools.T2Mini') }}<v-icon>mdi-printer-3d-nozzle</v-icon>: {{heaterTools[3].current.toFixed(1) == -273.1 || heaterTools[3].current == -273.15? "--": heaterTools[3].current.toFixed(1)}}
 					</v-col>
-					<v-col cols="2" align="center" style="padding: 6px;" v-if="nameTools.length = 4">
+					<v-col cols="2" align="center" style="padding: 6px;" v-if="nameTools.length >= 4">
 						{{ $t('domotek.tools.T3Mini') }}<v-icon>mdi-printer-3d-nozzle</v-icon>: {{heaterTools[4].current.toFixed(1) == -273.1 || heaterTools[4].current == -273.15? "--": heaterTools[4].current.toFixed(1)}}
 					</v-col>
 					<v-col cols="1" align="center"> 
@@ -230,7 +246,7 @@
 					<v-col cols="4" align="center" style="padding: 6px;" v-if="nameTools.length > 1"> 
 						{{ $t('domotek.tools.T0Mini') }}<v-icon>mdi-printer-3d-nozzle</v-icon>: {{heaterTools[1].current.toFixed(1) == -273.1 || heaterTools[1].current == -273.15? "--": heaterTools[1].current.toFixed(1)}}
 					</v-col>
-					<v-col cols="4" align="center" style="padding: 6px;" v-if="nameTools.length = 2"> 
+					<v-col cols="4" align="center" style="padding: 6px;" v-if="nameTools.length === 2"> 
 						{{ $t('domotek.tools.T1Mini') }}<v-icon>mdi-printer-3d-nozzle</v-icon>: {{heaterTools[2].current.toFixed(1) == -273.1 || heaterTools[2].current == -273.15? "--": heaterTools[2].current.toFixed(1)}}
 					</v-col>
 				</v-row>
@@ -266,7 +282,8 @@ export default {
 			DialogElectroSpinning: false,
 			DialogUltraviolet: false,
 			DialogClean: false,
-			DialogTmp: false
+			DialogTmp: false,
+			DialogEMD: false
 		}
 	},
 
@@ -308,6 +325,10 @@ export default {
 			// 	this.sendCode(`set global.UV_Capable = ${value}`);
 			// }			
 		},
+		EMDCapable: {
+		 	get() {
+		 		return this.$store.state.machine.model.global.EMD_Capable},			
+		 },
 	},
 	/* computed:{
 		heaterTools: this.$store.state.machine.model.heat.heaters
@@ -323,11 +344,12 @@ export default {
 			this.$router.push({path: ruta, params: { pruebaparam: 'ricardo' }})
 		},
 		closeDialog(){
-			console.log('Close Dialog UV - ES - CL');
+			console.log('Close Dialog UV - ES - CL - TMP - EMD');
 			this.DialogUltraviolet = false;
 			this.DialogElectroSpinning = false;
 			this.DialogClean = false;
 			this.DialogTmp = false;
+			this.DialogEMD = false;
          },  
 		 MuestraES(){
 			console.log('MuestraES ->Sendcode');
@@ -340,6 +362,12 @@ export default {
 			this.sendCode('M98 P"declare_variablesUV.g"');
 			console.log('MuestraUV ->dialog');
 			this.DialogUltraviolet = true;
+		}, 
+		MuestraEMD(){
+			console.log('MuestraEMD ->Sendcode');
+			this.sendCode('M98 P"declare_variablesEMD.g"');
+			console.log('MuestraEMD ->dialog');
+			this.DialogEMD = true;
 		} 
 	}, 
 	mounted() {

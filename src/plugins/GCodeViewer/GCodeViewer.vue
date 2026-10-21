@@ -116,9 +116,13 @@
 	<div class="primary-container mt-2" ref="primarycontainer" v-resize="resize">
 		<div :class="{ 'full-screen': fullscreen }" class="viewer-box">
 			<div class="emergency-button-placement" v-show="fullscreen">
-				<code-btn :code="'M112\nM999'" :log="false" :title="$t('button.emergencyStop.title')" color="error">
+				<!-- <code-btn :code="'M112\nM999'" :log="false" :title="$t('button.emergencyStop.title')" color="error">
 					<v-icon>mdi-flash</v-icon>
-				</code-btn>
+				</code-btn> -->
+				<v-btn block :height="$vuetify.breakpoint.mdAndUp ? 40 : 60" class="clsvbtn2" color="$props.color || error" :disabled="$props.disabled || isDisabled" @click="emergencyStopAll">
+					<v-icon class="mr-1">mdi-flash</v-icon>
+					<span class="hidden-xs-only">{{ $t('button.emergencyStop.caption') }}</span>
+				</v-btn>
 			</div>
 			<canvas :title="hoverLabel" class="babylon-canvas" ref="viewerCanvas"></canvas>
 			<fs-overlay v-show="fullscreen && showOverlay"></fs-overlay>
@@ -769,7 +773,28 @@ export default {
 		fastForward(){
 			this.scrubPlaying = false;
 			this.scrubPosition = this.scrubFileSize;
-		}
+		},
+		emergencyStopAll() {
+			// 1️⃣ Detener rodillo
+			this.sendCode('set global.rpmRodillo = 0');
+			this.sendCode('set global.rpmRodilloSet = 0');
+			this.sendCode('M118 P2 L1 S"##S#500##"'); // Mensaje opcional
+
+			// 2️⃣ Emergency Stop
+			setTimeout(() => {
+				this.sendCode('M112');
+
+				// 3️⃣ Reinicio firmware después de M112
+				setTimeout(() => {
+				this.sendCode('M999');
+				}, 100);
+			}, 100);
+		},
+  
+		emergencyStopAll2() {
+			// Llama al macro en el firmware
+			this.sendCode('M98 P"0:/sys/emergencyStop.g"');
+		},
 	},
 	activated() {
 		viewer.pause = false;

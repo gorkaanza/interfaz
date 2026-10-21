@@ -76,22 +76,22 @@ a:not(:hover) {
 										{{ 'X' }}
 									</span>
 									<span v-if="index==1">
-										{{ 'Y0' }}
-									</span>
-									<span v-if="index==2">
-										{{ 'Z0' }}
-									</span>
-									<span v-if="index==3">
 										{{ 'Y1' }}
 									</span>
-									<span v-if="index==4">
+									<span v-if="index==2">
+										{{ 'Z1' }}
+									</span>
+									<span v-if="index==3">
 										{{ 'Y2' }}
 									</span>
-									<span v-if="index==5">
+									<span v-if="index==4">
 										{{ 'Y3' }}
 									</span>
+									<span v-if="index==5">
+										{{ 'Y4' }}
+									</span>
 									<span v-if="index==6">
-										{{ 'Z1' }}
+										{{ 'Z2' }}
 									</span>
 								</strong>
 								<strong v-if="modeloMaquina == 'HK'">		
@@ -188,9 +188,9 @@ a:not(:hover) {
 
 			<!-- Sensors -->
 			<template v-if="sensorsPresent">
-				<v-divider  v-if="$store.state.nivelUsuario >= 2" v-show="move.axes.length || move.extruders.length || isNumber(move.currentMove.requestedSpeed) || isNumber(move.currentMove.topSpeed)" class="my-2"></v-divider>
+				<v-divider  v-if="$store.state.nivelUsuario >= 3" v-show="move.axes.length || move.extruders.length || isNumber(move.currentMove.requestedSpeed) || isNumber(move.currentMove.topSpeed)" class="my-2"></v-divider>
 
-				<v-row align-content="center" no-gutters class="flex-nowrap" v-if="$store.state.nivelUsuario >= 2">
+				<v-row align-content="center" no-gutters class="flex-nowrap" v-if="$store.state.nivelUsuario >= 3">
 					<v-col tag="strong" class="category-header">
 						{{ $t('panel.status.sensors') }}
 					</v-col>

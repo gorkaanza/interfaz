@@ -7,8 +7,8 @@
 <template>
 	<div class="component">
 		<v-toolbar>
-			<directory-breadcrumbs v-model="directory"></directory-breadcrumbs>
-
+			<!-- <directory-breadcrumbs v-model="directory"></directory-breadcrumbs> -->
+			<directory-breadcrumbs :value="directory" @input="onBreadcrumbNavigate" :disabled="isRestrictedUser"></directory-breadcrumbs>
 			<v-spacer></v-spacer>
 
 			<v-btn v-show="!isFirmwareDirectory" class="hidden-sm-and-down mr-3" :disabled="uiFrozen" :elevation="1" @click="showNewFile = true">
@@ -23,7 +23,7 @@
 			<upload-btn ref="mainUpload" class="hidden-sm-and-down" :elevation="1" :directory="directory" :target="uploadTarget" color="primary"></upload-btn>
 		</v-toolbar>
 		
-		<base-file-list ref="filelist" v-model="selection" :directory.sync="directory" :loading.sync="loading" sort-table="sys" @fileClicked="fileClicked" @fileEdited="fileEdited" :noFilesText="noFilesText">
+		<base-file-list ref="filelist" v-model="selection" :directory.sync="directory" :loading.sync="loading" sort-table="sys" @fileClicked="fileClicked" @fileEdited="fileEdited" :noFilesText="noFilesText" :filter-items="restrictFile">
 			<template #context-menu>
 				<v-list-item v-show="isFirmwareFile" @click="installFile">
 					<v-icon class="mr-1">mdi-update</v-icon> {{ $t('list.firmware.installFile') }}
@@ -87,6 +87,23 @@ export default {
 			status: state => state.state.status
 		}),
 		...mapGetters(['uiFrozen']),
+
+		// --- NUEVO: control de acceso restringido ---
+		nivelUsuario() {
+			return this.$store.state.nivelUsuario;
+		},
+		isRestrictedUser() {
+			// E500 = nivel 2
+			return this.nivelUsuario === 2;
+		},
+		restrictedTargetPath() {
+			return Path.combine(this.systemDirectory, 'domoBIO/UserSettings');
+		},
+		canModify() {
+			return !this.isRestrictedUser;
+		},
+		// --- FIN NUEVO ---
+
 		isFirmwareDirectory() { return !this.isSystemDirectory && Path.startsWith(this.directory, this.firmwareDirectory); },
 		isSystemDirectory() { return Path.startsWith(this.directory, this.systemDirectory) || Path.startsWith(this.directory, Path.system); },
 		isSystemRootDirectory() { return Path.equals(this.directory, this.systemDirectory); },
@@ -142,6 +159,38 @@ export default {
 	},
 	methods: {
 		...mapActions('machine', ['download', 'sendCode']),
+
+		// --- NUEVO: filtro de elementos y comprobación de rutas ---
+		restrictFile(item, directory) {
+			if (!this.isRestrictedUser) {
+				return true;
+			}
+
+			const fullPath = Path.combine(directory, item.name);
+
+			if (item.isDirectory) {
+				// Solo mostrar carpetas que estén en el camino hacia Variables_T2 (incluida)
+				return Path.startsWith(this.restrictedTargetPath, fullPath) || Path.equals(fullPath, this.restrictedTargetPath);
+			}
+
+			// Archivos: solo Mod_variables.g, y solo dentro de Variables_T2
+			return Path.equals(directory, this.restrictedTargetPath) && item.name === 'Mod_variables.g';
+		},
+		isPathAllowed(path) {
+			if (!this.isRestrictedUser) {
+				return true;
+			}
+			return Path.equals(path, this.restrictedTargetPath);
+		},
+		// NUEVO: intercepta clics en el breadcrumb antes de cambiar directory
+		onBreadcrumbNavigate(newDir) {
+			if (this.isPathAllowed(newDir)) {
+				this.directory = newDir;
+			}
+			// si no está permitido, simplemente no hacemos nada (ni siquiera llega a cambiar this.directory)
+		},
+		// --- FIN NUEVO ---
+
 		refresh() {
 			this.$refs.filelist.refresh();
 		},
@@ -159,7 +208,6 @@ export default {
 			const fullName = Path.combine(this.directory, filename);
 			const configFile = Path.combine(this.systemDirectory, Path.configFile);
 			if (!isPrinting(this.status) && (fullName === Path.configFile || fullName === configFile || fullName === Path.boardFile)) {
-				// Ask for firmware reset when config.g or 0:/sys/board.txt (RRF on LPC) has been edited
 				this.showResetPrompt = true;
 			}
 		},
@@ -219,7 +267,6 @@ export default {
 			for (let i = 0; i < files.length; i++) {
 				const fullName = Path.combine(this.directory, files[i].name);
 				if (!isPrinting(this.status) && (fullName === Path.configFile || fullName === configFile || fullName === Path.boardsFile)) {
-					// Ask for firmware reset when config.g or 0:/sys/board.txt (RRF on LPC) has been replaced
 					this.showResetPrompt = true;
 					break;
 				}
@@ -227,12 +274,19 @@ export default {
 		}
 	},
 	mounted() {
-		this.directory = this.systemDirectory;
+		// NUEVO: si es usuario restringido, arrancar directamente en Variables_T2
+		this.directory = this.isRestrictedUser ? this.restrictedTargetPath : this.systemDirectory;
 	},
 	watch: {
 		systemDirectory(to, from) {
 			if (Path.equals(this.directory, from) || Path.getVolume(from) !== Path.getVolume(to)) {
-				this.directory = to;
+				this.directory = this.isRestrictedUser ? this.restrictedTargetPath : to;
+			}
+		},
+		// NUEVO: bloquear navegación fuera de la ruta permitida
+		directory(newDir) {
+			if (!this.isPathAllowed(newDir)) {
+				this.directory = this.restrictedTargetPath;
 			}
 		}
 	}

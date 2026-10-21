@@ -200,7 +200,8 @@
       "gcodeReference": "G-Code参考",
       "menuReference": "菜单参考",
       "save": "保存",
-      "confirmClose": "文件已修改。如果继续，你的修改将丢失。"
+      "confirmClose": "文件已修改。如果继续，你的修改将丢失。",
+      "confirmSaveEmpty": ""
     },
     "fileTransfer": {
       "uploadingTitle": "正在上传文件第{0}个，共{1}个，已完成{2}%",

@@ -35,10 +35,30 @@
 				<v-col cols="12" v-if="$store.state.nivelUsuario >= 0">
 						<emergency-btn rounded></emergency-btn>
 				</v-col>
-				<v-col cols="12">
+				<!-- <v-col cols="12">
 					<v-select v-model="language" :items="languages" item-text="language" item-value="code" :return-object="false" :label="$t('panel.settingsAppearance.language')" hide-details></v-select>
+				</v-col> -->
+				<v-col cols="12">
+					<v-select
+						:value="machineLanguage"
+						:items="languages"
+						item-text="language"
+						item-value="code"
+						:label="$t('panel.settingsAppearance.language')"
+						@change="onLanguageChange"
+						hide-details
+					/>
 				</v-col>
-				<!-- <v-col cols="6">
+				<v-col cols="12" v-if="tieneLeds">
+					<div class="d-flex align-center">
+						<span class="mr-4 text-subtitle-2 font-weight-regular black--text">
+							Leds
+						</span>
+
+						<v-switch v-model="ledOn" hide-details @change="toggleLED" class="ma-0 pa-0"></v-switch>
+					</div>
+				</v-col>
+								<!-- <v-col cols="6">
 					<v-tooltip bottom>
 						<template #activator="{ on }">
 							<v-switch v-model="useBinaryPrefix" v-on="on" :label="$t('panel.settingsAppearance.binaryFileSizes')" hide-details></v-switch>
@@ -127,6 +147,8 @@
 							</v-row>
 						</v-btn>
 					</v-col>
+				</template>
+				<template v-if="$store.state.nivelUsuario >= 3">
 					<v-col cols="12">
 						<v-btn @click="cambiarRuta('/ObjectModel')" height="70px" block color="blue lighten-4" rounded>
 							<v-row>
@@ -202,14 +224,15 @@
 <script>
 'use strict';
 
-import { mapState, mapMutations } from 'vuex'
+import { mapState, mapMutations, mapActions } from 'vuex'
 
 import { DashboardMode } from '@/store/settings'
 import { UnitOfMeasure } from '../../store/settings';
 
 export default {
+	
 	computed: {
-		...mapState(['settings']),
+		...mapState(['settings', "machine"]),
 		usuarioAvanzado: {
 			get() { return this.settings.usuarioAvanzado; },
 			set(value) { this.update({ usuarioAvanzado: value }); },
@@ -231,9 +254,22 @@ export default {
 			get() { return this.settings.displayUnits; },
 			set(value) { this.update({ displayUnits: value }); }
 		},
+		// language: {
+		// 	get() { return this.settings.language; },
+		// 	set(value) {
+		// 		this.update({ language: value });
+		// 		this.sendCode(`set global.language = "${value}"`);
+		// 	}
+		// },
 		language: {
-			get() { return this.settings.language; },
-			set(value) { this.update({ language: value }); }
+			get() {
+				return this.settings.language;
+			},
+			set(value) {
+				this.update({ language: value });
+				this.$i18n.locale = value;
+				this.sendCode(`set global.language = "${value}"`);
+			}
 		},
 		languages() {
 			const result = [];
@@ -241,6 +277,21 @@ export default {
 				result.push({code: key, language: this.$i18n.messages[key].language});
 			}
 			return result;
+		},
+		machineLanguage() {
+    		return this.machine?.model?.global?.language || '';
+ 		},
+		tieneLeds: {			
+			get() {
+				return this.$store.state.machine.model.global.tieneLeds},
+		},
+		ledOn: {
+			get() {
+				return this.machine?.model?.global?.ledsOn === true;
+			},
+			set(value) {
+				this.toggleLED(value);
+			}
 		},
 		useBinaryPrefix: {
 			get() { return this.settings.useBinaryPrefix; },
@@ -286,12 +337,51 @@ export default {
 	},
 	methods:{
 		...mapMutations('settings', ['update']),
+		...mapActions('machine', ['sendCode']),
 		cambiarRuta(ruta){
 			this.$router.push(ruta)
 		},
 		cambiarRutaTop(ruta){
 			window.scrollTo(0,0);
 			this.$router.push(ruta)
+		},
+		onLanguageChange(newLang) {
+    		if (newLang && newLang !== this.language) {
+      		this.language = newLang;
+    		}
+		},
+
+		toggleLED(value) {
+			const state = value ? 1 : 0;
+
+			this.update?.({ ledsOn: value });
+			this.sendCode(`
+				set global.ledsOn = ${value}
+				M42 P{global.SalidaLED1} S${state}
+				M42 P{global.SalidaLED2} S${state}
+			`);
+		}
+  
+	},
+	async mounted() {
+		const lang = this.machine?.model?.global?.language;
+		if (lang) {
+			this.update({ language: lang });
+			this.$i18n.locale = lang;
+		}
+	},
+	watch: {
+		// Detecta cambios en el valor de idioma de la máquina y actualiza interfaz
+		'machine.model.global.language'(newLang) {
+			if (newLang && newLang !== this.language) {
+			this.update({ language: newLang });
+			this.$i18n.locale = newLang;
+			}
+		},
+		'machine.model.global.ledsOn'(newVal) {
+			if (typeof newVal === 'boolean' && newVal !== this.ledOn) {
+				this.update?.({ ledsOn: newVal });
+			}
 		}
 	}
 };

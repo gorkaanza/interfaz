@@ -51,14 +51,14 @@
 								<v-row>
 									<v-col align="center" cols="4" sm="4" md="4" lg="4" xl="4" class="mt-3 clsTitleMixLeft"></v-col>
 									<v-col v-if="$store.state.machine.model.global.TSeleccionado < 2" align="center" cols="4" sm="4" md="4" lg="4" xl="4" class="ma-0 clsVcol">
-										<v-btn v-if="$store.state.machine.model.global.coaxial1 == 0" width="150" height="48" rounded class="btnContinue ma-3 " color="green darken-1" @click="LinkTools( $store.state.machine.model.global.TSeleccionado );">LINK TOOLS</v-btn>	
-										<v-btn v-if="$store.state.machine.model.global.coaxial1 == 0" width="150" height="48" rounded class="btnContinue ma-3 " color="red darken-1" @click="UnLinkTools( $store.state.machine.model.global.TSeleccionado );">REMOVE TOOLS</v-btn>	
-										<v-btn v-on:click="closeDialog" v-if="$store.state.machine.model.global.coaxial1 == 1" width="150" height="48" rounded class="btnContinue ma-3 " color="red darken-1" @click="UnLinkTools( $store.state.machine.model.global.TSeleccionado );">UNLINK TOOLS</v-btn>	
+										<v-btn v-if="$store.state.machine.model.global.coaxial1 == 0" width="150" height="48" rounded class="btnContinue ma-3 " color="green lighten-3" @click="LinkTools( $store.state.machine.model.global.TSeleccionado );">LINK TOOLS</v-btn>	
+										<v-btn v-if="$store.state.machine.model.global.coaxial1 == 0" width="150" height="48" rounded class="btnContinue ma-3 " color="red lighten-3" @click="UnLinkTools( $store.state.machine.model.global.TSeleccionado );">REMOVE TOOLS</v-btn>	
+										<v-btn v-on:click="closeDialog" v-if="$store.state.machine.model.global.coaxial1 == 1" width="150" height="48" rounded class="btnContinue ma-3 " color="red lighten-3" @click="UnLinkTools( $store.state.machine.model.global.TSeleccionado );">UNLINK TOOLS</v-btn>	
 									</v-col>
 									<v-col v-if="$store.state.machine.model.global.TSeleccionado > 1" align="center" cols="4" sm="4" md="4" lg="4" xl="4" class="ma-0 clsVcol">
-										<v-btn v-if="$store.state.machine.model.global.coaxial2 == 0" width="150" height="48" rounded class="btnContinue ma-3 " color="green darken-1" @click="LinkTools( $store.state.machine.model.global.TSeleccionado );">LINK TOOLS</v-btn>	
-										<v-btn v-if="$store.state.machine.model.global.coaxial2 == 0" width="150" height="48" rounded class="btnContinue ma-3 " color="red darken-1" @click="UnLinkTools( $store.state.machine.model.global.TSeleccionado );">REMOVE TOOLS</v-btn>	
-										<v-btn v-on:click="closeDialog" v-if="$store.state.machine.model.global.coaxial2 == 1" width="150" height="48" rounded class="btnContinue ma-3 " color="red darken-1" @click="UnLinkTools( $store.state.machine.model.global.TSeleccionado );">UNLINK TOOLS</v-btn>	
+										<v-btn v-if="$store.state.machine.model.global.coaxial2 == 0" width="150" height="48" rounded class="btnContinue ma-3 " color="green lighten-3" @click="LinkTools( $store.state.machine.model.global.TSeleccionado );">LINK TOOLS</v-btn>	
+										<v-btn v-if="$store.state.machine.model.global.coaxial2 == 0" width="150" height="48" rounded class="btnContinue ma-3 " color="red lighten-3" @click="UnLinkTools( $store.state.machine.model.global.TSeleccionado );">REMOVE TOOLS</v-btn>	
+										<v-btn v-on:click="closeDialog" v-if="$store.state.machine.model.global.coaxial2 == 1" width="150" height="48" rounded class="btnContinue ma-3 " color="red lighten-3" @click="UnLinkTools( $store.state.machine.model.global.TSeleccionado );">UNLINK TOOLS</v-btn>	
 									</v-col>
 									<v-col align="center" cols="4" sm="4" md="4" lg="4" xl="4" class="mt-3 clsTitleMixRight"></v-col>
 								</v-row>
@@ -192,7 +192,7 @@
 				</v-row>
 			</v-card>
 		</v-col>
-		<v-col class="mb-0 pb-0">
+		<!-- <v-col class="mb-0 pb-0">
 			<v-dialog v-model="dialogATTACH" persistent max-width="500px">
 				<v-card>                                                                                  
 					<v-card-title class="title">
@@ -216,7 +216,7 @@
 					</v-card-actions>
 				</v-card>
 			</v-dialog>
-		</v-col> 
+		</v-col>  -->
 	</v-row>
 </template>
 <script>
@@ -226,7 +226,7 @@ import { mapState, mapGetters, mapActions } from 'vuex'
 export default {
 	data(){
 		return{
-			dialogATTACH: false,
+			//dialogATTACH: false,
 			codigo:null,
 			textoDialogo: null,
 			dialogCL_SAV: false,
@@ -239,26 +239,13 @@ export default {
 	computed:{
 		...mapState({
 			boards: state => state.machine.model.boards,
+			move: state => state.machine.model.move,
 		}),
 		...mapGetters('machine/model', ['global']),
 		isprinting: {
 			get() {
 				return this.$store.state.machine.model.state.status},
 		},
-		/* sliderkkG1:{
-			get() {
-				if(this.sliderG01==2.00){
-					this.sliderG01 = 0.50;
-					return this.$store.state.machine.model.global.group1T1Mix;
-				}
-				else
-					return this.sliderG1;
-				},
-		}, */
-		/* sliderG2:{
-			get() {
-				return this.$store.state.machine.model.global.group2T1Mix},
-		}, */
 		sliderG11: {
 			get() { return (this.sliderG1).toFixed(2)}
 		},
@@ -271,27 +258,46 @@ export default {
 		sliderG22: {
 			get() { return (1-this.sliderG2).toFixed(2)}
 		},
+		allAxesHomed () {
+			if (this.modeloMaquina === '2A') {
+				return this.move.axes[0].homed &&
+						this.move.axes[1].homed &&
+						this.move.axes[2].homed &&
+						this.move.axes[3].homed
+				}
+
+			return this.move.axes[0].homed &&
+				this.move.axes[1].homed &&
+				this.move.axes[2].homed &&
+				this.move.axes[3].homed &&
+				this.move.axes[4].homed &&
+				this.move.axes[5].homed &&
+				this.move.axes[6].homed
+		}
 	},
 	methods: {
 		...mapActions('machine', ['sendCode']),
 		closeDialog(){
 			this.$emit('close-dialog');
 		},
+		
 		async LinkTools(toolactivo){
+			if (!this.allAxesHomed) {
+				const msg = this.$t('domotek.varios.axesNotHomedLink');
+				const title = this.$t('domotek.varios.axesNotHomedTitle');
+				await this.sendCode(`M291 P"${msg}" R"${title}" S1`);
+				return;
+			}
+
 			console.info(`COAXIAL LINK`);
 			this.textoDialogo = 'Please, confirm COAXIAL ATTACH';
-			if ((toolactivo == 0)||(toolactivo == 1)) {
-				this.codigo = 'M98 P"/sys/Coaxial/coaxial_4AT0.g"';
-				await this.sendCode(this.codigo);
-				this.codigo = 'set global.coaxial1 = 1';
+			if ((toolactivo == 0) || (toolactivo == 1)) {
+				await this.sendCode('M98 P"/sys/Coaxial/coaxial_4AT0.g"');
+				await this.sendCode('set global.coaxial1 = 1');
+			} else {
+				await this.sendCode('M98 P"/sys/Coaxial/coaxial_4AT3.g"');
+				await this.sendCode('set global.coaxial2 = 1');
 			}
-			else
-			{
-				this.codigo = 'M98 P"/sys/Coaxial/coaxial_4AT3.g"';
-				await this.sendCode(this.codigo);
-				this.codigo = 'set global.coaxial2 = 1';
-			}
-			this.dialogATTACH = true;
 		},
 		async UnLinkTools(toolactivo){
 			console.info(`COAXIAL UNLINK`);
@@ -299,13 +305,17 @@ export default {
 			if ((toolactivo == 0)||(toolactivo == 1)) {
 				this.codigo = 'M98 P"/sys/Coaxial/grupo1Off.g"';
 				await this.sendCode(this.codigo);
+				this.codigo = 'set global.coaxial1 = 0';
+				await this.sendCode(this.codigo);
 			}
 			else
 			{
-				this.codigo = 'M98 P"/sys/Coaxial/grupo2Off.g"';
+				this.codigo = 'M98 P"/sys/Coaxial/GRUPO2OFF.g"';
+				await this.sendCode(this.codigo);
+				this.codigo = 'set global.coaxial2 = 0';
 				await this.sendCode(this.codigo);
 			}
-			this.dialogATTACH = true;
+			//this.dialogATTACH = true;
 		},
 		StartSaveSettings(toolactivo){
 			console.info(`startSaveSettings`);
@@ -316,6 +326,8 @@ export default {
 				this.sendCode(this.codigo);
 				this.codigo = "set global.group1T2Mix = "+ this.sliderG12 + "\n";
 				console.info(this.codigo);
+				this.sendCode(this.codigo);
+				this.codigo = "M567 P0 E" + this.sliderG11 + ":" + this.sliderG12 + "\n";
 				this.sendCode(this.codigo);
 				this.codigo = 'M28 "/sys/declare_variablesCO.g"' + '\n';
 				this.codigo += "global variablesCO = 1" + '\n';
@@ -335,6 +347,8 @@ export default {
 				this.sendCode(this.codigo);
 				this.codigo = "set global.group2T2Mix = "+ this.sliderG22 + "\n";
 				console.info(this.codigo);
+				this.sendCode(this.codigo);
+				this.codigo = "M567 P3 E" + this.sliderG22 + ":" + this.sliderG21 + "\n";
 				this.sendCode(this.codigo);
 				this.codigo = 'M28 "/sys/declare_variablesCO.g"' + '\n';
 				this.codigo += "global variablesCO = 1" + '\n';

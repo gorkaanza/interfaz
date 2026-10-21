@@ -24,6 +24,22 @@ a:not(:hover) {
 .probe-span:not(:last-child) {
 	margin-right: 8px;
 }
+/* Mantiene cada bloque (texto + número) fijo en su lugar */
+.speed-block {
+  width: 240px; /* Mismo ancho para ambos bloques */
+}
+
+/* Fija el espacio del número para que no mueva el texto */
+.fixed-width-value {
+  display: inline-block;
+  min-width: 80px;
+  text-align: left;
+}
+
+/* Opcional: asegura que la cabecera esté alineada correctamente */
+.category-header {
+  text-align: left;
+}
 </style>
 
 <template>
@@ -73,22 +89,22 @@ a:not(:hover) {
 										{{ 'X' }}
 									</span>
 									<span v-if="index==1">
-										{{ 'Y0' }}
-									</span>
-									<span v-if="index==2">
-										{{ 'Z0' }}
-									</span>
-									<span v-if="index==3">
 										{{ 'Y1' }}
 									</span>
-									<span v-if="index==4">
+									<span v-if="index==2">
+										{{ 'Z1' }}
+									</span>
+									<span v-if="index==3">
 										{{ 'Y2' }}
 									</span>
-									<span v-if="index==5">
+									<span v-if="index==4">
 										{{ 'Y3' }}
 									</span>
+									<span v-if="index==5">
+										{{ 'Y4' }}
+									</span>
 									<span v-if="index==6">
-										{{ 'Z1' }}
+										{{ 'Z2' }}
 									</span>
 								</strong>
 								<strong v-if="modeloMaquina == 'HK'">		
@@ -121,7 +137,9 @@ a:not(:hover) {
 						</v-row>
 					</v-col>
 				</v-row>
+				
 			</template>
+			
 
 			<!-- Extruders -->
 			<!-- <template v-if="move.extruders.length">
@@ -151,7 +169,7 @@ a:not(:hover) {
 			</template> -->
 
 			<!-- Speeds -->
-			<!-- <template v-show="isNumber(move.currentMove.requestedSpeed) || isNumber(move.currentMove.topSpeed)">
+			<!-- <template>
 				<v-divider v-show="move.axes.length + move.extruders.length" class="my-2"></v-divider>
 
 				<v-row align-content="center" no-gutters class="flex-nowrap">
@@ -182,6 +200,32 @@ a:not(:hover) {
 					</v-col>
 				</v-row>
 			</template> -->
+			<template>
+				<!-- <v-divider
+					v-show="move.axes.length + move.extruders.length"
+					class="my-2"
+				></v-divider> -->
+				<!-- Bloque de velocidades -->
+				<v-row align="center" no-gutters class="flex-nowrap mt-3 justify-center pl-6">
+					<!-- Requested speed -->
+					<v-col cols="auto" class="d-flex align-center justify-center speed-block" v-if="isNumber(move.currentMove.requestedSpeed)">
+						<strong>{{ $t('panel.status.requestedSpeed') }}:</strong>
+						<span class="ml-2 fixed-width-value">
+							{{ $display(move.currentMove.requestedSpeed, 0, 'mm/s') }}
+						</span>
+					</v-col>
+
+					<!-- Top speed -->
+					<v-col cols="auto" class="d-flex align-center justify-center speed-block" v-if="isNumber(move.currentMove.topSpeed)">
+						<strong>{{ $t('panel.status.topSpeed') }}:</strong>
+						<span class="ml-2 fixed-width-value">
+							{{ $display(move.currentMove.topSpeed, 0, 'mm/s') }}
+						</span>
+					</v-col>
+				</v-row>
+			</template>
+
+
 
 			<!-- Sensors - control de usuario --> 
 			<!-- <template v-if="sensorsPresent" >

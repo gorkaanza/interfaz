@@ -12,7 +12,7 @@
 
 <template>
 	<v-card>
-		<v-card-title class="pt-0">
+		<v-card-title class="pt-0">z
 			<v-icon small class="mr-1">mdi-swap-horizontal</v-icon>
 			{{ $t('panel.movement.caption') }}
 			<v-spacer></v-spacer>

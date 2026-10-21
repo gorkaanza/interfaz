@@ -17,7 +17,7 @@
 			<upload-btn class="hidden-sm-and-down" :elevation="1" :directory="directory" target="macros" color="primary"></upload-btn>
 		</v-toolbar>
 		
-		<base-file-list ref="filelist" v-model="selection" :directory.sync="directory" :loading.sync="loading" sort-table="macros" @fileClicked="fileClicked" no-files-text="list.macro.noMacros">
+		<base-file-list ref="filelist" v-model="selection" :directory.sync="directory" :loading.sync="loading" sort-table="macros" @fileClicked="fileClicked" @directoryLoaded="onDirectoryLoaded" no-files-text="list.macro.noMacros">
 			<template #context-menu>
 				<v-list-item v-show="isFile" @click="runFile(selection[0].name)">
 					<v-icon class="mr-1">mdi-play</v-icon> {{ $t('list.macro.run') }}
@@ -92,6 +92,18 @@ export default {
 		refresh() {
 			this.$refs.filelist.refresh();
 		},
+		onDirectoryLoaded() {
+			if (this.$store.state.nivelUsuario < 2) {
+				this.$refs.filelist.innerFilelist = this.$refs.filelist.innerFilelist.filter(
+					item => !(item.isDirectory && (item.name === 'Enable-Disable_AUTO-CAL' || item.name === 'Enable-Disable_DOOR_DETECTION' || item.name === 'On-Off_CHAMBER_FAN'))
+				);
+			}
+			if (this.$store.state.nivelUsuario < 3) {
+				this.$refs.filelist.innerFilelist = this.$refs.filelist.innerFilelist.filter(
+					item => !(item.isDirectory && (item.name === 'Scripts' || item.name === 'Run scripts'))
+				);
+			}
+		},
 		fileClicked(item) {
 			this.runMacroDialog.title = this.$t('dialog.runMacro.title', [item.name]);
 			this.runMacroDialog.prompt = this.$t('dialog.runMacro.prompt', [item.name]);
@@ -110,6 +122,10 @@ export default {
 			if (Path.equals(this.directory, from) || !Path.startsWith(this.directory, to)) {
 				this.directory = to;
 			}
+		},
+		 // Cuando cambia el nivel de usuario, refrescar la lista
+		'$store.state.nivelUsuario'() {
+			this.refresh();
 		}
 	}
 }

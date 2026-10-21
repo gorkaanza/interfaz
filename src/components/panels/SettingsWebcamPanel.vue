@@ -1,5 +1,5 @@
 <template>
-	<v-card outlined v-if="$store.state.nivelUsuario >= 2">
+	<v-card outlined v-if="$store.state.nivelUsuario >= 3">
 		<v-card-title class="pb-0">
 			{{ $t('panel.settingsWebcam.caption') }}
 		</v-card-title>

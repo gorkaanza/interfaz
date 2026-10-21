@@ -35,11 +35,16 @@
 	.snack {
 		font-size: 4rem !important;
 	}
+
+	/* Menos relleno en los pasos del stepper de este panel (evita el scroll vertical en la pantalla de la impresora) */
+	.panelStepper .v-stepper__content {
+		padding: 8px 12px 8px 12px !important;
+	}
 </style>
 <template>
 	<v-row class="mb-0 pb-0"  > 
-		<v-col cols="12" align="center">
-			<v-stepper v-model="pasos" class="blue lighten-5 "  >
+		<v-col cols="12" align="center" class="py-0">
+			<v-stepper v-model="pasos" class="blue lighten-5 panelStepper"  >
 				<v-stepper-header class="Stephead">
 					<v-btn icon style="margin: 16px 0 0 16px; background:" v-on:click="closeDialog">
 						<v-icon x-large> mdi-thermometer </v-icon> 
@@ -52,8 +57,8 @@
 				</v-stepper-header>
 				<v-stepper-items>
 					<v-stepper-content step="S">
-						<v-card class="mb-4" color="blue lighten-4"	height="350px">
-							<v-card id="vcselectorCfg" outlined class="blue lighten-4" style="height: 250px; width: 800px">	
+						<v-card class="mb-0" color="blue lighten-4" :height="panelCardPx">
+							<v-card id="vcselectorCfg" outlined class="blue lighten-4" :height="panelCardPx - 100" style="width: 800px">	
 								<p style="font-size: 1.3rem; font-weight:bold;" class="mt-2 mb-0 text-center">{{ $t('domotek.varios.generalSettings') }}</p>
 								<v-row style="height:30px;margin:0px;" class="ma-0 ">
 									<v-col cols="2" class="ma-0 pa-0">
@@ -92,8 +97,7 @@
 					</v-stepper-content>
 				</v-stepper-items>
 			</v-stepper>
-		</v-col>
-		<v-col class="mb-0 pb-0">
+			<!-- Dialogos y aviso dentro de la misma columna: asi no crean filas vacias que alargan el panel -->
 			<v-dialog v-model="dialogTMP" max-width="500">
 				<v-card>                                                                                  
 					<v-card-title class="headline">
@@ -119,8 +123,6 @@
 					</v-card-actions>
 				</v-card>
 			</v-dialog>
-		</v-col>
-		<v-col class="mb-0 pb-0">
 			<v-dialog v-model="dialogTMP_SAV" max-width="500">
 				<v-card>
 					<v-card-title class="headline">
@@ -173,6 +175,11 @@ export default {
 			selectedItem: 5,
 			snackbar:false,
 			snackbarValor:"0",
+			// --- Altura del panel: se ajusta a la pantalla (igual que en los paneles UV y ES) ---
+			windowHeight: window.innerHeight,
+			panelOffsetPx: 80,		// alto que ocupan cabecera del stepper + margenes (subir si vuelve a salir scroll)
+			panelMinPx: 350,		// altura minima de la tarjeta
+			panelMaxPx: 400,		// altura maxima (para que en el PC no quede una tarjeta enorme)
 		}
 	},
 	computed:{
@@ -213,6 +220,10 @@ export default {
 			get() {
 				return this.$store.state.machine.model.global.ChamberMode},		
 		},	
+		// Altura de la tarjeta: llena la pantalla sin hacer scroll
+		panelCardPx() {
+			return Math.round(Math.min(this.panelMaxPx, Math.max(this.panelMinPx, this.windowHeight - this.panelOffsetPx)));
+		},
 
 
 
@@ -235,6 +246,9 @@ export default {
 			
 			this.codigo += 'M29' + '\n';
 		},
+		onWindowResize() {
+			this.windowHeight = window.innerHeight;
+		},
 		CambiaStep(newStep){
 			this.pasos = newStep;
 		},
@@ -242,7 +256,12 @@ export default {
 
 	},	
 	mounted() {
+		window.addEventListener('resize', this.onWindowResize);
+		this.onWindowResize();
 		this.$vuetify.goTo(0);
+	},
+	beforeDestroy() {
+		window.removeEventListener('resize', this.onWindowResize);
 	},
 	
 	watch: {

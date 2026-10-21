@@ -35,11 +35,16 @@
 	.snack {
 		font-size: 4rem !important;
 	}
+
+	/* Menos relleno en los pasos del stepper de este panel (evita el scroll vertical en la pantalla de la impresora) */
+	.panelStepper .v-stepper__content {
+		padding: 8px 12px 8px 12px !important;
+	}
 </style>
 <template>
 	<v-row class="mb-0 pb-0"  > 
-		<v-col cols="12" align="center">
-			<v-stepper v-model="pasos" class="blue lighten-5 "  >
+		<v-col cols="12" align="center" class="py-0">
+			<v-stepper v-model="pasos" class="blue lighten-5 panelStepper"  >
 				<v-stepper-header class="Stephead">
 					<v-btn icon style="margin: 16px 0 0 16px; background:" v-on:click="closeDialog">
 						<v-icon x-large> mdi-brush-variant </v-icon> 
@@ -52,8 +57,8 @@
 				</v-stepper-header>
 				<v-stepper-items>
 					<v-stepper-content step="S">
-						<v-card class="mb-4" color="blue lighten-4"	height="350px">
-							<v-card id="vcselectorCfg" outlined class="blue lighten-4" style="height: 250px; width: 800px">	
+						<v-card class="mb-0" color="blue lighten-4" :height="panelCardPx">
+							<v-card id="vcselectorCfg" outlined class="blue lighten-4" :height="panelCardPx - 100" style="width: 800px">	
 								<p style="font-size: 1.3rem; font-weight:bold;" class="mt-2 mb-0 text-center">{{ $t('domotek.varios.generalSettings') }}</p>
 								
 								<v-row style="height:30px;margin:0px;" class="ma-0 ">
@@ -67,7 +72,31 @@
  											class="">
 										</v-checkbox>
 									</v-col>
-									
+								</v-row>
+								<v-row style="height: 62px; margin-left: 180px" align="center">  
+									<!-- Segundo checkbox -->
+									<v-col cols="5">
+										<v-checkbox 
+										:disabled="!enableCL" 
+										v-model="cadenceEnableCL" 
+										:label="$t('domotek.varios.cleanDuringES') + ' ' + (exposureTimeSeconds / 60).toFixed(2)  + ' ' + $t('domotek.varios.minutes')"  
+										class="etiqueta align-center justify-center">
+										</v-checkbox>
+									</v-col>
+
+									<!-- Botón, solo aparece si ambos checkbox están activos -->
+									<v-col cols="6" v-show="enableCL && cadenceEnableCL">
+										<v-btn
+										x-large
+										outlined
+										color="#1976d2"
+										@click="openTimeDialog"
+										>
+										<v-icon left>mdi-timer-outline</v-icon>
+										<span class="title font-weight-bold mr-2">{{ (exposureTimeSeconds / 60).toFixed(2) }}</span>
+										<span class="subtitle-1">{{ $t('panel.electrospinning.minutes') }}</span>
+										</v-btn>
+									</v-col>
 								</v-row>		
 							</v-card>
 							
@@ -75,15 +104,57 @@
 								<v-icon class="mr-1">mdi-floppy</v-icon>
 							</v-btn>
 							<v-btn v-if="isprinting == 'idle' || isprinting == 'paused'" class="btnContinue mt-10 mr-5" color="green white--text" @click="StartClean();" rounded>{{ $t('domotek.varios.runOnce') }}</v-btn>
-							<v-btn v-if="isprinting != 'idle' && isprinting != 'paused'" class="btnContinue mt-10 mr-5" color="#ffb812" @click="StartCleanPausing();" rounded>{{ $t('domotek.varios.runOnce') }}</v-btn>
+							<v-btn v-if="isprinting != 'idle' && isprinting != 'paused'" class="btnContinue mt-10 mr-5" color="#fb8c00" @click="StartCleanPausing();" rounded>{{ $t('domotek.varios.runOnce') }}</v-btn>
 							<!-- <v-btn class="btnContinue mt-10 " color="primary" @click="CambiaStep('1')"> Change <v-icon dark right> mdi-wrench-outline </v-icon></v-btn> -->
-							
 						</v-card>
+						<v-dialog v-model="dialogManualTime" persistent max-width="380px">
+							<v-card>
+								<v-card-title class="justify-center text-center">
+									<span class="headline">{{ $t('panel.electrospinning.timeInMinutes') }} </span>
+								</v-card-title>
+								<v-card-text class="pb-0">
+									<v-container>
+										<!-- Campo de texto único para el tiempo -->
+										<v-row justify="center">
+											<v-col cols="12" class="py-1">
+												<v-text-field v-model="manualTimeInput" @keydown="handleKeydownManualInput" outlined class="title text-center font-weight-bold" :rules="[rules.required, rules.positiveNumber, rules.timeRange]" :error-messages="manualTimeError"></v-text-field>
+											</v-col>
+										</v-row>
+
+										<!-- Teclado Numérico Personalizado -->
+										 <div class="numeric-keypad text-center">
+											<v-row dense v-for="(row, rowIndex) in keypadLayout" :key="rowIndex">
+												<v-col v-for="key in row" :key="key.value" class="pa-1">
+												<template v-if="key.value !== 'EMPTY'">
+													<!-- <v-btn block class ="btn-medium-custom" :color="key.color || 'grey lighten-2'" @click="handleTimeKeyPress(key.value)" :disabled="key.value === 'DEL' && !manualTimeInput.length" > -->
+													<v-btn block class ="btn-medium-custom" :color="key.color || 'grey lighten-2'" @click="handleTimeKeyPress(key.value)">	
+														<v-icon v-if="key.icon">{{ key.icon }}</v-icon>
+														<span v-else class="headline">{{ key.text }}</span>
+													</v-btn>
+												</template>
+												<template v-else>
+													<div style="visibility: hidden; height: 48px;"></div>
+												</template>
+												</v-col>
+											</v-row>
+										</div>
+									</v-container>
+								</v-card-text>
+								<v-card-actions>
+									<v-spacer></v-spacer>
+									<v-btn color="blue darken-1" text @click="cancelManualTime">
+										{{ $t('generic.cancel') }}
+									</v-btn>
+									<v-btn color="blue darken-1" text @click="confirmManualTime" :disabled="!!manualTimeError || !manualTimeInput">
+										{{ $t('generic.ok') }}
+									</v-btn>
+								</v-card-actions>
+							</v-card>
+						</v-dialog>
 					</v-stepper-content>
 				</v-stepper-items>
 			</v-stepper>
-		</v-col>
-		<v-col class="mb-0 pb-0">
+			<!-- Dialogos y aviso dentro de la misma columna: asi no crean filas vacias que alargan el panel -->
 			<v-dialog v-model="dialogCL" max-width="500">
 				<v-card>                                                                                  
 					<v-card-title class="headline">
@@ -109,8 +180,6 @@
 					</v-card-actions>
 				</v-card>
 			</v-dialog>
-		</v-col>
-		<v-col class="mb-0 pb-0">
 			<v-dialog v-model="dialogCL_SAV" max-width="500">
 				<v-card>
 					<v-card-title class="headline">
@@ -164,6 +233,48 @@ export default {
 			selectedItem: 5,
 			snackbar:false,
 			snackbarValor:"0",
+			// --- Altura del panel: se ajusta a la pantalla (igual que en el panel de temperaturas) ---
+			windowHeight: window.innerHeight,
+			panelOffsetPx: 80,		// alto que ocupan cabecera del stepper + margenes (subir si vuelve a salir scroll)
+			panelMinPx: 350,		// altura minima de la tarjeta
+			panelMaxPx: 400,		// altura maxima: en la pantalla de la impresora llena el hueco y en el PC no crece mas
+			dialogManualTime: false,
+			dialogTimePicker: false,
+			manualTimeInput: '',
+			manualTimeError: '',
+			keypadLayout: [ // Definición del layout del teclado
+                [{text: '7', value: '7'}, {text: '8', value: '8'}, {text: '9', value: '9'}],
+                [{text: '4', value: '4'}, {text: '5', value: '5'}, {text: '6', value: '6'}],
+                [{text: '1', value: '1'}, {text: '2', value: '2'}, {text: '3', value: '3'}],
+                [{text: '.', value: '.'}, {text: '0', value: '0'}, {icon: 'mdi-backspace-outline', value: 'DEL', color: 'blue lighten-4'}],
+				[{text: '', value: 'EMPTY'}, {text: 'C', value: 'CLEAR', color: 'blue lighten-4'}, {text: '', value: 'EMPTY'}]
+            ],
+			rules: { // Reglas para los text fields (aunque la validación principal es en handleKeyPress)
+				timeRange: value => {
+					if (value === '' || value === null) return true; // Permitir vacío mientras escribe
+
+					const num = parseFloat(value);
+
+					const min = 0.1;
+					const max = 120;
+
+					if (isNaN(num) || num < min || num > max) {
+						return this.$t('panel.electrospinning.timeRangeErrorDetailed', {
+							min,
+							max,
+							val: value
+						});
+					}
+
+					return true;
+				},
+
+				required: value => !!value || this.$t('domotek.varios.valorRequerido'),
+				positiveNumber: value => {
+					const num = Number(value);
+					return !isNaN(num) && num > 0 || this.$t('domotek.varios.numeroPositivo');
+				}
+            }            
 		}
 	},
 	computed:{
@@ -182,11 +293,34 @@ export default {
 				this.sendCode(`set global.enableCL = ${value}`);
 			}			
 		},
+		cadenceEnableCL: {
+			get() {
+				return this.$store.state.machine.model.global.cadenceEnableCL},
+			set(value){
+				this.sendCode(`set global.cadenceEnableCL = ${value}`);
+			}			
+		},
+		cadenceAmountCL: {
+			get() {
+				return this.$store.state.machine.model.global.cadenceAmountCL},
+			set(value){
+				this.sendCode(`set global.cadenceAmountCL = ${value}`);
+				this.snackbar = true;
+				this.snackbarValor = value;
+			}			
+		},
 
 		isprinting: {
 			get() {
 				return this.$store.state.machine.model.state.status},
-		}		
+		},
+		exposureTimeSeconds() {
+			return this.$store.state.machine.model.global.cadenceAmountCL;
+		},		
+		// Altura de la tarjeta: llena la pantalla sin hacer scroll
+		panelCardPx() {
+			return Math.round(Math.min(this.panelMaxPx, Math.max(this.panelMinPx, this.windowHeight - this.panelOffsetPx)));
+		},
 
 	},
 	methods: {
@@ -202,6 +336,8 @@ export default {
 			this.codigo += 'M28 "/sys/declare_variablesCL.g"' + '\n';
 			this.codigo += "global variablesCL = 1" + '\n';
 			this.codigo += "global enableCL = "+ this.$store.state.machine.model.global.enableCL + '\n';
+			this.codigo += "global cadenceEnableCL = "+ this.$store.state.machine.model.global.cadenceEnableCL + '\n';
+			this.codigo += "global cadenceAmountCL = "+ this.$store.state.machine.model.global.cadenceAmountCL + '\n';
 			
 			this.codigo += 'M29' + '\n';
 		},
@@ -215,17 +351,122 @@ export default {
 		StartCleanPausing(){
 			this.dialogCL = true;
 			console.info(`Run once Clean`);
-			this.nombreMacro = 'Job in progress, would you like to launch Clean?';
-			this.codigo = 'M25'+'\n'+'M98 P"/macros/Scripts/CLMacro.g"'+'\n'+'M24';
+			this.nombreMacro = this.$t('panel.clean.clJobInProgress');
+		},
+		onWindowResize() {
+			this.windowHeight = window.innerHeight;
 		},
 		CambiaStep(newStep){
 			this.pasos = newStep;
 		},
+		openTimeDialog() {
+			// Carga el valor actual en el campo de texto del diálogo
+			//this.manualTimeInput = this.exposureTimeSeconds.toString();
+			this.manualTimeInput = (this.exposureTimeSeconds / 60).toFixed(2).toString();
+			this.manualTimeError = ''; // Limpia errores previos
+			this.dialogManualTime = true;
+		},
+
+		handleTimeKeyPress(key) {
+			if (key === 'DEL') {
+				this.manualTimeInput = this.manualTimeInput.slice(0, -1);
+			} else if (key === 'CLEAR') {
+				this.manualTimeInput = '';
+			} else {
+				if (this.manualTimeInput.length < 5) { // Límite de 5 dígitos
+					this.manualTimeInput += key;
+				}
+			}
+			// Validar después de cada pulsación
+			this.validateTime();
+		},
+		validateTime() {
+			const value = this.manualTimeInput;
+			const ruleRequired = this.rules.required(value);
+			if (ruleRequired !== true) {
+				this.manualTimeError = ruleRequired;
+				return;
+			}
+
+			const rulePositive = this.rules.positiveNumber(value);
+			if (rulePositive !== true) {
+				this.manualTimeError = rulePositive;
+				return;
+			}
+
+			// Si todas las reglas pasan, se limpia el error
+			this.manualTimeError = '';
+		},
+
+		/**
+		 * Cierra el diálogo sin guardar cambios.
+		 */
+		cancelManualTime() {
+			this.dialogManualTime = false;
+		},
+
+		/**
+		 * Confirma el valor, lo guarda y llama a tu método principal.
+		 */
+		confirmManualTime() {
+			this.validateTime();
+			if (this.manualTimeError) return;
+
+			const minutes = parseFloat(this.manualTimeInput);
+			const newValue = Math.round(minutes * 60); // convierte a segundos
+
+			this.sendCode(`set global.cadenceAmountCL = ${newValue}`);
+
+			//this.ChangeSelectedExp(newValue); // actualiza gcode si aplica
+
+			this.dialogManualTime = false;
+		},
+		//Validacion de caracteres por teclado
+		handleKeydownManualInput(event) {
+			const allowedKeys = [
+				'0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+				'.', 'Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'
+			];
+
+			// Permitir teclas de control
+			if (allowedKeys.includes(event.key)) {
+				// Obtener el valor actual y el valor seleccionado en el campo
+				const input = event.target;
+				const currentVal = input.value;
+				const selectionStart = input.selectionStart;
+				const selectionEnd = input.selectionEnd;
+
+				// No permitir más de 5 caracteres si se intenta añadir uno nuevo
+				const isCharKey = event.key.length === 1 && !['Backspace', 'Delete'].includes(event.key);
+
+				// Si es punto, y ya hay uno, lo bloqueamos
+				if (event.key === '.' && currentVal.includes('.')) {
+					event.preventDefault();
+					return;
+				}
+
+				if (isCharKey) {
+					const newLength = 
+						currentVal.length - (selectionEnd - selectionStart) + 1;
+					if (newLength > 5) {
+						event.preventDefault();
+					}
+				}
+			} else {
+				// Bloquear cualquier otra tecla no permitida
+				event.preventDefault();
+			}
+		}
 		
 
 	},	
 	mounted() {
+		window.addEventListener('resize', this.onWindowResize);
+		this.onWindowResize();
 		this.$vuetify.goTo(0);
+	},
+	beforeDestroy() {
+		window.removeEventListener('resize', this.onWindowResize);
 	},
 	
 	watch: {

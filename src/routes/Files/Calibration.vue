@@ -115,7 +115,7 @@
 				
 			</v-stepper>
 		</v-col>
-		<v-col cols="12" v-if="$store.state.nivelUsuario >= 2">
+		<v-col cols="12" v-if="$store.state.nivelUsuario >= 3">
 			<calibration-file-list></calibration-file-list>
 		</v-col>
 		<v-col class="mb-0 pb-0">

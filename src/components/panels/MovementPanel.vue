@@ -16,17 +16,17 @@
 <template>
 	<v-card elevation="0" class="blue lighten-4">
 
-		<v-card-title >
+		<!-- <v-card-title > -->
 			
 			<!-- <code-btn v-show="visibleAxes.length" color="primary" small code="G28" :title="$t('button.home.titleAll')" class="ml-0 hidden-sm-and-down">
 				{{ $t('button.home.captionAll') }}
 			</code-btn> -->
 
-			<v-spacer class="hidden-sm-and-down"></v-spacer>
+			<!-- <v-spacer class="hidden-sm-and-down"></v-spacer>
 
 			<v-icon small class="mr-1">mdi-swap-horizontal</v-icon> {{ $t('panel.movement.caption') }}
 
-			<v-spacer></v-spacer>
+			<v-spacer></v-spacer> -->
 
 			<!-- <v-menu offset-y left :disabled="uiFrozen">
 				<template #activator="{ on }">
@@ -71,14 +71,20 @@
 					</v-list>
 				</v-card>
 			</v-menu> -->
-		</v-card-title>
+		<!-- </v-card-title> -->
 
 		<v-card-text v-show="visibleAxes.length !== 0" class="pb-0">
 			<!-- Mobile home buttons -->
+			<v-row class="mt-2"></v-row>
 			<position-panel></position-panel>
 			<v-row class="py-2" no-gutters>
 				<v-col>
-						<code-btn :color="move.axes[0].homed ? 'teal':'warning'" code="G28" :title="$t('button.home.titleAll')" block rounded style="border:10px;">
+						<!-- <code-btn :color="move.axes[0].homed && move.axes[1].homed && move.axes[2].homed && move.axes[3].homed && move.axes[4].homed && move.axes[5].homed && move.axes[6].homed? 'teal':'warning'" code="G28" :title="$t('button.home.titleAll')" block rounded style="border:10px;">
+							<span>
+								{{ $t('button.home.captionAll') }}
+							</span>
+						</code-btn> -->
+						<code-btn :color="(modeloMaquina === '2A' ? move.axes[0].homed && move.axes[1].homed && move.axes[2].homed && move.axes[3].homed : move.axes[0].homed && move.axes[1].homed && move.axes[2].homed && move.axes[3].homed && move.axes[4].homed && move.axes[5].homed && move.axes[6].homed ) ? 'teal' : 'warning'" code="G28" :title="$t('button.home.titleAll')" block rounded style="border:10px;" >
 							<span>
 								{{ $t('button.home.captionAll') }}
 							</span>
@@ -160,7 +166,7 @@
 						<v-col cols="" align="center" class="mb-0">
 							<v-icon class="mt-10">mdi-alpha-y-circle-outline</v-icon>
 							<!-- <span>Z+</span> -->
-							<code-btn-redondo :code="boards.length > 2 ? `M120\nG91\nG1 Y${sizeMove}\nG90\nM121`:`M120\nG91\nG1 Y-${sizeMove} F6000\nG90\nM121`" no-wait class="move-btn material-icons">
+							<code-btn-redondo :code="boards.length > 2 ? `M120\nG91\nG1 Y${sizeMove}\nG90\nM121`:`M120\nG91\nG1 Y-${sizeMove}\nG90\nM121`" no-wait class="move-btn material-icons">
 								<v-icon size="70"> mdi-arrow-up-bold-circle </v-icon>
 							</code-btn-redondo>
 							<v-icon class="mx-3"></v-icon>
@@ -170,7 +176,7 @@
 						</v-col> -->
 						<v-col cols="12" align="center" class="pa-0 pt-3">
 							<v-icon class="mt-10">mdi-alpha-x-circle-outline</v-icon>
-							<code-btn-redondo :code="modeloMaquina != '2A' ? `M120\nG91\nG1 X${sizeMove}\nG90\nM121`:`M120\nG91\nG1 X-${sizeMove} F6000\nG90\nM121`" no-wait class="move-btn mr-10">
+							<code-btn-redondo :code="modeloMaquina != '2A' ? `M120\nG91\nG1 X${sizeMove}\nG90\nM121`:`M120\nG91\nG1 X-${sizeMove}\nG90\nM121`" no-wait class="move-btn mr-10">
 								<v-icon  size="70">mdi-arrow-left-bold-circle</v-icon>
 							</code-btn-redondo>
 							<v-btn-toggle v-model="toogleToolState" color="teal" background-color="blue lighten-4" rounded>
@@ -214,7 +220,7 @@
 								</v-btn> -->
 							</v-btn-toggle>
 							<v-icon class="mt-10 ml-6">mdi-alpha-x-circle-outline</v-icon>
-							<code-btn-redondo :code="modeloMaquina != '2A' ? `M120\nG91\nG1 X-${sizeMove}\nG90\nM121`:`M120\nG91\nG1 X${sizeMove} F6000 \nG90\nM121`" no-wait class="move-btn ml-0 mr-4">
+							<code-btn-redondo :code="modeloMaquina != '2A' ? `M120\nG91\nG1 X-${sizeMove}\nG90\nM121`:`M120\nG91\nG1 X${sizeMove}\nG90\nM121`" no-wait class="move-btn ml-0 mr-4">
 								<v-icon size="70">mdi-arrow-right-bold-circle</v-icon>
 							</code-btn-redondo>
 						</v-col>
@@ -223,7 +229,7 @@
 						</v-col> -->
 						<v-col cols="12" align="center" class="mt-3 pa-0">
 							<v-icon class="mt-10 pa-0">mdi-alpha-y-circle-outline</v-icon>
-							<code-btn-redondo :code="modeloMaquina != '2A' ? `M120\nG91\nG1 Y-${sizeMove}\nG90\nM121`:`M120\nG91\nG1 Y${sizeMove} F6000\nG90\nM121`" no-wait class="move-btn">
+							<code-btn-redondo :code="modeloMaquina != '2A' ? `M120\nG91\nG1 Y-${sizeMove}\nG90\nM121`:`M120\nG91\nG1 Y${sizeMove}\nG90\nM121`" no-wait class="move-btn">
 								<v-icon size="70">mdi-arrow-down-bold-circle</v-icon>
 							</code-btn-redondo>
 							<v-icon class="mx-3"></v-icon>
@@ -267,17 +273,17 @@
 					<span class="ml-2 pt-5">mm</span> 
 				</v-col>
 				<v-col cols="2" lg="1" class="ml-0 mt-4 pa-0 ma-0" align="center">
-					<code-btn :code="`M18`" icon>
+					<v-btn @click="disableSteppers" icon>
 						<v-row dense>
 							<v-col cols="12">
 								<v-icon class="mb-4" x-large> mdi-engine-off </v-icon>
 								<br>
-								<span>{{ $t('domotek.movePanel.disableSteppers') }}</span>
+								<span >{{ $t('domotek.movePanel.disableSteppers') }}</span>
 							</v-col>
 							<v-col>
 							</v-col>
 						</v-row>
-					</code-btn>
+					</v-btn>
 				</v-col>
 				<v-col cols="2" lg="1" class="ml-0 mt-4 pa-0 ma-0" align="center">
 					<v-btn @click="dialogExtrude = true" icon>
@@ -639,6 +645,9 @@ export default {
 			this.DialogClean = false;
 			this.DialogTmp = false;
          },  
+		disableSteppers(){
+			this.sendCode(`M18`);
+		},
 		// viewToolActive(){
 		// 	return;
 		// 	this.countTools = 0;

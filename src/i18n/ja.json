@@ -199,7 +199,8 @@
       "gcodeReference": "G-Codeリファレンス",
       "menuReference": "メニューリファレンス",
       "save": "保存",
-      "confirmClose": "ファイルが変更されています。先に進むと、変更内容が失われます"
+      "confirmClose": "ファイルが変更されています。先に進むと、変更内容が失われます",
+      "confirmSaveEmpty": ""
     },
     "fileTransfer": {
       "uploadingTitle": "ファイルアップロード中 {0} / {1}, {2}% 完了",
@@ -797,6 +798,9 @@
     "webcam": {
       "caption": "ウェブカメラ監視",
       "alt": "(webcam image)"
+    },
+    "ultraviolet": {
+      "EMDJobInProgress": ""
     }
   },
   "pluginPermissions": {

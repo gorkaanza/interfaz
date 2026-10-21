@@ -188,7 +188,8 @@
       "gcodeReference": "Referência do G-Code ",
       "menuReference": "Referência do Menu",
       "save": "Salvar",
-      "confirmClose": "O arquivo foi alterado. Se você continuar, suas alterações serão perdidas."
+      "confirmClose": "O arquivo foi alterado. Se você continuar, suas alterações serão perdidas.",
+      "confirmSaveEmpty": ""
     },
     "fileTransfer": {
       "uploadingTitle": "Fazendo Uploading do arquivo {0} de {1}, {2}% completo",

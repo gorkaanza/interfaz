@@ -1,7 +1,7 @@
 <template>
 	<v-card outlined class="blue lighten-5" elevation="5">
 		<v-card-title class="pb-0">
-			<span>Custom domoBIO v1.8.7 DWC {{ version }} </span>
+			<span>Custom domoBIO 1.10.2 BETA DWC {{ version }} </span>
 			<!--  <v-spacer></v-spacer>-->
 			<!--<a href="https://github.com/Duet3D/DuetWebControl" target="_blank">
 				<v-icon small>mdi-star</v-icon> GitHub
@@ -29,7 +29,7 @@
 					{{ `DSF Version: ${dsfVersion}` }} <br>
 				</template>
 				<template v-if="mainboard.firmwareName">
-					{{ $t('panel.settingsElectronics.firmware', [mainboard.firmwareName + ' ' + $display(mainboard.firmwareVersion), $display(mainboard.firmwareDate)]) }} <br>
+					{{ $t('panel.settingsElectronics.firmware', [mainboard.firmwareName + ' ' + $display(mainboard.firmwareVersion) + ' Domotek', $display(mainboard.firmwareDate)]) }} <br>
 				</template>
 				<template v-if="firstInterface.firmwareVersion && firstInterface.type === 'wifi'">
 					{{ $t('panel.settingsElectronics.dwsFirmware', [$display(firstInterface.firmwareVersion)]) }} <br>

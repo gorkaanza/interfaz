@@ -20,17 +20,17 @@
 					<v-btn icon style="margin: 16px 0 0 16px; background:" v-on:click="closeDialog">
 						<v-icon large> mdi-axis-arrow </v-icon>
 					</v-btn>
-					<v-stepper-step editable step="1" color="teal">
+					<v-stepper-step editable step="1" color="#0a21ad">
 					</v-stepper-step>
 
 					<v-divider></v-divider>
 
-					<v-stepper-step editable step="2" color="teal">
+					<v-stepper-step editable step="2" color="#0a21ad">
 					</v-stepper-step>
 
 					<v-divider></v-divider>
 
-					<v-stepper-step editable step="3" color="teal">
+					<v-stepper-step editable step="3" color="#0a21ad">
 					</v-stepper-step>
 
 					<!-- <v-divider></v-divider> -->
@@ -46,14 +46,14 @@
 					<v-btn icon style="margin: 16px 0 0 16px; background:" v-on:click="closeDialog">
 						<v-icon large> mdi-axis-arrow </v-icon>
 					</v-btn>
-					<v-stepper-step editable step="1" color="teal">
+					<v-stepper-step editable step="1" color="#0a21ad">
 					</v-stepper-step>
 
 					
 
 					<v-divider></v-divider>
 
-					<v-stepper-step editable step="3" color="teal">
+					<v-stepper-step editable step="3" color="#0a21ad">
 					</v-stepper-step>
 
 					<!-- <v-divider></v-divider> -->
@@ -67,13 +67,13 @@
 				</v-stepper-header>
 				<v-stepper-items>
 					<v-stepper-content step="1" class="">
-						<v-card class="mb-4" color="teal lighten-4"	height="270px" elevation="0">
+						<v-card class="mb-4" color="blue lighten-4"	height="270px" elevation="0">
 								<v-row class="pa-5">
 									<v-col cols="12" class="mt-7">
 										{{ $t('domotek.calibracion.autoCal') }}
 									</v-col>
 									<v-col cols="12">
-										<v-btn class="mt-8 blue lighten-5" @click="SelectCalibration(0)" rounded block>
+										<v-btn class="mt-8 blue lighten-5" @click="SelectCalibration(0)" :disabled="calibrando" rounded block>
 											<v-row>
 												<v-col cols="12">
 													<span>{{$t('domotek.calibracion.start')}}</span>
@@ -87,7 +87,7 @@
 				</v-stepper-items>
 				<v-stepper-items>
 					<v-stepper-content step="2">
-						<v-card class="mb-4" color="teal lighten-4"	height="270px">
+						<v-card class="mb-4" color="blue lighten-4"	height="270px">
 							<v-row class="pt-3">
 								<v-col cols="2"/>
 								<v-col cols="2" class="mt-1 " >
@@ -95,8 +95,20 @@
 									<icon-base v-if="valFOI < 0" width="96" height="96" icon-name="write"><icon-izquierda /><icon-turn-left-left /> <icon-turn-value offsetX="75" :valor = nivelFOI /></icon-base>
 									<icon-base v-if="valFOI > 0" width="96" height="96" icon-name="write"><icon-izquierda /><icon-turn-right-left /> <icon-turn-value offsetX="75" :valor = nivelFOI /></icon-base>
 								</v-col>
-								<v-col cols="4" class="mt-15" >
-									{{ $t('domotek.calibracion.platformLeveling') }}
+								<v-col cols="4" class="mt-4 text-center">
+									<div style="font-size: 1.2em;">
+										{{ $t('domotek.calibracion.platformLeveling') }}
+									</div>
+									<div class="mt-3 text-left" style="font-size: 0.85em; display: inline-block;">
+										<div class="d-flex align-center mb-2">
+											<div class="mr-2" style="width: 12px; height: 12px; background-color: green; border-radius: 50%;"></div>
+											<span>{{ $t('domotek.calibracion.greenLegend') }}</span>
+										</div>
+										<div class="d-flex align-center">
+											<div class="mr-2" style="width: 12px; height: 12px; background-color: red; border-radius: 50%;"></div>
+											<span>{{ $t('domotek.calibracion.redLegend') }}</span>
+										</div>
+									</div>
 								</v-col>
 								<v-col cols="2" class="mt-1 ">
 									<icon-base v-if="valFOD == 0" width="96" height="96" icon-name="write"><icon-derecha /></icon-base>	
@@ -112,14 +124,26 @@
 									<icon-base v-if="valFRI < 0" width="96" height="96" icon-name="write"><icon-izquierda /><icon-turn-left-left /> <icon-turn-value offsetX="75" :valor = nivelFRI /></icon-base>
 									<icon-base v-if="valFRI > 0" width="96" height="96" icon-name="write"><icon-izquierda /><icon-turn-right-left /> <icon-turn-value offsetX="75" :valor = nivelFRI /></icon-base>
 								</v-col>
-								<v-col cols="4"  class="mt-9">
-									<v-btn class="mt-1 blue lighten-5" @click="SelectCalibration(1)" rounded block>
+								<v-col cols="4" class="mt-9">
+									<v-btn v-if="!calibrandoPaso2" class="mt-1 blue lighten-5" @click="SelectCalibration(1)" :disabled="calibrando" rounded block>
 										<v-row>
 											<v-col cols="12" class="mt-1">
 												<span>{{ $t('domotek.calibracion.start') }}</span>
 											</v-col>
 										</v-row>
 									</v-btn>
+
+									<div v-else class="mt-1">
+										<v-progress-linear
+											indeterminate
+											rounded
+											height="8"
+											color="blue darken-2"
+										></v-progress-linear>
+										<div class="text-center mt-2" style="font-size: 0.85em;">
+											{{ $t('domotek.calibracion.leveling') }}
+										</div>
+									</div>
 								</v-col>
 								<v-col cols="2" class="mt-1 ">
 									<icon-base v-if="valFRD == 0" width="96" height="96" icon-name="write"><icon-derecha /></icon-base>	
@@ -133,15 +157,15 @@
 				</v-stepper-items>
 				<v-stepper-items>
 					<v-stepper-content step="3">
-						<v-card class="mb-4" color="teal lighten-4"	height="270px">
-								<movement-panel-calibration></movement-panel-calibration>
+						<v-card class="mb-4" color="blue lighten-4"	height="270px">
+								<movement-panel-calibration :calibrando-externo="calibrando"></movement-panel-calibration>
 						</v-card>
 					</v-stepper-content>
 				</v-stepper-items>
 				
 			</v-stepper>
 		</v-col>
-		<v-col cols="12" v-if="$store.state.nivelUsuario >= 2">
+		<v-col cols="12" v-if="$store.state.nivelUsuario >= 3">
 			<calibration-file-list></calibration-file-list>
 		</v-col>
 		<v-col class="mb-0 pb-0">
@@ -162,8 +186,8 @@
 								</v-btn>
 							</v-col>
 							<v-col>
-								<v-btn width="90" height="90" color="green darken-1" text @click="dialog = false, toolClick = false, numTool = null" outlined rounded>
-									<code-btn width="90" height="90" :code='`M98 p${codigo}`' color="green lighten-3" rounded>
+								<v-btn width="90" height="90" color="green darken-1" text outlined rounded :disabled="calibrando" @click="ConfirmarCalibracion">
+									<code-btn width="90" height="90" color="green lighten-3" rounded>
 										{{ $t('domotek.varios.yes') }}
 									</code-btn>
 								</v-btn>
@@ -204,6 +228,8 @@ export default {
 			codigo:null,
 			nombreCal: null,
 			pasos: 1,
+			calibrando: false,
+			numeroActual: null
 			//nivelFOI: -1,
 			//nivelFOD: 1,
 			//nivelFRI: -1,
@@ -264,15 +290,18 @@ export default {
 				}
 			},
 			modeloMaquina: {
-			get() {
-					try {
-							return this.$store.state.machine.model.global.MachineModel ;
-					} catch (error) {
-							console.log(`error CalibrationPanel.vue modeloMaquina`);
-							return "2A";
-					}
+				get() {
+						try {
+								return this.$store.state.machine.model.global.MachineModel ;
+						} catch (error) {
+								console.log(`error CalibrationPanel.vue modeloMaquina`);
+								return "2A";
+						}
+				}
+			},
+			calibrandoPaso2() {
+				return this.calibrando && this.numeroActual === 1;
 			}
-		},
 	},
 	methods: {
 		closeDialog(){
@@ -280,6 +309,7 @@ export default {
 		},
 		SelectCalibration(numero){
 			this.dialog = true;
+			this.numeroActual = numero;
 			this.codigo = '"/calibration/';
 			switch (numero) {
 				case 0:
@@ -319,6 +349,21 @@ export default {
 			}
 			// Enviar el comando M98 a la impresora
 			//this.sendGCode('M98 P"0:/macros/Pruebas_AUTO-CAL/Enable-Disable/habilitar.g"');
+		},
+		async ConfirmarCalibracion(){
+			this.dialog = false;
+			this.toolClick = false;
+			this.numTool = null;
+
+			this.calibrando = true;
+			try {
+			await this.$store.dispatch('machine/sendCode', { code: `M98 p${this.codigo}` });
+			} catch (e) {
+			console.error('Error ejecutando calibración:', e);
+			// opcional: mostrar snackbar/alerta
+			} finally {
+			this.calibrando = false;
+			}
 		},
 		// async sendGCode(gcode) {
 		// 	try {

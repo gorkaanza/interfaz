@@ -106,8 +106,8 @@ textarea {
 						<v-btn block height="95" @click="cambiarRuta('/Settings/General'),mostrarHome = false">
 							<v-icon x-large>mdi-cog</v-icon>
 						</v-btn>
-						<v-divider v-if="$store.state.nivelUsuario >= 2"></v-divider>
-						<v-btn  v-if="$store.state.nivelUsuario >= 2" block height="95" @click="cambiarRuta('/Settings/Machine'),mostrarHome = false">
+						<v-divider v-if="$store.state.nivelUsuario >= 3"></v-divider>
+						<v-btn  v-if="$store.state.nivelUsuario >= 3" block height="95" @click="cambiarRuta('/Settings/Machine'),mostrarHome = false">
 							<v-icon x-large>mdi-cogs</v-icon>
 						</v-btn>
 						<v-divider></v-divider>
@@ -368,7 +368,6 @@ export default {
 		hiddenStatus(){ //domotek
 			console.log("Oculta los paneles"); //domotek
 		},//domotek
-		
 		isExpanded(category) {
 			if (this.$vuetify.breakpoint.xsOnly) { //domotek
 				const route = this.$route;

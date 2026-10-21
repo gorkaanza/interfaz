@@ -4,8 +4,12 @@
         "paths": {
             "@/*": [
                 "./src/*"
-            ],
-        }
+            ]
+        },
+        "moduleResolution": "node",
+        "allowJs": true,
+        "checkJs": false,
+        "skipLibCheck": true
     },
     "vueCompilerOptions": {
         "target": 2

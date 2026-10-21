@@ -40,6 +40,7 @@ import UVPanel from './UVPanel.vue'
 import ESPanel from './ESPanel.vue'
 import CLPanel from './CLPanel.vue'
 import TMPanel from './TMPanel.vue'
+import EMDPanel from './EMDPanel.vue'
 import COPanel from './COPanel.vue'
 import CalibrationPanel from './CalibrationPanel.vue'
 
@@ -80,6 +81,7 @@ Vue.component('spindle-speed-panel', SpindleSpeedPanel)
 Vue.component('ultraviolet-panel', UVPanel)
 Vue.component('electrospinning-panel', ESPanel)
 Vue.component('clean-panel', CLPanel)
+Vue.component('emd-panel', EMDPanel)
 Vue.component('temp-panel', TMPanel)
 Vue.component('coaxial-panel', COPanel)
 Vue.component('calibration-panel', CalibrationPanel)

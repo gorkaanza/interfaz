@@ -164,7 +164,12 @@ export default {
 			default: ''
 		},
 		noRename: Boolean,
-		noDelete: Boolean
+		noDelete: Boolean,
+		// NUEVO
+		filterItems: {
+			type: Function,
+			default: null
+		}
 	},
 	computed: {
 		...mapState(['selectedMachine']),
@@ -343,7 +348,9 @@ export default {
 				}
 
 				// Assign new file list
-				this.innerFilelist = files;
+				//this.innerFilelist = files;
+				// Assign new file list (aplicando filtro si existe)
+				this.innerFilelist = this.filterItems ? files.filter(item => this.filterItems(item, directory)) : files;
 				this.innerFilelistLoaded = true;
 				this.innerValue = [];
 				this.$nextTick(function() {

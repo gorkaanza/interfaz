@@ -19,6 +19,7 @@
     "@sindarius/gcodeviewer": "^3.1.2",
     "chart.js": "^2.9.4",
     "chartjs-adapter-date-fns": "^1.0.0",
+    "chartjs-plugin-zoom": "^0.7.7",
     "compare-versions": "^3.6.0",
     "date-fns": "^2.17.0",
     "file-saver": "^2.0.5",
@@ -41,7 +42,7 @@
     "webpack-sources": "^3.2.3"
   },
   "devDependencies": {
-    "@mdi/font": "^6.4.95",
+    "@mdi/font": "^7.4.47",
     "@vue/cli-plugin-babel": "^4.5.15",
     "@vue/cli-plugin-eslint": "^4.5.15",
     "@vue/cli-plugin-pwa": "^4.5.15",

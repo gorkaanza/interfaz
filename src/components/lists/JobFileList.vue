@@ -29,7 +29,7 @@
 			<upload-btn class="hidden-sm-and-down" :elevation="1" :directory="directory" target="gcodes" color="primary"/>
 		</v-toolbar>
 		
-		<base-file-list ref="filelist" v-model="selection" :headers="headers" :directory.sync="directory" :filelist.sync="filelist" :loading.sync="loading" sort-table="jobs" @directoryLoaded="directoryLoaded" @fileClicked="fileClicked" no-files-text="list.jobs.noJobs">
+		<base-file-list ref="filelist" v-model="selection" :headers="headers" :directory.sync="directory" :filelist.sync="filelist" :loading.sync="loading" sort-table="jobs" @directoryLoaded="onDirectoryLoaded" @fileClicked="fileClicked" no-files-text="list.jobs.noJobs">
 			<v-progress-linear slot="progress" :indeterminate="fileinfoProgress === -1" :value="(fileinfoProgress / filelist.length) * 100"/>
 
 			<template #folder="{ item }">
@@ -59,7 +59,7 @@
 			</template>
 
 			<template #context-menu>
-				<v-list-item v-show="isFile && !isPrinting" @click="loadES() , loadUV() , start">    
+				<v-list-item v-show="isFile && !isPrinting" @click="loadES() , loadUV(), loadEMD() , start">    
 					<v-icon class="mr-1">mdi-play</v-icon> {{ $t('list.jobs.start') }}
 				</v-list-item>
 				<v-list-item v-show="isFile && !isPrinting" @click="simulate">
@@ -93,7 +93,7 @@
 		</v-speed-dial>
 
 		<new-directory-dialog :shown.sync="showNewDirectory" :directory="directory"/>
-		<confirm-dialog :shown.sync="startJobDialog.shown" :title="startJobDialog.title" :prompt="startJobDialog.prompt" @confirmed="loadES(),loadUV(), start(startJobDialog.item)"/>
+		<confirm-dialog :shown.sync="startJobDialog.shown" :title="startJobDialog.title" :prompt="startJobDialog.prompt" @confirmed="loadES(),loadUV(), loadEMD(), start(startJobDialog.item)"/>
 	</div>
 </template>
 
@@ -186,12 +186,16 @@ export default {
 		},
 		enableUV: {	get(){return (this.$store.state.machine.model.global.enableUV);}},
 		enableES: {	get(){return (this.$store.state.machine.model.global.enableES);}},
+		enableEMD: { get(){return (this.$store.state.machine.model.global.enableEMD);}},
 		cadenceEnableUV: {get(){return (this.$store.state.machine.model.global.cadenceEnableUV);}},
 		cadenceEnableES: {get(){return (this.$store.state.machine.model.global.cadenceEnableES);}},
+		cadenceEnableEMD: {get(){return (this.$store.state.machine.model.global.cadenceEnableEMD);}},
 		cadenceAmountUV: {get(){return (this.$store.state.machine.model.global.cadenceAmountUV);}},
 		cadenceAmountES: {get(){return (this.$store.state.machine.model.global.cadenceAmountES);}},
+		cadenceAmountEMD: {get(){return (this.$store.state.machine.model.global.cadenceAmountEMD);}},
 		aplicarFinUV: {get(){return (this.$store.state.machine.model.global.aplicarFinUV);}},
 		aplicarFinES: {get(){return (this.$store.state.machine.model.global.aplicarFinES);}},
+		aplicarFinEMD: {get(){return (this.$store.state.machine.model.global.aplicarFinEMD);}},
 		firstLayerUV: {get(){return (this.$store.state.machine.model.global.firstLayerUV);}},
 		enableTMPTools: {get(){return (this.$store.state.machine.model.global.enableTMPTools);}},
 		enableTMPBed: {get(){return (this.$store.state.machine.model.global.enableTMPBed);}},
@@ -248,6 +252,18 @@ export default {
 		refresh() {
 			this.clearFileInfo(this.directory);
 			this.$refs.filelist.refresh();
+		},
+		onDirectoryLoaded() {
+			if (this.$store.state.nivelUsuario < 2) {
+				this.$refs.filelist.innerFilelist = this.$refs.filelist.innerFilelist.filter(
+					item => !(item.isDirectory && item.name === 'Automatically Generated G-codes')
+				);
+			}
+			if (this.$store.state.nivelUsuario < 3) {
+				this.$refs.filelist.innerFilelist = this.$refs.filelist.innerFilelist.filter(
+					item => !(item.isDirectory && item.name === 'Admin')
+				);
+			}
 		},
 		async requestFileInfo(directory, fileIndex, fileCount) {
 			if (fileIndex === 0) {
@@ -394,8 +410,8 @@ export default {
 					},
 
 		async start(item) {
-			/* Chequeamos si UV o ES se van a aplicar   */
-			/* if( ES || UV ) {*/
+			/* Chequeamos si UV , ES o EMD se van a aplicar   */
+			/* if( ES || UV || EMD) {*/
 			/*	PostProcessLayers(`M32 "${Path.combine(this.directory, (item && item.name) ? item.name : this.selection[0].name)}"`);*/
 			try {
 
@@ -469,14 +485,16 @@ export default {
 					console.info(ddData.length);
 					let myUniqueArray = [...new Set(ddData)]; // myArray = [...new Set(myArray)];
 					console.log(myUniqueArray); // console.log(myArray)
-					var tresMayores = this.mayores(myUniqueArray, 3);
-					var tresMenores = this.menores(myUniqueArray, 3);
-					console.info(`tresMayores `);
-					console.info(tresMayores.length);
-					console.info(`tresMenores `);
-					console.info(tresMenores.length);
 					var cadenciageneral= 0.0;
-					cadenciageneral=parseFloat(tresMenores[1]-tresMenores[0]);
+					myUniqueArray.sort((a, b) => a - b);// Ordenamos el array de alturas únicas
+					// Recorremos el array buscando la primera diferencia pequeña (entre 0.05mm y 1mm)
+					for (let i = 1; i < myUniqueArray.length; i++) {
+						let diff = myUniqueArray[i] - myUniqueArray[i - 1];
+						if (diff > 0.05 && diff < 1.0) { // asumimos altura de capa entre 0.05 y 1 mm
+							cadenciageneral = parseFloat(diff.toFixed(3));
+							break;
+						}
+					}
 					console.info(`Cadencia Detectada:${cadenciageneral}`);
 					// generamos el fichero de salida 
 					console.info(`generamos el fichero de salida `);
@@ -487,17 +505,25 @@ export default {
 					var ultimaCapaES = this.aplicarFinES;
 					var primeraCapaUV = this.firstLayerUV;
 					var ultimaCapaUV = this.aplicarFinUV;
+					var primeraCapaEMD = this.firstLayerEMD;
+					var ultimaCapaEMD = this.aplicarFinEMD;
 					var frecuenciaCapasES = this.cadenceAmountES;
 					var frecuenciaCapasUV = this.cadenceAmountUV;
+					var frecuenciaCapasEMD = this.cadenceAmountEMD;
+					var primeraCapaUVInsertada = false;	
 					var secuenciaES = 'M98 P"/macros/Scripts/ESMacro.g" ';
 					var secuenciaUV = 'M98 P"/macros/Scripts/UVMacro.g" ';
+					var secuenciaEMD = 'M98 P"/macros/Scripts/EMDMacro.g" ';
 					var removeTempCommands = this.enableTMPChamber || this.enableTMPTools || this.enableTMPBed; //añadido Gorka
 					const filenameES = "0:/macros/Scripts/ESMacro.g";
 					const filenameUV = "0:/macros/Scripts/UVMacro.g";
+					const filenameEMD = "0:/macros/Scripts/EMDMacro.g";
 					console.info(`Fichero ESMacro `);
 					console.info(filenameES);
 					console.info(`Fichero UVMacro `);
 					console.info(filenameUV);
+					console.info(`Fichero EMDMacro `);
+					console.info(filenameEMD);
 					this.filenameES = "0:/macros/Scripts/ESMacro.g";
 					console.info(`carga filenameES `);
 					//const secuenciaES2 = this.machineDownload({ filenameES, type: 'blob', showSuccess: false });
@@ -506,11 +532,15 @@ export default {
 					console.info(`carga filenameUV `);
 					//const secuenciaUV = this.machineDownload({ filenameUV, type: 'text', showSuccess: false });
 					console.info(`cargado filenameUV `);
+					console.info(`carga filenameEMD `);
+					console.info(`cargado filenameEMD `);
 					//var secuenciaUV = 'M98 P"/macros/Scripts/UVMacro.g" '
 					var enableUV = this.enableUV;
 					var cadenceEnableUV = this.cadenceEnableUV;
 					var enableES = this.enableES;
 					var cadenceEnableES = this.cadenceEnableES;
+					var enableEMD = this.enableEMD;
+					var cadenceEnableEMD = this.cadenceEnableEMD;
 					var enableTMPTools = this.enableTMPTools;
 					var enableTMPBed = this.enableTMPBed;
 					var enableTMPChamber = this.enableTMPChamber;
@@ -553,10 +583,16 @@ export default {
 										ficTemporal += secuenciaES  + '\n';	
 										console.info(`añadido filenameES `);
 									}
-									if(primeraCapaUV && enableUV){
+									if(primeraCapaUV && enableUV && !primeraCapaUVInsertada){
 										console.info(`añadir filenameUV `);
 										ficTemporal += secuenciaUV  + '\n';	
 										console.info(`añadido filenameUV `);
+										primeraCapaUVInsertada = true;
+									}
+									if(primeraCapaEMD && enableEMD){
+										console.info(`añadir filenameEMD `);
+										ficTemporal += secuenciaEMD  + '\n';	
+										console.info(`añadido filenameEMD `);
 									}
 									capaZeroDet = true;
 									console.info(`LAYER: ${layers} valor: ${ValorFloat}  CurrentZ: ${currentZ} Cadencia: ${cadenciageneral} valor: ${ValorFloat}`);
@@ -582,6 +618,9 @@ export default {
 														}
 														if((layers % frecuenciaCapasES == 0) && (enableES == true) && (cadenceEnableES == true)) {
 															ficTemporal += secuenciaES  + '\n';
+														}
+														if((layers % frecuenciaCapasEMD == 0) && (enableEMD == true) && (cadenceEnableEMD == true)) {
+															ficTemporal += secuenciaEMD  + '\n';
 														}
 													}	
 											}
@@ -617,6 +656,9 @@ export default {
 														if((layers % frecuenciaCapasES == 0) && (enableES == true) && (cadenceEnableES == true)) {
 															ficTemporal += secuenciaES  + '\n';
 														}
+														if((layers % frecuenciaCapasEMD == 0) && (enableEMD == true) && (cadenceEnableEMD == true)) {
+															ficTemporal += secuenciaEMD  + '\n';
+														}
 													}	
 													
 												}
@@ -630,6 +672,9 @@ export default {
 									}
 									if(ultimaCapaES && enableES){
 										ficTemporal += secuenciaES  + '\n';
+									}
+									if(ultimaCapaEMD && enableEMD){
+										ficTemporal += secuenciaEMD  + '\n';
 									}
 									// Añadir el comando de standby al final del G-code
 									if (primeraTemperatura !== null) {
@@ -651,7 +696,7 @@ export default {
 					// ficTemporal += 'M32 "/gcodes/Selected_Job.g"' + '\n';
 					ficTemporal += `M32 "${outputPath}"\n`;
 					//console.info(`Lineas fichero generado` + ficTemporal);
-					if(enableES || enableUV || enableTMPTools || enableTMPBed || enableTMPChamber){
+					if(enableES || enableUV || enableEMD|| enableTMPTools || enableTMPBed || enableTMPChamber){
 						this.sendCode({ code: `${ficTemporal}`, log: false });
 					}	
 					else {
@@ -724,6 +769,27 @@ export default {
 				//}
 			}
 		},
+		async loadEMD() {
+			try {
+					console.info(`----------------------- ENTRADA EN LOAD EMD	 ------------------- `); 
+					// var secuenciaEMD = 'M98 P"/macros/Scripts/EMDMacro.g" ';
+					// const filenameEMD = "0:/macros/Scripts/EMDMacro.g";
+					// console.info(`Fichero EMDMacro `);
+					// console.info(filenameEMD);
+					// this.filenameEMD = "0:/macros/Scripts/EMDMacro.g";
+					// console.info(`carga filenameEMD `);
+					// secuenciaEMD = this.machineDownload({ filenameEMD, type: 'blob', showSuccess: false });
+					// console.info(secuenciaEMD);
+					// console.info(`cargado filenameEMD `);
+			} catch (e) {
+				//if (!(e instanceof DisconnectedError) && !(e instanceof OperationCancelledError)) {
+					console.info(`Analizamos response ERROR INI`);
+					console.info(e);
+					console.info(`Analizamos response ERROR FIN`);
+				//}
+			}
+		},
+
 
 
 		simulate(item) {
@@ -754,6 +820,10 @@ export default {
 				// Refresh the filelist after a short moment so DSF and RRF can update the simulation time first
 				setTimeout(this.$refs.filelist.refresh.bind(this), 2000);
 			}
+		},
+		 // Cuando cambia el nivel de usuario, refrescar la lista
+		'$store.state.nivelUsuario'() {
+			this.refresh();
 		}
 	}
 }

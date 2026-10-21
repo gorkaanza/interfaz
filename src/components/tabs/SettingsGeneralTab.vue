@@ -17,12 +17,12 @@
 					<settings-general-panel></settings-general-panel>
 				</v-col>
 
-				<!--
+				
 
-					Email y Notificaciones
+					<!-- Email y Notificaciones -->
 				<v-col cols="12">
 					<settings-notifications-panel></settings-notifications-panel>
-				</v-col>-->
+				</v-col>
 				<v-col cols="12">
 					<settings-webcam-panel></settings-webcam-panel>
 				</v-col> 

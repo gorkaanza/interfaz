@@ -187,7 +187,8 @@
       "gcodeReference": "G-Code Referansı",
       "menuReference": "Menü Referansı",
       "save": "Kaydet",
-      "confirmClose": "Dosya değiştirildi. Devam edersen, değişikliklerin kaybolacak."
+      "confirmClose": "Dosya değiştirildi. Devam edersen, değişikliklerin kaybolacak.",
+      "confirmSaveEmpty": ""
     },
     "meshEdit": {
       "title": "Kafes Parametrelerini Ayarla",

@@ -187,7 +187,8 @@
       "gcodeReference": "Информация о G-коде",
       "menuReference": "Информация о меню",
       "save": "Save",
-      "confirmClose": "Файл был изменен. Если вы продолжите, ваши изменения будут потеряны."
+      "confirmClose": "Файл был изменен. Если вы продолжите, ваши изменения будут потеряны.",
+      "confirmSaveEmpty": ""
     },
     "meshEdit": {
       "title": "Set Mesh Parameters",

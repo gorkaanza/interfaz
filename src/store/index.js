@@ -213,7 +213,7 @@ const store = new Vuex.Store({
 	mutations: {
 		//cambiarUsuario: state => state.nivelUsuario = 2,
 		//luis - cambiar a usuario avanzado
-		cambiarUsuario(state){
+		cambiarUsuario_old(state){
 			//window.alert(settings.state.usuarioAvanzado)
 			console.log("PREV.UsuarioAvanzado:"+settings.state.usuarioAvanzado + " nivelUsuario:"+state.nivelUsuario);
 			if (settings.state.usuarioAvanzado) {
@@ -229,6 +229,27 @@ const store = new Vuex.Store({
 			}
 			console.log("POST.UsuarioAvanzado:"+settings.state.usuarioAvanzado + " nivelUsuario:"+state.nivelUsuario);	
 			
+		},
+		cambiarUsuario(state, tipo){
+			console.log("PREV.UsuarioAvanzado:"+settings.state.usuarioAvanzado + " nivelUsuario:"+state.nivelUsuario);
+			if (settings.state.usuarioAvanzado) {
+				//CLIENTE ADMIN
+				if (tipo === 'E500') {
+					state.nivelUsuario = 2;
+				}
+				//SUPER USUARIO
+				else if (tipo === 'D500') {
+					state.nivelUsuario = 3;
+				}
+				else {
+					state.nivelUsuario = 1;
+				}
+
+			} else {
+				state.nivelUsuario = 1;
+			}
+
+			console.log("POST.UsuarioAvanzado:"+settings.state.usuarioAvanzado + " nivelUsuario:"+state.nivelUsuario);  
 		},
 		cambiarMenu(state){
 			state.mostrarMenu = !state.mostrarMenu

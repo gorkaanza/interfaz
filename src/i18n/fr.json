@@ -191,7 +191,8 @@
       "gcodeReference": "Références G-Code",
       "menuReference": "Référence Menu",
       "save": "Sauvegarder",
-      "confirmClose": "Le fichier a été modifié. Si vous continuez, vos modifications seront perdues."
+      "confirmClose": "Le fichier a été modifié. Si vous continuez, vos modifications seront perdues.",
+      "confirmSaveEmpty": ""
     },
     "meshEdit": {
       "title": "Définir Paramètres de Maillage",
