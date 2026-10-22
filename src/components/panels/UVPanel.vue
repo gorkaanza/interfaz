@@ -51,7 +51,7 @@
 	<div v-if="temaBio" class="bio-pp">
 		<header class="bio-proc-cab">
 			<button type="button" class="bio-volver" :aria-label="$t('domotek.tools.back')" @click="closeDialog"><v-icon>mdi-chevron-left</v-icon></button>
-			<v-icon color="#B49CF2">mdi-white-balance-sunny</v-icon>
+			<v-icon color="var(--bio-lila)">mdi-white-balance-sunny</v-icon>
 			<span class="bio-proc-titulo">{{ $t('domotek.jobs.ultraviolet') }}</span>
 			<div style="flex: 1"></div>
 			<ol class="bio-cal-pasos">
@@ -62,7 +62,7 @@
 		<!-- Resumen -->
 		<main v-show="pasos === 'S'" class="bio-proc-cuerpo">
 			<h2 class="bio-proc-h2">{{ $t('domotek.proc.uvSettings') }}
-				<span v-if="uvProbe" class="bio-proc-hv uv"><v-icon small color="#B49CF2">mdi-flash</v-icon>{{ $t('panel.jobControl.warninguv') }}</span>
+				<span v-if="uvProbe" class="bio-proc-hv uv"><v-icon small color="var(--bio-lila)">mdi-flash</v-icon>{{ $t('panel.jobControl.warninguv') }}</span>
 			</h2>
 			<div class="bio-proc-datos">
 				<div><span>{{ $t('domotek.proc.pattern') }}</span><strong>{{ bioNombrePatron }}<small v-if="patronUV == 2 && uvPointsCount > 1"> ({{ uvPointsCount }})</small></strong></div>
@@ -924,6 +924,8 @@
 'use strict'
 import { mapState, mapGetters, mapActions } from 'vuex'
 
+import { paletaBio } from '../../utils/temaBio.js'
+
 export default {
 	data(){
 		return{
@@ -1104,9 +1106,10 @@ export default {
 		...mapGetters('machine/model', ['global']),
 
 		temaBio() { return this.$store.state.settings.temaBio; }, // domotek
-		bioColores() { // colores de los lienzos según el tema
+		bioColores() { // colores de los lienzos según el tema (oscuro o claro)
+			const c = paletaBio();
 			return this.temaBio
-				? { rejilla: '#2A3138', borde: '#3A444D', punto: '#B49CF2', puntoEdit: '#F2D35A', puntoBorde: '#2B2540', texto: '#E8EDF1', trazo: '#B49CF2', relleno: 'rgba(180,156,242,0.18)', rayado: 'rgba(180,156,242,0.45)', cierra: '#6EDDA9', cierraFondo: 'rgba(110,221,169,0.22)', zona: 'rgba(255,255,255,0.06)', abierto: '#F08A83' }
+				? { rejilla: c.linea, borde: c.linea2, punto: c.lila, puntoEdit: c.amarillo, puntoBorde: c.lilaBg, texto: c.texto, trazo: c.lila, relleno: `rgba(${c.lilaRgb},0.18)`, rayado: `rgba(${c.lilaRgb},0.45)`, cierra: c.verde, cierraFondo: `rgba(${c.verdeRgb},0.22)`, zona: c.zona, abierto: c.peligro }
 				: { rejilla: '#ddd', borde: '#999', punto: 'red', puntoEdit: '#1976d2', puntoBorde: 'darkred', texto: '#000', trazo: '#1976d2', relleno: 'rgba(25,118,210,0.22)', rayado: 'rgba(25,118,210,0.55)', cierra: '#2e7d32', cierraFondo: 'rgba(46,125,50,0.25)', zona: 'rgba(0,0,0,0.06)', abierto: 'red' };
 		},
 		bioPasos() {
@@ -2420,6 +2423,9 @@ export default {
 	},
 	
 	watch: {
+		bioColores() { // domotek: al cambiar de modo claro/oscuro se vuelven a pintar los lienzos
+			this.$nextTick(() => { if (this.ctx) { this.drawGrid(); } if (this.$refs.freehandCanvas) { this.drawFreehandCanvas(); } });
+		},
 		// Otro cliente (PC / pantalla de la impresora) ha cambiado los puntos → recargar desde la impresora
 		'$store.state.machine.model.global.uvPointsRev'(newVal) {
 			console.log('[UV-SYNC] cambio uvPointsRev →', newVal, '(mia:', this.lastOwnPointsRev, ')');

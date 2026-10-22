@@ -10,51 +10,51 @@
 	font-size: 14px;
 	button { font-family: inherit; color: inherit; border: none; cursor: pointer; }
 }
-.bio-esc-card { background: #1E2328; border-radius: 16px; padding: 18px 20px; min-width: 0; min-height: 0; display: flex; flex-direction: column; gap: 10px; box-sizing: border-box; }
-.bio-esc-card h2 { margin: 0; font-size: 13px; color: #9AA5AF; font-weight: 500; }
+.bio-esc-card { background: var(--bio-sup); border-radius: 16px; padding: 18px 20px; min-width: 0; min-height: 0; display: flex; flex-direction: column; gap: 10px; box-sizing: border-box; }
+.bio-esc-card h2 { margin: 0; font-size: 13px; color: var(--bio-tenue); font-weight: 500; }
 .bio-esc-trabajo { grid-column: 1 / span 2; display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: 20px; }
 .bio-esc-info { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
 .bio-esc-fila { display: flex; align-items: baseline; gap: 12px; }
 .bio-esc-archivo { flex: 1; min-width: 0; font-size: 20px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.bio-esc-pct { font-size: 28px; font-weight: 600; color: #3CC9B0; line-height: 1; }
-.bio-esc-datos { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; color: #9AA5AF; font-size: 13px; }
-.bio-esc-datos div div { color: #E8EDF1; font-size: 17px; font-weight: 500; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bio-esc-pct { font-size: 28px; font-weight: 600; color: var(--bio-acento); line-height: 1; }
+.bio-esc-datos { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; color: var(--bio-tenue); font-size: 13px; }
+.bio-esc-datos div div { color: var(--bio-texto); font-size: 17px; font-weight: 500; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .bio-esc-acciones { display: flex; gap: 10px; align-items: center; }
 .bio-esc-btn, .v-btn.bio-esc-btn {
-	height: 40px !important; padding: 0 18px !important; border-radius: 10px !important; background: #262C33 !important;
-	color: #E8EDF1 !important; font-size: 14px; font-weight: 400; box-shadow: none !important; letter-spacing: 0; text-transform: none;
-	&.peligro { background: #3A1D1C !important; color: #F08A83 !important; }
-	&.acento { background: #3CC9B0 !important; color: #0E1013 !important; font-weight: 600; }
+	height: 40px !important; padding: 0 18px !important; border-radius: 10px !important; background: var(--bio-sup2) !important;
+	color: var(--bio-texto) !important; font-size: 14px; font-weight: 400; box-shadow: none !important; letter-spacing: 0; text-transform: none;
+	&.peligro { background: var(--bio-peligro-bg) !important; color: var(--bio-peligro) !important; }
+	&.acento { background: var(--bio-acento) !important; color: var(--bio-rail) !important; font-weight: 600; }
 	&.v-btn--disabled { opacity: .5; }
 	&.ancho { width: 100%; }
 }
-.bio-esc-resumen { font-size: 13px; color: #9AA5AF; white-space: nowrap; strong { color: #E8EDF1; } }
+.bio-esc-resumen { font-size: 13px; color: var(--bio-tenue); white-space: nowrap; strong { color: var(--bio-texto); } }
 .bio-esc-pos { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px 8px; }
-.bio-esc-pos .et { font-size: 12px; color: #9AA5AF; }
+.bio-esc-pos .et { font-size: 12px; color: var(--bio-tenue); }
 .bio-esc-pos .vl { font-size: 20px; font-weight: 500; }
-.bio-esc-pos .vl.sin-home { color: #F2A65A; }
+.bio-esc-pos .vl.sin-home { color: var(--bio-calor); }
 .bio-esc-tabla-cab, .bio-esc-tabla-fila { display: grid; grid-template-columns: 40px minmax(0, 1fr) 78px 70px; align-items: center; padding: 0 6px; }
-.bio-esc-tabla-cab { font-size: 12px; color: #9AA5AF; }
+.bio-esc-tabla-cab { font-size: 12px; color: var(--bio-tenue); }
 .bio-esc-tabla-fila { height: 40px; border-radius: 10px; font-size: 14px; white-space: nowrap; }
 .bio-esc-tabla-fila > span { overflow: hidden; text-overflow: ellipsis; }
-.bio-esc-tabla-fila .t { font-weight: 600; color: #9AA5AF; }
-.bio-esc-tabla-fila.activa { background: #1F3B37; .t { color: #3CC9B0; } }
-.bio-esc-tabla-fila .tenue { color: #9AA5AF; }
-.bio-esc-tabla-fila .obj { color: #F2A65A; }
-.bio-esc-sep { height: 1px; background: #2A3138; flex: none; }
-.bio-esc-graf-cab { display: flex; align-items: center; gap: 14px; font-size: 12px; color: #9AA5AF; }
+.bio-esc-tabla-fila .t { font-weight: 600; color: var(--bio-tenue); }
+.bio-esc-tabla-fila.activa { background: var(--bio-acento-bg); .t { color: var(--bio-acento); } }
+.bio-esc-tabla-fila .tenue { color: var(--bio-tenue); }
+.bio-esc-tabla-fila .obj { color: var(--bio-calor); }
+.bio-esc-sep { height: 1px; background: var(--bio-linea); flex: none; }
+.bio-esc-graf-cab { display: flex; align-items: center; gap: 14px; font-size: 12px; color: var(--bio-tenue); }
 .bio-esc-graf-cab h2 { flex: 1; }
 .bio-esc-leyenda { display: flex; align-items: center; gap: 6px; white-space: nowrap; }
 .bio-esc-leyenda i { width: 14px; height: 3px; border-radius: 2px; display: inline-block; }
 .bio-esc-graf { flex: 1; min-height: 0; width: 100%; position: relative; }
 .bio-esc-graf svg { position: absolute; inset: 0; width: 100%; height: 100%; }
-.bio-esc-graf-et { position: absolute; left: 0; transform: translateY(-50%); font-size: 11px; color: #9AA5AF; }
-.bio-esc-proc { display: flex; align-items: center; gap: 12px; min-height: 52px; border-radius: 12px; background: #262C33; padding: 6px 14px; text-align: left; width: 100%; box-sizing: border-box; }
+.bio-esc-graf-et { position: absolute; left: 0; transform: translateY(-50%); font-size: 11px; color: var(--bio-tenue); }
+.bio-esc-proc { display: flex; align-items: center; gap: 12px; min-height: 52px; border-radius: 12px; background: var(--bio-sup2); padding: 6px 14px; text-align: left; width: 100%; box-sizing: border-box; }
 .bio-esc-proc .punto { width: 10px; height: 10px; border-radius: 50%; flex: none; }
 .bio-esc-proc .nom { flex: 1; font-size: 14px; min-width: 0; }
-.bio-esc-proc .det { font-size: 13px; color: #9AA5AF; white-space: nowrap; }
-.bio-esc-proc:hover { background: #2C333B; }
-.bio-esc-vacio { color: #9AA5AF; font-size: 13px; padding: 4px 0; }
+.bio-esc-proc .det { font-size: 13px; color: var(--bio-tenue); white-space: nowrap; }
+.bio-esc-proc:hover { background: var(--bio-sup3); }
+.bio-esc-vacio { color: var(--bio-tenue); font-size: 13px; padding: 4px 0; }
 </style>
 
 <template>
@@ -132,8 +132,8 @@
 			<div class="bio-esc-graf">
 				<span v-for="l in lineasY" :key="'e' + l.v" class="bio-esc-graf-et" :style="{ top: (l.y / 300 * 100) + '%' }">{{ l.v }}</span>
 				<svg role="img" :aria-label="descripcionGrafica" viewBox="0 0 380 300" preserveAspectRatio="none">
-					<path v-for="l in lineasY" :key="l.v" :d="`M30 ${l.y}H380`" stroke="#262C33" stroke-width="1" vector-effect="non-scaling-stroke"></path>
-					<path v-for="s in series" :key="'p' + s.nombre" :d="s.d" :stroke="s.color" stroke-width="2.5" fill="none" vector-effect="non-scaling-stroke" stroke-linejoin="round" stroke-linecap="round"></path>
+					<path v-for="l in lineasY" :key="l.v" :d="`M30 ${l.y}H380`" style="stroke: var(--bio-sup2)" stroke-width="1" vector-effect="non-scaling-stroke"></path>
+					<path v-for="s in series" :key="'p' + s.nombre" :d="s.d" :style="{ stroke: s.color }" stroke-width="2.5" fill="none" vector-effect="non-scaling-stroke" stroke-linejoin="round" stroke-linecap="round"></path>
 				</svg>
 			</div>
 		</section>
@@ -161,7 +161,7 @@ import { isPrinting, isPaused } from '../../store/machine/modelEnums.js'
 import { extractFileName } from '../../utils/path.js'
 import { historial, iniciarHistorial } from '../../utils/historialTemp.js'
 
-const COLORES = { tool: '#3CC9B0', cama: '#F2A65A', chamber: '#6CB8E6' };
+const COLORES = { tool: 'var(--bio-acento)', cama: 'var(--bio-calor)', chamber: 'var(--bio-azul)' };
 
 export default {
 	computed: {
@@ -293,14 +293,14 @@ export default {
 				const capa = this.job.layer || 0;
 				return this.$t('domotek.desktop.nextLayer', [Math.floor(capa / n) * n + n]);
 			};
-			if (g.ES_Capable && prog('ES')) { out.push({ id: 'ES', color: '#F2D35A', texto: `${this.$t('domotek.jobs.electrospinning')} ${prog('ES')}`, detalle: proxima('ES') }); }
-			if (g.UV_Capable && prog('UV')) { out.push({ id: 'UV', color: '#B49CF2', texto: `${this.$t('domotek.jobs.ultraviolet')} ${prog('UV')}`, detalle: proxima('UV') }); }
+			if (g.ES_Capable && prog('ES')) { out.push({ id: 'ES', color: 'var(--bio-amarillo)', texto: `${this.$t('domotek.jobs.electrospinning')} ${prog('ES')}`, detalle: proxima('ES') }); }
+			if (g.UV_Capable && prog('UV')) { out.push({ id: 'UV', color: 'var(--bio-lila)', texto: `${this.$t('domotek.jobs.ultraviolet')} ${prog('UV')}`, detalle: proxima('UV') }); }
 			if (g.EMD_Capable && prog('EMD')) {
 				const det = g.calibratedEMD ? this.$t('panel.emd.calibrated') : this.$t('panel.emd.notCalibrated');
 				const vol = g.volDropEMD ? ` · ${g.volDropEMD} nL` : '';
-				out.push({ id: 'EMD', color: '#3CC9B0', texto: `${this.$t('domotek.jobs.EMD')}${vol} ${prog('EMD')}`, detalle: det });
+				out.push({ id: 'EMD', color: 'var(--bio-acento)', texto: `${this.$t('domotek.jobs.EMD')}${vol} ${prog('EMD')}`, detalle: det });
 			}
-			if (g.CL_Capable && prog('CL')) { out.push({ id: 'CL', color: '#6CB8E6', texto: `${this.$t('domotek.jobs.clean')} ${prog('CL')}`, detalle: proxima('CL') }); }
+			if (g.CL_Capable && prog('CL')) { out.push({ id: 'CL', color: 'var(--bio-azul)', texto: `${this.$t('domotek.jobs.clean')} ${prog('CL')}`, detalle: proxima('CL') }); }
 			return out;
 		}
 	},

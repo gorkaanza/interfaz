@@ -47,7 +47,7 @@
 	<div v-if="temaBio" class="bio-pp">
 		<header class="bio-proc-cab">
 			<button type="button" class="bio-volver" :aria-label="$t('domotek.tools.back')" @click="closeDialog"><v-icon>mdi-chevron-left</v-icon></button>
-			<v-icon color="#6CB8E6">mdi-brush-variant</v-icon>
+			<v-icon color="var(--bio-azul)">mdi-brush-variant</v-icon>
 			<span class="bio-proc-titulo">{{ $t('domotek.proc.cleaning') }}</span>
 		</header>
 		<main class="bio-proc-cuerpo">

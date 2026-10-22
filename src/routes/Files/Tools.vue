@@ -101,7 +101,7 @@
 								<div class="bio-tool-cab">
 									<span class="bio-punto" :class="'bio-punto--' + bioEstado(heaterTools[20])"></span>
 									<span class="bio-tool-nombre"><span class="bio-cap">{{ $t('domotek.tools.chamber') }}</span></span>
-									<v-icon :color="doorStateOpen ? '#3CC9B0' : '#9AA5AF'">{{ doorStateOpen ? 'mdi-door-open' : 'mdi-door-closed' }}</v-icon>
+									<v-icon :color="doorStateOpen ? 'var(--bio-acento)' : 'var(--bio-tenue)'">{{ doorStateOpen ? 'mdi-door-open' : 'mdi-door-closed' }}</v-icon>
 								</div>
 								<div class="bio-fila-valor">
 									<template v-if="miniclima_capable && modoInput === 'HUM'">
@@ -1174,7 +1174,7 @@
 			<footer class="bio-elegir-pie">
 				<span class="bio-tenue" style="flex: 1">
 					{{ $t('domotek.tools.nowIn', [camaClick ? $t('domotek.tools.platform') : $t('domotek.tools.T' + ClickToolAnterior + 'Mini')]) }}
-					<strong style="color: #E8EDF1; font-weight: 500">{{ camaClick ? bioNombreCama : (bioTools[ClickToolAnterior] ? bioTools[ClickToolAnterior].nombre : '') }}</strong>
+					<strong style="color: var(--bio-texto); font-weight: 500">{{ camaClick ? bioNombreCama : (bioTools[ClickToolAnterior] ? bioTools[ClickToolAnterior].nombre : '') }}</strong>
 				</span>
 				<button type="button" class="bio-btn-sec" @click="toolClick = false">{{ $t('domotek.tools.back') }}</button>
 			</footer>

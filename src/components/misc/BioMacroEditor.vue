@@ -10,71 +10,71 @@
 	button { font-family: inherit; color: inherit; border: none; cursor: pointer; background: none; }
 }
 .bio-arbol {
-	background: #1E2328; border-radius: 12px; padding: 12px; min-height: 0;
+	background: var(--bio-sup); border-radius: 12px; padding: 12px; min-height: 0;
 	display: flex; flex-direction: column; gap: 8px;
 }
 .bio-arbol-busca { display: flex; gap: 8px; }
 .bio-arbol-busca input {
-	flex: 1; min-width: 0; height: 38px; border-radius: 10px; border: 1px solid #2F363E;
-	background: #14171A; color: #E8EDF1; padding: 0 12px; font: inherit; outline: none;
-	&:focus { border-color: #3CC9B0; }
+	flex: 1; min-width: 0; height: 38px; border-radius: 10px; border: 1px solid var(--bio-sup3);
+	background: var(--bio-hondo); color: var(--bio-texto); padding: 0 12px; font: inherit; outline: none;
+	&:focus { border-color: var(--bio-acento); }
 }
-.bio-arbol-raices { display: flex; gap: 4px; background: #14171A; border-radius: 10px; padding: 3px; }
-.bio-arbol-raices button { flex: 1; height: 32px; border-radius: 8px; color: #9AA5AF; font-size: 13px; }
-.bio-arbol-raices button.activo { background: #262C33; color: #E8EDF1; font-weight: 500; }
+.bio-arbol-raices { display: flex; gap: 4px; background: var(--bio-hondo); border-radius: 10px; padding: 3px; }
+.bio-arbol-raices button { flex: 1; height: 32px; border-radius: 8px; color: var(--bio-tenue); font-size: 13px; }
+.bio-arbol-raices button.activo { background: var(--bio-sup2); color: var(--bio-texto); font-weight: 500; }
 .bio-btn-cuadrado {
-	width: 38px; height: 38px; border-radius: 10px !important; background: #262C33 !important;
+	width: 38px; height: 38px; border-radius: 10px !important; background: var(--bio-sup2) !important;
 	display: flex; align-items: center; justify-content: center; flex: none;
-	.v-icon { color: #3CC9B0 !important; }
+	.v-icon { color: var(--bio-acento) !important; }
 }
-.bio-arbol-ruta { font-size: 12px; color: #9AA5AF; font-family: 'IBM Plex Mono', ui-monospace, monospace; }
+.bio-arbol-ruta { font-size: 12px; color: var(--bio-tenue); font-family: 'IBM Plex Mono', ui-monospace, monospace; }
 .bio-arbol-lista { flex: 1; overflow-y: auto; min-height: 0; margin: 0 -6px; }
 .bio-nodo {
 	display: flex; align-items: center; gap: 6px; width: 100%; text-align: left;
 	height: 28px; padding: 0 8px; border-radius: 7px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-	.v-icon { font-size: 18px; color: #9AA5AF !important; }
-	&:hover { background: #262C33; }
-	&.abierto { background: #1F3B37; color: #3CC9B0; .v-icon { color: #3CC9B0 !important; } }
+	.v-icon { font-size: 18px; color: var(--bio-tenue) !important; }
+	&:hover { background: var(--bio-sup2); }
+	&.abierto { background: var(--bio-acento-bg); color: var(--bio-acento); .v-icon { color: var(--bio-acento) !important; } }
 	.nombre { overflow: hidden; text-overflow: ellipsis; }
 }
-.bio-arbol-pie { font-size: 12px; color: #9AA5AF; text-align: center; padding: 6px; border: 1px dashed #2F363E; border-radius: 10px; }
-.bio-arbol-pie.arrastrando { border-color: #3CC9B0; color: #3CC9B0; }
+.bio-arbol-pie { font-size: 12px; color: var(--bio-tenue); text-align: center; padding: 6px; border: 1px dashed var(--bio-sup3); border-radius: 10px; }
+.bio-arbol-pie.arrastrando { border-color: var(--bio-acento); color: var(--bio-acento); }
 
 .bio-edit {
-	background: #1E2328; border-radius: 12px; min-height: 0; overflow: hidden;
+	background: var(--bio-sup); border-radius: 12px; min-height: 0; overflow: hidden;
 	display: flex; flex-direction: column;
 }
-.bio-edit-cab { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-bottom: 1px solid #262C33; }
+.bio-edit-cab { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-bottom: 1px solid var(--bio-sup2); }
 .bio-edit-archivo { font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.bio-edit-sucio { font-size: 12px; color: #F2A65A; white-space: nowrap; }
+.bio-edit-sucio { font-size: 12px; color: var(--bio-calor); white-space: nowrap; }
 .bio-edit-btn {
-	height: 32px; padding: 0 12px; border-radius: 8px !important; background: #262C33 !important; font-size: 12.5px; font-weight: 500;
-	display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; text-decoration: none; color: #E8EDF1 !important;
+	height: 32px; padding: 0 12px; border-radius: 8px !important; background: var(--bio-sup2) !important; font-size: 12.5px; font-weight: 500;
+	display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; text-decoration: none; color: var(--bio-texto) !important;
 	.v-icon { font-size: 18px; color: inherit !important; }
-	&.acento { background: #3CC9B0 !important; color: #0E1013 !important; font-weight: 600; }
+	&.acento { background: var(--bio-acento) !important; color: var(--bio-rail) !important; font-weight: 600; }
 	&:disabled { opacity: .45; cursor: default; }
 }
 .bio-edit-cuerpo { flex: 1; min-height: 0; position: relative; }
 .bio-edit-cuerpo .vue-codemirror, .bio-edit-cuerpo .CodeMirror { height: 100%; }
-.bio-edit-vacio { height: 100%; display: flex; align-items: center; justify-content: center; color: #9AA5AF; flex-direction: column; gap: 8px; }
-.bio-edit-pie { display: flex; gap: 18px; padding: 8px 14px; border-top: 1px solid #262C33; font-size: 12px; color: #9AA5AF; }
+.bio-edit-vacio { height: 100%; display: flex; align-items: center; justify-content: center; color: var(--bio-tenue); flex-direction: column; gap: 8px; }
+.bio-edit-pie { display: flex; gap: 18px; padding: 8px 14px; border-top: 1px solid var(--bio-sup2); font-size: 12px; color: var(--bio-tenue); }
 
 // Tema de CodeMirror a juego
 .cm-s-bio.CodeMirror {
-	background: #181C20; color: #E8EDF1;
+	background: var(--bio-codigo); color: var(--bio-texto);
 	font-family: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 13px; line-height: 1.5;
-	.CodeMirror-gutters { background: #181C20; border-right: 1px solid #262C33; }
-	.CodeMirror-linenumber { color: #5A6670; }
-	.CodeMirror-cursor { border-left-color: #3CC9B0; }
-	.CodeMirror-activeline-background { background: rgba(60, 201, 176, .06); }
-	.CodeMirror-selected, &.CodeMirror-focused .CodeMirror-selected { background: rgba(60, 201, 176, .22); }
-	.cm-comment { color: #6F7C87; font-style: italic; }
-	.cm-keyword { color: #3CC9B0; font-weight: 500; }
-	.cm-string { color: #F2D35A; }
-	.cm-number { color: #F2A65A; }
-	.cm-variable, .cm-builtin { color: #B49CF2; }
-	.cm-atom { color: #6CB8E6; }
-	.cm-qualifier { color: #E8EDF1; }
+	.CodeMirror-gutters { background: var(--bio-codigo); border-right: 1px solid var(--bio-sup2); }
+	.CodeMirror-linenumber { color: var(--bio-apagado); }
+	.CodeMirror-cursor { border-left-color: var(--bio-acento); }
+	.CodeMirror-activeline-background { background: var(--bio-acento-suave); }
+	.CodeMirror-selected, &.CodeMirror-focused .CodeMirror-selected { background: var(--bio-acento-sombra); }
+	.cm-comment { color: var(--bio-apagado); font-style: italic; }
+	.cm-keyword { color: var(--bio-acento); font-weight: 500; }
+	.cm-string { color: var(--bio-amarillo); }
+	.cm-number { color: var(--bio-calor); }
+	.cm-variable, .cm-builtin { color: var(--bio-lila); }
+	.cm-atom { color: var(--bio-azul); }
+	.cm-qualifier { color: var(--bio-texto); }
 }
 </style>
 
@@ -117,7 +117,7 @@
 			<div class="bio-edit-cuerpo">
 				<codemirror v-if="archivo" ref="cm" v-model="texto" :options="cmOptions" @changes="sucio = true" @cursorActivity="moverCursor"></codemirror>
 				<div v-else class="bio-edit-vacio">
-					<v-icon size="40" color="#3A444D">mdi-file-code-outline</v-icon>
+					<v-icon size="40" color="var(--bio-linea2)">mdi-file-code-outline</v-icon>
 					{{ $t('domotek.editor.pickFile') }}
 				</div>
 			</div>

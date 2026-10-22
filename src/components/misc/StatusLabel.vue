@@ -26,11 +26,11 @@ export default {
 		...mapState('settings', ['darkTheme', 'temaBio']),
 		statusDot() { // domotek: color del punto con el tema oscuro
 			switch (this.state.status) {
-				case StatusType.idle: return '#3CC9B0';
-				case StatusType.processing: case StatusType.simulating: return '#3CC9B0';
-				case StatusType.busy: case StatusType.changingTool: case StatusType.starting: case StatusType.updating: return '#6CB8E6';
-				case StatusType.pausing: case StatusType.paused: case StatusType.resuming: return '#F2A65A';
-				default: return '#F08A83';
+				case StatusType.idle: return 'var(--bio-acento)';
+				case StatusType.processing: case StatusType.simulating: return 'var(--bio-acento)';
+				case StatusType.busy: case StatusType.changingTool: case StatusType.starting: case StatusType.updating: return 'var(--bio-azul)';
+				case StatusType.pausing: case StatusType.paused: case StatusType.resuming: return 'var(--bio-calor)';
+				default: return 'var(--bio-peligro)';
 			}
 		},
 		statusText() {

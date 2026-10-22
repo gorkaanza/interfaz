@@ -46,7 +46,7 @@
 	<div v-if="temaBio" class="bio-pp">
 		<header class="bio-proc-cab">
 			<button type="button" class="bio-volver" :aria-label="$t('domotek.tools.back')" @click="closeDialog"><v-icon>mdi-chevron-left</v-icon></button>
-			<v-icon color="#F2D35A">mdi-flash-outline</v-icon>
+			<v-icon color="var(--bio-amarillo)">mdi-flash-outline</v-icon>
 			<span class="bio-proc-titulo">{{ $t('domotek.jobs.electrospinning') }}</span>
 			<div style="flex: 1"></div>
 			<ol class="bio-cal-pasos">
@@ -57,7 +57,7 @@
 		<!-- Resumen -->
 		<main v-show="pasos === 'S'" class="bio-proc-cuerpo">
 			<h2 class="bio-proc-h2">{{ $t('domotek.proc.esSettings') }}
-				<span v-if="hvProbe" class="bio-proc-hv"><v-icon small color="#F5B52E">mdi-flash</v-icon>{{ $t('panel.jobControl.warninghv') }}</span>
+				<span v-if="hvProbe" class="bio-proc-hv"><v-icon small color="var(--bio-ambar)">mdi-flash</v-icon>{{ $t('panel.jobControl.warninghv') }}</span>
 			</h2>
 			<div class="bio-proc-datos">
 				<div><span>{{ $t('domotek.proc.pattern') }}</span><strong>{{ bioNombrePatron }}<small v-if="patronES == 3 && esPointsCount > 1"> ({{ esPointsCount }})</small></strong></div>
@@ -1053,6 +1053,8 @@
 
 import { mapState, mapGetters, mapActions } from 'vuex'
 
+import { paletaBio } from '../../utils/temaBio.js'
+
 export default {
 	data(){
 		return{
@@ -1334,9 +1336,10 @@ export default {
 		},
 		
 		temaBio() { return this.$store.state.settings.temaBio; }, // domotek
-		bioColores() { // colores de los lienzos según el tema
+		bioColores() { // colores de los lienzos según el tema (oscuro o claro)
+			const c = paletaBio();
 			return this.temaBio
-				? { rejilla: '#2A3138', borde: '#3A444D', punto: '#3CC9B0', puntoEdit: '#F2D35A', puntoBorde: '#1F3B37', texto: '#E8EDF1', trazo: '#3CC9B0', relleno: 'rgba(60,201,176,0.18)', rayado: 'rgba(60,201,176,0.45)', cierra: '#6EDDA9', cierraFondo: 'rgba(110,221,169,0.22)', zona: 'rgba(255,255,255,0.06)', abierto: '#F08A83' }
+				? { rejilla: c.linea, borde: c.linea2, punto: c.acento, puntoEdit: c.amarillo, puntoBorde: c.acentoBg, texto: c.texto, trazo: c.acento, relleno: `rgba(${c.acentoRgb},0.18)`, rayado: `rgba(${c.acentoRgb},0.45)`, cierra: c.verde, cierraFondo: `rgba(${c.verdeRgb},0.22)`, zona: c.zona, abierto: c.peligro }
 				: { rejilla: '#ddd', borde: '#999', punto: 'red', puntoEdit: '#1976d2', puntoBorde: 'darkred', texto: '#000', trazo: '#1976d2', relleno: 'rgba(25,118,210,0.22)', rayado: 'rgba(25,118,210,0.55)', cierra: '#2e7d32', cierraFondo: 'rgba(46,125,50,0.25)', zona: 'rgba(0,0,0,0.06)', abierto: 'red' };
 		},
 		bioPasos() {
@@ -3059,6 +3062,9 @@ export default {
 	},
 	
 	watch: {
+		bioColores() { // domotek: al cambiar de modo claro/oscuro se vuelven a pintar los lienzos
+			this.$nextTick(() => { if (this.ctx) { this.drawGrid(); } if (this.$refs.freehandCanvas) { this.drawFreehandCanvas(); } });
+		},
 		patronES(newVal) {
 			if (newVal === 3) {
 				this.$nextTick(() => {

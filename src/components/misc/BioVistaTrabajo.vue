@@ -1,18 +1,18 @@
 <style lang="scss">
 // domotek: vista del trabajo (figura del G-code, webcam o gráfica de capas)
-.bio-vista { position: relative; background: #14171A; border-radius: 12px; overflow: hidden; display: flex; align-items: center; justify-content: center; min-height: 0; height: 100%; }
-.bio-vista-tabs { position: absolute; left: 8px; top: 8px; z-index: 1; display: flex; gap: 3px; padding: 3px; border-radius: 10px; background: rgba(14, 16, 19, .85); }
-.bio-vista-tabs button { height: 28px; padding: 0 11px; border: none; border-radius: 8px; background: transparent; color: #9AA5AF; font: inherit; font-size: 12px; cursor: pointer; }
-.bio-vista-tabs button.activo { background: #262C33; color: #E8EDF1; font-weight: 500; }
+.bio-vista { position: relative; background: var(--bio-hondo); border-radius: 12px; overflow: hidden; display: flex; align-items: center; justify-content: center; min-height: 0; height: 100%; }
+.bio-vista-tabs { position: absolute; left: 8px; top: 8px; z-index: 1; display: flex; gap: 3px; padding: 3px; border-radius: 10px; background: var(--bio-sup); box-shadow: 0 0 0 1px var(--bio-borde); }
+.bio-vista-tabs button { height: 28px; padding: 0 11px; border: none; border-radius: 8px; background: transparent; color: var(--bio-tenue); font: inherit; font-size: 12px; cursor: pointer; }
+.bio-vista-tabs button.activo { background: var(--bio-sup2); color: var(--bio-texto); font-weight: 500; }
 .bio-vista-figura { max-width: 88%; max-height: 88%; object-fit: contain; image-rendering: auto; }
-.bio-vista-vacia { display: flex; flex-direction: column; align-items: center; gap: 8px; color: #5A6670; font-size: 13px; text-align: center; padding: 0 16px; }
+.bio-vista-vacia { display: flex; flex-direction: column; align-items: center; gap: 8px; color: var(--bio-apagado); font-size: 13px; text-align: center; padding: 0 16px; }
 .bio-vista-webcam { width: 100%; height: 100%; }
 .bio-vista-webcam .v-card { background: transparent !important; box-shadow: none !important; height: 100%; }
 .bio-vista-webcam .v-card__title { display: none; }
 .bio-vista-webcam img, .bio-vista-webcam iframe { max-width: 100%; max-height: 100%; }
 .bio-vista-capas { position: absolute; inset: 40px 6px 6px; display: flex; }
 .bio-vista-capas .v-card { background: transparent !important; box-shadow: none !important; }
-.bio-vista-capas .v-card__title { font-size: 12px !important; padding: 0 8px 4px; color: #9AA5AF; }
+.bio-vista-capas .v-card__title { font-size: 12px !important; padding: 0 8px 4px; color: var(--bio-tenue); }
 </style>
 
 <template>
@@ -24,14 +24,14 @@
 		<template v-if="modo === 'figura'">
 			<img v-if="imagen" :src="imagen" :alt="$t('domotek.jobs.view.figura')" class="bio-vista-figura">
 			<div v-else class="bio-vista-vacia">
-				<v-icon size="44" color="#3A444D">mdi-cube-outline</v-icon>
+				<v-icon size="44" color="var(--bio-linea2)">mdi-cube-outline</v-icon>
 				<span>{{ tieneTrabajo ? $t('domotek.jobs.view.noThumbnail') : $t('domotek.jobs.view.noJob') }}</span>
 			</div>
 		</template>
 		<template v-else-if="modo === 'webcam'">
 			<div v-if="webcamActiva" class="bio-vista-webcam"><webcam-panel></webcam-panel></div>
 			<div v-else class="bio-vista-vacia">
-				<v-icon size="44" color="#3A444D">mdi-camera-outline</v-icon>
+				<v-icon size="44" color="var(--bio-linea2)">mdi-camera-outline</v-icon>
 				<span>{{ $t('domotek.desktop.noWebcam') }}</span>
 			</div>
 		</template>

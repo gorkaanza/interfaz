@@ -1487,7 +1487,10 @@
       }
     },
     "settings": {
-      "usuarioAvanzado": "Root User"
+      "usuarioAvanzado": "Root User",
+      "colorMode": "Color mode",
+      "darkMode": "Dark",
+      "lightMode": "Light"
     },
     "varios": {
       "generalSettings": "GENERAL - SETTINGS",

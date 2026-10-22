@@ -59,7 +59,7 @@
 	<div v-if="temaBio" class="bio-pp">
 		<header class="bio-proc-cab">
 			<button type="button" class="bio-volver" :aria-label="$t('domotek.tools.back')" @click="closeDialog"><v-icon>mdi-chevron-left</v-icon></button>
-			<v-icon color="#3CC9B0">mdi-magnet-on</v-icon>
+			<v-icon color="var(--bio-acento)">mdi-magnet-on</v-icon>
 			<span class="bio-proc-titulo">{{ $t('domotek.proc.solenoid') }}</span>
 			<div style="flex: 1"></div>
 			<ol class="bio-cal-pasos">
@@ -130,8 +130,8 @@
 								<td class="n">{{ i + 1 }}</td><td>{{ pt.P }}</td><td>{{ pt.t }}</td>
 								<td>{{ pt.V !== null && pt.V !== undefined ? $display(pt.V, 1) : '—' }}</td>
 								<td class="est">
-									<v-progress-circular v-if="pt.state === 'running'" indeterminate size="16" width="2" color="#3CC9B0" />
-									<v-icon v-else-if="pt.state === 'done'" small color="#3CC9B0">mdi-check</v-icon>
+									<v-progress-circular v-if="pt.state === 'running'" indeterminate size="16" width="2" color="var(--bio-acento)" />
+									<v-icon v-else-if="pt.state === 'done'" small color="var(--bio-acento)">mdi-check</v-icon>
 								</td>
 							</tr>
 							<tr v-if="!calibPoints.length"><td colspan="5" class="bio-tenue">{{ $t('panel.emd.solve_missingData') }}</td></tr>
@@ -677,6 +677,7 @@
 'use strict'
 import { mapState, mapActions } from 'vuex'
 import { EMD_MACHINE, viscAt, solve, fit, calibrationGrid } from './emdModel.js'
+import { paletaBio } from '../../utils/temaBio.js'
 
 /*
  * Parámetros que introduce el usuario. Todos se guardan como global.<key>.
@@ -811,8 +812,9 @@ export default {
 		},
 		bioCadencia() { return Number(this.g('cadenceAmountEMD')) || 1; },
 		bioColores() {
+			const c = paletaBio();
 			return this.temaBio
-				? { rejilla: '#2A3138', borde: '#3A444D', punto: '#3CC9B0', puntoBorde: '#1F3B37' }
+				? { rejilla: c.linea, borde: c.linea2, punto: c.acento, puntoBorde: c.acentoBg }
 				: { rejilla: '#ddd', borde: '#999', punto: 'red', puntoBorde: 'darkred' };
 		},
 		bioValorActual() {
@@ -1224,6 +1226,7 @@ export default {
 	},
 
 	watch: {
+		bioColores() { this.$nextTick(() => this.drawGrid()); }, // domotek: repintar al cambiar de modo
 		'globals.posxEMD'(v) { if (v !== this.selectedPointMm.x) this.updateMarkerFromStore(); },
 		'globals.posyEMD'(v) { if (v !== this.selectedPointMm.y) this.updateMarkerFromStore(); },
 		paramInput() { if (this.dialogParam) this.validateParam(); },

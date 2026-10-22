@@ -84,7 +84,7 @@ textarea {
 </style>
 
 <template>
-	<v-app :class="{ 'tema-bio': temaBio, 'bio-escritorio': temaBio && escritorio, 'bio-tactil-ancho': temaBio && !escritorio && ventanaAncha }">
+	<v-app :class="{ 'tema-bio': temaBio, 'bio-claro': temaBio && claro, 'bio-escritorio': temaBio && escritorio, 'bio-tactil-ancho': temaBio && !escritorio && ventanaAncha }">
 		<!-- domotek: un único menú lateral para el tema oscuro (táctil: 80 px, escritorio: 232 px).
 		     Se usa un solo componente porque al cambiar entre dos v-navigation-drawer Vuetify
 		     podía quedarse con el ancho del anterior y dejar un hueco a la izquierda. -->
@@ -105,8 +105,8 @@ textarea {
 			<template v-else>
 			<button v-for="item in railItems" :key="item.id" type="button" class="bio-rail-btn" :class="{ activo: railActivo === item.id }" :aria-label="item.label" @click="railClick(item)">
 				<svg v-if="item.id === 'job' && isPrinting" class="anillo" viewBox="0 0 48 48" aria-hidden="true">
-					<circle cx="24" cy="24" r="21" fill="none" stroke="#2A4A45" stroke-width="3"></circle>
-					<circle cx="24" cy="24" r="21" fill="none" stroke="#3CC9B0" stroke-width="3" stroke-linecap="round" :stroke-dasharray="`${(jobProgress || 0) * 131.9} 131.9`" transform="rotate(-90 24 24)"></circle>
+					<circle cx="24" cy="24" r="21" fill="none" style="stroke: var(--bio-acento-bg)" stroke-width="3"></circle>
+					<circle cx="24" cy="24" r="21" fill="none" style="stroke: var(--bio-acento)" stroke-width="3" stroke-linecap="round" :stroke-dasharray="`${(jobProgress || 0) * 131.9} 131.9`" transform="rotate(-90 24 24)"></circle>
 				</svg>
 				<v-icon large>{{ item.icon }}</v-icon>
 			</button>
@@ -212,7 +212,7 @@ textarea {
 					<status-label v-if="status"></status-label>
 					<div style="flex: 1"></div>
 					<span v-if="bioPuerta !== null" class="bio-tenue" style="font-size: 14px">
-						<v-icon small class="mr-1" :color="bioPuerta ? '#3CC9B0' : '#9AA5AF'">{{ bioPuerta ? 'mdi-door-open' : 'mdi-door-closed' }}</v-icon>{{ bioPuerta ? $t('domotek.home.doorOpen') : $t('domotek.home.doorClosed') }}
+						<v-icon small class="mr-1" :color="bioPuerta ? 'var(--bio-acento)' : 'var(--bio-tenue)'">{{ bioPuerta ? 'mdi-door-open' : 'mdi-door-closed' }}</v-icon>{{ bioPuerta ? $t('domotek.home.doorOpen') : $t('domotek.home.doorClosed') }}
 					</span>
 				</header>
 				<section class="bio-inicio-marca">
@@ -349,6 +349,7 @@ import PositionPanel from './components/panels/PositionPanel.vue'
 import { MachineMode } from './store/machine/modelEnums.js';
 import { DashboardMode } from './store/settings.js'
 import { esEscritorio, forzarModo, ventanaAncha } from './utils/modoPantalla.js'
+import { esClaro } from './utils/temaBio.js'
 import { iniciarHistorial } from './utils/historialTemp.js'
 
 
@@ -442,17 +443,18 @@ export default {
 			return items;
 		},
 		escritorio() { return esEscritorio(); }, // domotek
+		claro() { return esClaro(); }, // domotek: modo claro del tema domoBIO
 		ventanaAncha() { return ventanaAncha(); },
 		navEscritorio() { // domotek: menú del modo escritorio
 			const nivel = this.$store.state.nivelUsuario || 0;
 			const g = (this.$store.state.machine.model.global) || {};
 			const t = k => this.$t('domotek.desktop.nav.' + k);
 			const procesos = [];
-			if (g.UV_Capable) { procesos.push({ id: 'p-UV', label: t('uv'), punto: '#B49CF2', ruta: '/Job/Status', query: { abrir: 'UV' } }); }
-			if (g.ES_Capable) { procesos.push({ id: 'p-ES', label: t('es'), punto: '#F2D35A', ruta: '/Job/Status', query: { abrir: 'ES' } }); }
-			if (g.EMD_Capable) { procesos.push({ id: 'p-EMD', label: t('emd'), punto: '#3CC9B0', ruta: '/Job/Status', query: { abrir: 'EMD' } }); }
-			if (g.CL_Capable) { procesos.push({ id: 'p-CL', label: t('clean'), punto: '#6CB8E6', ruta: '/Job/Status', query: { abrir: 'CL' } }); }
-			procesos.push({ id: 'p-CAL', label: t('calibration'), punto: '#9AA5AF', ruta: '/Job/Status', query: { abrir: 'CAL' } });
+			if (g.UV_Capable) { procesos.push({ id: 'p-UV', label: t('uv'), punto: 'var(--bio-lila)', ruta: '/Job/Status', query: { abrir: 'UV' } }); }
+			if (g.ES_Capable) { procesos.push({ id: 'p-ES', label: t('es'), punto: 'var(--bio-amarillo)', ruta: '/Job/Status', query: { abrir: 'ES' } }); }
+			if (g.EMD_Capable) { procesos.push({ id: 'p-EMD', label: t('emd'), punto: 'var(--bio-acento)', ruta: '/Job/Status', query: { abrir: 'EMD' } }); }
+			if (g.CL_Capable) { procesos.push({ id: 'p-CL', label: t('clean'), punto: 'var(--bio-azul)', ruta: '/Job/Status', query: { abrir: 'CL' } }); }
+			procesos.push({ id: 'p-CAL', label: t('calibration'), punto: 'var(--bio-tenue)', ruta: '/Job/Status', query: { abrir: 'CAL' } });
 			const archivos = [{ id: 'files-jobs', label: t('jobs'), ruta: '/Files/Jobs' }];
 			if (nivel >= 2) {
 				archivos.push({ id: 'files-macros', label: t('macros'), ruta: '/Files/Macros' });
@@ -523,6 +525,17 @@ export default {
 		
 	},
 	methods: {
+		// domotek: tema de Vuetify según el tema domoBIO (oscuro o claro) o el ajuste antiguo
+		aplicarTemaVuetify() {
+			const luz = this.$vuetify.theme.themes.light;
+			if (!this._paletaLuzOriginal) { this._paletaLuzOriginal = { ...luz }; }
+			if (this.temaBio && this.claro) {
+				Object.assign(luz, { primary: '#0A21AD', secondary: '#EEF1F5', accent: '#0A21AD', success: '#16865A', info: '#1F6FB8', warning: '#B87400', error: '#C62828' });
+			} else {
+				Object.assign(luz, this._paletaLuzOriginal);
+			}
+			this.$vuetify.theme.dark = this.temaBio ? !this.claro : this.darkTheme;
+		},
 		...mapActions(['connect', 'disconnectAll']),
 		...mapActions('settings', ['load']),
 		...mapMutations(['cambiarUsuario']), //domotek
@@ -634,7 +647,7 @@ export default {
 
 		// Attempt to load the settings
 		this.load();
-		this.$vuetify.theme.dark = this.temaBio || this.darkTheme; // domotek
+		this.aplicarTemaVuetify(); // domotek
 		iniciarHistorial(this.$store); // domotek: datos para la gráfica de temperaturas
 
 		// Validate navigation
@@ -661,12 +674,9 @@ export default {
 				this.$router.push('/');
 			}
 		},
-		darkTheme(to) {
-			this.$vuetify.theme.dark = to || this.temaBio;
-		},
-		temaBio(to) { // domotek
-			this.$vuetify.theme.dark = to || this.darkTheme;
-		},
+		darkTheme() { this.aplicarTemaVuetify(); },
+		temaBio() { this.aplicarTemaVuetify(); }, // domotek
+		claro() { this.aplicarTemaVuetify(); }, // domotek
 		status(to, from) {
 			if (to === StatusType.disconnected || from === StatusType.disconnected) {
 				this.updateTitle();

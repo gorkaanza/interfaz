@@ -47,7 +47,7 @@
 	<div v-if="temaBio" class="bio-pp">
 		<header class="bio-proc-cab">
 			<button type="button" class="bio-volver" :aria-label="$t('domotek.tools.back')" @click="closeDialog"><v-icon>mdi-chevron-left</v-icon></button>
-			<v-icon color="#F2A65A">mdi-thermometer-lines</v-icon>
+			<v-icon color="var(--bio-calor)">mdi-thermometer-lines</v-icon>
 			<span class="bio-proc-titulo">{{ $t('domotek.jobs.keepTemps') }}</span>
 		</header>
 		<main class="bio-proc-cuerpo">

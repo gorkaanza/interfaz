@@ -13,7 +13,7 @@
 	<div v-if="temaBio" class="bio-cal">
 		<header class="bio-cal-cab">
 			<button type="button" class="bio-volver" :aria-label="$t('domotek.tools.back')" @click="closeDialog"><v-icon>mdi-chevron-left</v-icon></button>
-			<v-icon color="#3CC9B0">mdi-axis-arrow</v-icon>
+			<v-icon color="var(--bio-acento)">mdi-axis-arrow</v-icon>
 			<span class="bio-cal-titulo">{{ $t('domotek.calibracion.calibrate_button') }}</span>
 			<div style="flex: 1"></div>
 			<ol class="bio-cal-pasos" :aria-label="$t('domotek.calibracion.steps')">
@@ -29,14 +29,14 @@
 		<main v-if="pasos == 1" class="bio-cal-cuerpo">
 			<section class="bio-cal-tarjeta bio-cal-paso1">
 				<svg class="bio-cal-dibujo" viewBox="0 0 220 200" aria-hidden="true">
-					<rect x="10" y="168" width="200" height="12" rx="6" fill="#262C33"></rect>
-					<rect x="88" y="140" width="40" height="28" rx="6" fill="#2F363E"></rect>
-					<rect x="84" y="18" width="48" height="70" rx="8" fill="#2F363E"></rect>
-					<path d="M94 88h28l-8 24h-12z" fill="#3A444D"></path>
-					<path d="M108 116v20M100 128l8 8 8-8" stroke="#3CC9B0" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></path>
-					<circle cx="108" cy="140" r="5" fill="#3CC9B0"></circle>
-					<path d="M150 36h28M150 36v130M150 166h12" stroke="#5A6670" stroke-width="2" stroke-dasharray="5 5" fill="none"></path>
-					<text x="162" y="106" fill="#9AA5AF" font-size="14" font-family="IBM Plex Sans, sans-serif">Z</text>
+					<rect x="10" y="168" width="200" height="12" rx="6" style="fill: var(--bio-sup2)"></rect>
+					<rect x="88" y="140" width="40" height="28" rx="6" style="fill: var(--bio-sup3)"></rect>
+					<rect x="84" y="18" width="48" height="70" rx="8" style="fill: var(--bio-sup3)"></rect>
+					<path d="M94 88h28l-8 24h-12z" style="fill: var(--bio-linea2)"></path>
+					<path d="M108 116v20M100 128l8 8 8-8" style="stroke: var(--bio-acento)" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></path>
+					<circle cx="108" cy="140" r="5" style="fill: var(--bio-acento)"></circle>
+					<path d="M150 36h28M150 36v130M150 166h12" style="stroke: var(--bio-apagado)" stroke-width="2" stroke-dasharray="5 5" fill="none"></path>
+					<text x="162" y="106" style="fill: var(--bio-tenue)" font-size="14" font-family="IBM Plex Sans, sans-serif">Z</text>
 				</svg>
 				<div class="bio-cal-texto">
 					<h2>{{ $t('domotek.calibracion.autoCal') }}</h2>
@@ -46,7 +46,7 @@
 						<li :class="{ ok: plataformaLibre }"><button type="button" class="bio-cal-marcar" @click="plataformaLibre = !plataformaLibre"><v-icon small>{{ plataformaLibre ? 'mdi-check' : 'mdi-circle-outline' }}</v-icon>{{ $t('domotek.calibracion.platformClear') }}</button></li>
 					</ul>
 					<button v-if="!(calibrando && numeroActual === 0)" type="button" class="bio-cal-principal" :disabled="calibrando" @click="SelectCalibration(0)">{{ $t('domotek.calibracion.startCal') }}</button>
-					<div v-else class="bio-cal-progreso"><v-progress-linear indeterminate rounded height="6" color="#3CC9B0"></v-progress-linear><span>{{ $t('domotek.calibracion.running') }}</span></div>
+					<div v-else class="bio-cal-progreso"><v-progress-linear indeterminate rounded height="6" color="var(--bio-acento)"></v-progress-linear><span>{{ $t('domotek.calibracion.running') }}</span></div>
 				</div>
 			</section>
 			<footer class="bio-cal-pie">
@@ -80,7 +80,7 @@
 				</div>
 				<div style="flex: 1"></div>
 				<button v-if="!calibrandoPaso2" type="button" class="bio-cal-principal" :disabled="calibrando" @click="SelectCalibration(1)">{{ hayMedida ? $t('domotek.calibracion.measureAgain') : $t('domotek.calibracion.measure') }}</button>
-				<div v-else class="bio-cal-progreso"><v-progress-linear indeterminate rounded height="6" color="#3CC9B0"></v-progress-linear><span>{{ $t('domotek.calibracion.leveling') }}</span></div>
+				<div v-else class="bio-cal-progreso"><v-progress-linear indeterminate rounded height="6" color="var(--bio-acento)"></v-progress-linear><span>{{ $t('domotek.calibracion.leveling') }}</span></div>
 				<div class="bio-cal-pie dentro">
 					<button type="button" class="bio-cal-sec" :disabled="calibrando" @click="pasos = 1">{{ $t('domotek.tools.back') }}</button>
 					<button type="button" class="bio-cal-sec listo" :disabled="calibrando" @click="siguientePaso">{{ $t('domotek.calibracion.continue') }}</button>
