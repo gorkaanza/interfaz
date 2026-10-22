@@ -153,7 +153,7 @@
       "heater": "Heater {0}",
       "sensor": "Sensor {0}",
       "noData": "Sin Datos",
-      "save":"Guardar"
+      "save": "Guardar"
     }
   },
   "dialog": {
@@ -861,10 +861,10 @@
       "noConex": "Webcam no conectada"
     },
     "clean": {
-      "enableClean": "Habilitar Limpieza" ,
+      "enableClean": "Habilitar Limpieza",
       "clJobInProgress": "Trabajo en curso, ¿quieres lanzar la limpieza?"
     },
-    "electrospinning":{
+    "electrospinning": {
       "electrospinningSettings": "ELECTROSPINNING - AJUSTES",
       "enableES": "Habilitar ES",
       "applyWhen": "Aplicar al finalizar impresión ",
@@ -894,22 +894,20 @@
       "electrospinningDrawPathHelp": "Dibuja con el dedo o arrastrando el ratón. Puedes hacer varios trazos.",
       "fillArea": "Rellenar área"
     },
-    
-    "temperatures":{
+    "temperatures": {
       "toolTemperatures": "Mantener Temperaturas de Tool",
       "bedTemperatures": "Mantener Temperaturas de Cama",
       "chamberTemperatures": "Mantener Temperaturas de Chamber"
-
     },
-    "ultraviolet":{
+    "ultraviolet": {
       "ultravioletSettings": "ULTRAVIOLETA - AJUSTES",
       "ultravioletParams": "ULTRAVIOLETA - PARÁMETROS",
       "ultravioletPattern": "ULTRAVIOLETA - PATRÓN",
       "UvPower": "Potencia UV (%) ",
       "resumeUvPower": "% Potencia",
       "power": "Potencia: ",
-      "percent":"%",
-      "time":"Tiempo: ",
+      "percent": "%",
+      "time": "Tiempo: ",
       "autoUvMode": "Modo UV automático ",
       "applyBefore": "Aplicar antes de imprimir (esterilizar superficie)",
       "applyWhen": "Aplicar al finalizar impresión",
@@ -961,7 +959,10 @@
       "solve_tooSmall": "Volumen demasiado pequeño para esta boquilla",
       "solve_tooLarge": "Volumen demasiado grande para esta boquilla",
       "fit_notEnoughPoints": "No hay suficientes pruebas válidas para calcular",
-      "fit_badFit": "Los resultados no son coherentes, repite la calibración"
+      "fit_badFit": "Los resultados no son coherentes, repite la calibración",
+      "showCalc": "Ver cálculo",
+      "calcTitle": "Parámetros calculados",
+      "height": "Altura"
     }
   },
   "pluginPermissions": {
@@ -1204,7 +1205,33 @@
       "drumSpeed": "Velocidad del drum",
       "autoMode": "Modo automático",
       "appliesDuringPrint": "Se aplica durante la impresión",
-      "seeSummary": "Ver resumen"
+      "seeSummary": "Ver resumen",
+      "solenoid": "Solenoide",
+      "cleaning": "Limpieza",
+      "drop": "Gota",
+      "point": "Punto",
+      "auto": "Automático",
+      "calculated": "Calculado",
+      "noSolution": "Sin solución",
+      "calcShort": "Cálculo",
+      "calibPoints": "Pruebas de calibración",
+      "result": "Resultado",
+      "runCalibFirst": "Calibra para ver el ajuste",
+      "shotPoint": "Punto de disparo",
+      "noPoint": "Toca la rejilla para elegir el punto",
+      "tapToPick": "Toca para elegir el punto",
+      "cleanSettings": "Ajustes de limpieza",
+      "cleanAuto": "Limpieza automática",
+      "cleanAutoHint": "Limpia la boquilla durante el trabajo",
+      "interval": "Intervalo",
+      "every": "Cada",
+      "keepTempsHint": "Mantiene la temperatura de consigna de cada grupo",
+      "tools": "Tools",
+      "bed": "Cama",
+      "chamber": "Cámara",
+      "runOnce": "Ejecutar una vez",
+      "pauseAndClean": "Pausar y limpiar",
+      "heatingOff": "Sin calentar"
     },
     "keypad": {
       "rangeGeneric": "Entre {0} y {1} {2}",
@@ -1397,7 +1424,7 @@
       "tall": "Todos los tools",
       "greenLegend": "Hasta 0,25 vueltas: correcto",
       "redLegend": "Más de 0,25 vueltas: ajustar",
-      "leveling":"Nivelando..."
+      "leveling": "Nivelando..."
     },
     "movePanel": {
       "toolToMove": "Tool que se mueve",
@@ -1442,7 +1469,7 @@
       "ultraviolet": "Ultravioleta",
       "clean": "Limpiar",
       "temperatures": "Temperaturas",
-      "EMD":"EMD",
+      "EMD": "EMD",
       "notifications": {
         "emailNotifications": "Email de notificaciones",
         "duringprinting": "Notificaciones durante la impresión",
@@ -1455,7 +1482,7 @@
         "invalidEmails": "Direcciones no válidas",
         "saving": "Guardando...",
         "toolDisc": "Tool desconectado o jeringa vacía",
-        "heaterFault": "Fault de heater"     
+        "heaterFault": "Fault de heater"
       }
     },
     "settings": {
@@ -1494,7 +1521,7 @@
       "temp_out": "Temperatura fuera de rango",
       "hum_out": "Humedad fuera de rango",
       "rpm_out": "RPM fuera de rango",
-      "center" : "Centrar",
+      "center": "Centrar",
       "manual": "Manual",
       "ejeX": "Eje X",
       "ejeY": "Eje Y",
@@ -1526,6 +1553,5 @@
     "error": {
       "toolAgotado": "Tool desconectado o sin material"
     }
-    
   }
 }

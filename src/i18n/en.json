@@ -838,10 +838,10 @@
       "standby": "Standby",
       "bed": "Bed {0}",
       "chamber": "Chamber {0}",
-      "calibrado":"Calibrated",
-      "toolCalibrado":"✅ Tool Calibrated",
-      "toolNoCalibrado":"⚠️ Tool Not Calibrated",
-      "noCalibrado":"Not Calibrated",
+      "calibrado": "Calibrated",
+      "toolCalibrado": "✅ Tool Calibrated",
+      "toolNoCalibrado": "⚠️ Tool Not Calibrated",
+      "noCalibrado": "Not Calibrated",
       "platformOffsets": "Platform Offsets",
       "platformOffsetsText": "Left bridge (Z):\nMinimum: {zMin}\nMaximum: {zMax}\n\nRight bridge (A):\nMinimum: {aMin}\nMaximum: {aMax}",
       "chamberNotHeating": "The chamber is not heating up. Make sure the door is closed and the switch is on.",
@@ -863,9 +863,9 @@
     },
     "clean": {
       "enableClean": "Enable Clean",
-      "clJobInProgress": "Job in progress, would you like to launch Clean?" 
+      "clJobInProgress": "Job in progress, would you like to launch Clean?"
     },
-    "electrospinning":{
+    "electrospinning": {
       "electrospinningSettings": "ELECTROSPINNING - SETTINGS",
       "enableES": "Enable ES",
       "applyWhen": "Apply when printing is finished",
@@ -894,24 +894,22 @@
       "electrospinningDrawPath": "ELECTROSPINNING - DRAW PATH",
       "electrospinningDrawPathHelp": "Draw with your finger or by dragging the mouse. You can draw several strokes.",
       "fillArea": "Fill Area"
-      
     },
-    "temperatures":{
+    "temperatures": {
       "toolTemperatures": "Keep Tool temperatures",
       "bedTemperatures": "Keep Bed temperatures",
       "chamberTemperatures": "Keep Chamber temperatures"
-
     },
-    "ultraviolet":{
+    "ultraviolet": {
       "ultravioletSettings": "ULTRAVIOLET - SETTINGS",
       "ultravioletParams": "ULTRAVIOLET - PARAMETERS",
       "ultravioletPattern": "ULTRAVIOLET - PATTERN",
       "ultravioletSelectPoint": "ULTRAVIOLET - SELECT POINT",
       "UvPower": "UV Power (%) ",
       "resumeUvPower": "% Power",
-      "power":"Power: ",
-      "percent":"%",
-      "time":"Time: ",
+      "power": "Power: ",
+      "percent": "%",
+      "time": "Time: ",
       "autoUvMode": "Automatic UV mode",
       "applyBefore": "Apply before printing(sterilize surface)",
       "applyWhen": "Apply when printing is finished",
@@ -966,7 +964,6 @@
       "showCalc": "Show calculation",
       "calcTitle": "Calculated parameters",
       "height": "Height"
-      
     }
   },
   "pluginPermissions": {
@@ -1209,7 +1206,33 @@
       "drumSpeed": "Drum speed",
       "autoMode": "Automatic mode",
       "appliesDuringPrint": "Applied during printing",
-      "seeSummary": "See summary"
+      "seeSummary": "See summary",
+      "solenoid": "Solenoid",
+      "cleaning": "Cleaning",
+      "drop": "Droplet",
+      "point": "Point",
+      "auto": "Automatic",
+      "calculated": "Calculated",
+      "noSolution": "No solution",
+      "calcShort": "Calculation",
+      "calibPoints": "Calibration tests",
+      "result": "Result",
+      "runCalibFirst": "Calibrate to see the fit",
+      "shotPoint": "Dispensing point",
+      "noPoint": "Tap the grid to pick the point",
+      "tapToPick": "Tap to pick the point",
+      "cleanSettings": "Cleaning settings",
+      "cleanAuto": "Automatic cleaning",
+      "cleanAutoHint": "Cleans the nozzle during the job",
+      "interval": "Interval",
+      "every": "Every",
+      "keepTempsHint": "Holds the target temperature of each group",
+      "tools": "Tools",
+      "bed": "Bed",
+      "chamber": "Chamber",
+      "runOnce": "Run once",
+      "pauseAndClean": "Pause and clean",
+      "heatingOff": "No heating"
     },
     "keypad": {
       "rangeGeneric": "Between {0} and {1} {2}",
@@ -1334,7 +1357,6 @@
       "chamber": "CHAMBER",
       "humidity": "Humidity",
       "heater": "Heater"
-  
     },
     "toolNames": {
       "EMPTY": "EMPTY",
@@ -1448,7 +1470,7 @@
       "ultraviolet": "Ultraviolet",
       "clean": "Clean",
       "temperatures": "Temperatures",
-      "EMD":"EMD",
+      "EMD": "EMD",
       "notifications": {
         "emailNotifications": "Email notifications",
         "duringprinting": "Notifications during printing",
@@ -1461,7 +1483,7 @@
         "invalidEmails": "Invalid email addresses",
         "saving": "Saving...",
         "toolDisc": "Tool disconnected or syringe empty",
-        "heaterFault": "Heater fault"     
+        "heaterFault": "Heater fault"
       }
     },
     "settings": {

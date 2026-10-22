@@ -757,6 +757,74 @@ $bio-ambar:      #F5B52E;
 }
 .tema-bio .bio-proc-hv.uv { color: #B49CF2; }
 
+// Solenoide (EMD), limpieza y mantener temperaturas
+.tema-bio {
+	.bio-proc-hv.ok { color: $bio-acento; .v-icon { color: inherit !important; } }
+	.bio-proc-hv.mal { color: $bio-peligro; .v-icon { color: inherit !important; } }
+	.bio-peligro-txt { color: $bio-peligro; }
+	.bio-ambar-txt { color: $bio-ambar; }
+	.bio-proc-valores.cuatro { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+	.bio-proc-valores.uno { grid-template-columns: minmax(0, 1fr); }
+	.bio-proc-valores.uno button { padding: 10px 14px; strong { font-size: 24px; } }
+	.bio-proc-valores button .ic.calor { background: #3A2E1C; .v-icon { color: $bio-calor !important; } }
+	.bio-proc-valores button strong.apagado { font-size: 18px; color: $bio-tenue; line-height: 34px; }
+	.bio-proc-datos.tres { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+	.bio-proc-datos > div > strong.bio-tenue { font-size: 15px; font-weight: 500; line-height: 25px; }
+	.bio-emd-calc {
+		display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)) 24px; align-items: center; gap: 10px;
+		background: $bio-sup !important; border-radius: 14px; padding: 8px 14px; text-align: left; width: 100%;
+		> div { display: flex; flex-direction: column; min-width: 0; }
+		> div > span:first-child { font-size: 12px; color: $bio-tenue; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+		strong { font-size: 17px; font-weight: 600; white-space: nowrap; small { font-size: 12px; color: $bio-tenue; font-weight: 400; } }
+		.v-icon { color: $bio-tenue !important; }
+		&:active { background: $bio-sup2 !important; }
+	}
+	.bio-emd-estado {
+		display: inline-block; align-self: flex-start; border-radius: 999px; padding: 3px 10px; font-size: 12px; font-weight: 600;
+		white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;
+		background: $bio-sup2; color: $bio-tenue;
+		&.ok { background: $bio-acento-bg; color: $bio-acento; }
+		&.est { background: #3A321C; color: $bio-ambar; }
+	}
+	.bio-proc-h2 .bio-emd-estado { font-size: 12px; }
+	.bio-emd-calib { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 12px; }
+	.bio-emd-tabla-caja { background: $bio-sup; border-radius: 16px; padding: 6px 14px; overflow-y: auto; min-height: 0; }
+	.bio-emd-tabla {
+		width: 100%; border-collapse: collapse; font-size: 15px;
+		th { font-size: 12px; color: $bio-tenue; font-weight: 500; text-align: left; padding: 6px 4px; small { font-size: 11px; } }
+		td { padding: 6px 4px; border-top: 1px solid #2A3138; font-variant-numeric: tabular-nums; }
+		td.n { color: $bio-acento; font-weight: 600; width: 26px; }
+		td.est { width: 26px; text-align: center; }
+		tr.running td { background: rgba(60, 201, 176, .06); }
+	}
+	.bio-emd-calib-lado { display: flex; flex-direction: column; gap: 10px; min-height: 0; }
+	.bio-emd-resultado {
+		flex: 1; background: $bio-sup; border-radius: 16px; padding: 10px 14px; display: flex; flex-direction: column; gap: 6px; font-size: 13px;
+		.vals { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 14px; color: $bio-tenue; strong { color: $bio-texto; font-size: 17px; font-weight: 600; } }
+	}
+	.bio-emd-xy { display: flex; flex-direction: column; gap: 2px; font-size: 13px; color: $bio-tenue; strong { color: $bio-texto; font-size: 20px; font-weight: 600; } }
+	.bio-emd-calculo {
+		background: $bio-sup; border-radius: 22px; padding: 16px; color: $bio-texto; display: flex; flex-direction: column; gap: 12px; font-size: 14px;
+		button { font-family: inherit; color: inherit; border: none; cursor: pointer; }
+		.bio-proc-datos > div { background: $bio-sup2; }
+		.bio-proc-lista { background: $bio-sup2; .fila { border-top-color: #333B44; } }
+		.bio-teclado-acciones { grid-template-columns: 1fr; }
+	}
+
+	// Limpieza y temperaturas: filas grandes con icono
+	.bio-proc-lista .fila.grande { min-height: 60px; padding-left: 0; color: $bio-texto; &:first-child { border-top: none; } }
+	.bio-proc-lateral .bio-proc-valores button { background: $bio-sup2 !important; }
+	.bio-proc-lista .fila.grande .ic { width: 40px; height: 40px; border-radius: 12px; flex: none; display: flex; align-items: center; justify-content: center; background: #3A2E1C; .v-icon { color: $bio-calor !important; } &.verde { background: $bio-acento-bg; .v-icon { color: $bio-acento !important; } } }
+	.bio-proc-lista .fila.grande > span.txt { flex: 1; min-width: 0; strong { display: block; font-weight: 500; font-size: 15px; } small { display: block; font-size: 12px; color: $bio-tenue; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } }
+	.bio-proc-lista .fila.grande.tenue { opacity: .55; }
+	.bio-proc-valor-btn {
+		height: 44px; border-radius: 12px; background: $bio-sup2 !important; padding: 0 14px; font-size: 13px; color: $bio-tenue !important;
+		display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;
+		strong { font-size: 20px; color: $bio-texto; font-weight: 600; }
+		.v-icon { color: $bio-tenue !important; }
+	}
+}
+
 // Colores del teclado genérico (BioTecladoValor)
 .tema-bio {
 	.bio-teclado-icono.lila { background: #2B2540; .v-icon { color: #B49CF2 !important; } }
