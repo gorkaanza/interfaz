@@ -40,6 +40,8 @@ $bio-verde-bg: var(--bio-verde-bg);
 $bio-desactivado: var(--bio-desactivado);
 $bio-marca-1: var(--bio-marca-1);
 $bio-marca-2: var(--bio-marca-2);
+$bio-home-no: var(--bio-home-no);
+$bio-home-si: var(--bio-home-si);
 
 .tema-bio {
 	--bio-fondo: #14171A;
@@ -75,6 +77,8 @@ $bio-marca-2: var(--bio-marca-2);
 	--bio-desactivado: rgba(38, 44, 51, .5);
 	--bio-marca-1: #E8EDF1;
 	--bio-marca-2: #F5B52E;
+	--bio-home-no: #F2A65A;	// botón Home: ejes sin referenciar (naranja)
+	--bio-home-si: #3CC9B0;	// botón Home: todos los ejes referenciados (verde azulado)
 }
 // Modo claro: blancos y grises muy claros con el azul y el amarillo del logo de domoBIO
 .tema-bio.bio-claro {
@@ -111,6 +115,8 @@ $bio-marca-2: var(--bio-marca-2);
 	--bio-desactivado: rgba(20, 26, 41, .06);
 	--bio-marca-1: #0A21AD;
 	--bio-marca-2: #FFB812;
+	--bio-home-no: #E8710A;	// naranja
+	--bio-home-si: #0A21AD;	// azul del logo
 }
 
 .tema-bio {
@@ -366,9 +372,9 @@ $bio-marca-2: var(--bio-marca-2);
 	}
 	.v-btn.bio-home {
 		height: 44px !important; padding: 0 16px !important; border-radius: 12px !important;
-		background: $bio-calor !important; color: $bio-rail !important; font-size: 14px; font-weight: 600;
+		background: $bio-home-no !important; color: $bio-rail !important; font-size: 14px; font-weight: 600;
 		.v-icon { color: $bio-rail !important; }
-		&.ok { background: $bio-sup2 !important; color: $bio-texto !important; .v-icon { color: $bio-acento !important; } }
+		&.ok { background: $bio-home-si !important; }
 	}
 	.bio-mandos { flex: 1; display: grid; grid-template-columns: minmax(0, 1fr) 96px; gap: 10px; min-height: 0; }
 	.bio-cruz {
@@ -675,7 +681,7 @@ $bio-marca-2: var(--bio-marca-2);
 	}
 	.bio-cal-offset { font-size: 20px; font-weight: 600; color: $bio-acento; }
 	.bio-cal-pie3 { align-items: stretch; .bio-cal-sec, .bio-cal-principal, .bio-cal-home { height: auto; min-height: 52px; } }
-	.bio-cal-home { min-width: 120px; padding: 0 16px; border-radius: 14px; background: $bio-calor !important; color: $bio-rail !important; font-size: 14px; font-weight: 600; &.ok { background: $bio-sup2 !important; color: $bio-texto !important; } &:disabled { opacity: .5; } }
+	.bio-cal-home { min-width: 120px; padding: 0 16px; border-radius: 14px; background: $bio-home-no !important; color: $bio-rail !important; font-size: 14px; font-weight: 600; &.ok { background: $bio-home-si !important; } &:disabled { opacity: .5; } }
 
 	.bio-cal-dialogo { padding: 8px 8px 12px; }
 	.bio-cal-dialogo .v-card__title { font-size: 16px !important; word-break: normal; }
