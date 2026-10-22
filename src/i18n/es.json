@@ -1303,7 +1303,8 @@
         "system": "Sistema",
         "settingsGroup": "Ajustes",
         "settings": "Ajustes",
-        "machine": "Máquina"
+        "machine": "Máquina",
+        "slicer": "Slicer"
       }
     },
     "editor": {

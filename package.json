@@ -8,6 +8,7 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
+    "build:slicer": "vue-cli-service build --mode slicer",
     "build-plugin": "node scripts/build-plugin.js",
     "report": "vue-cli-service build --report",
     "lint": "vue-cli-service lint"

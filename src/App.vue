@@ -94,7 +94,7 @@ textarea {
 			<template v-for="grupo in navEscritorio">
 				<span :key="'g-' + grupo.id" class="bio-nav-grupo">{{ grupo.titulo }}</span>
 				<button v-for="item in grupo.items" :key="item.id" type="button" class="bio-nav-item" :class="{ activo: railActivo === item.id }" @click="railClick(item)">
-					<span v-if="item.punto" class="bio-nav-punto" :style="{ background: item.punto }"></span><span>{{ item.label }}</span>
+					<span v-if="item.punto" class="bio-nav-punto" :style="{ background: item.punto }"></span><span>{{ item.label }}</span><v-icon v-if="item.externo" small class="bio-nav-externo">mdi-open-in-new</v-icon>
 					<span v-if="item.id === 'job' && isPrinting" class="bio-nav-pct">{{ Math.round((jobProgress || 0) * 100) }} %</span>
 				</button>
 			</template>
@@ -153,6 +153,12 @@ textarea {
 						<v-btn block height="95" @click="cambiarRuta('/Settings/General'),mostrarHome = false">
 							<v-icon x-large>mdi-cog</v-icon>
 						</v-btn>
+						<template v-if="conSlicer">
+							<v-divider></v-divider>
+							<v-btn block height="95" :href="printerUrl" icon>
+								<v-icon x-large>mdi-animation-outline</v-icon>
+							</v-btn>
+						</template>
 						<v-divider v-if="$store.state.nivelUsuario >= 3"></v-divider>
 						<v-btn  v-if="$store.state.nivelUsuario >= 3" block height="95" @click="cambiarRuta('/Settings/Machine'),mostrarHome = false">
 							<v-icon x-large>mdi-cogs</v-icon>
@@ -432,8 +438,19 @@ export default {
 				{ id: 'home', icon: 'mdi-home-variant-outline', label: 'Inicio' },
 				{ id: 'tools', icon: 'mdi-tools', label: 'Herramientas', ruta: '/Files/tools' },
 				{ id: 'job', icon: 'mdi-play', label: 'Trabajos', ruta: '/Job/Status' },
-				{ id: 'move', icon: 'mdi-arrow-all', label: 'Movimiento', ruta: '/' }
+				{ id: 'move', icon: 'mdi-arrow-all', label: 'Movimiento', ruta: '/' },
+				...(this.conSlicer ? [{ id: 'slicer', icon: 'mdi-animation-outline', label: 'Slicer', url: this.printerUrl }] : [])
 			];
+		},
+		// domotek: menú del slicer. Se activa al compilar con --mode slicer (VUE_APP_SLICER=true)
+		// o si la máquina declara global.Slicer_Capable
+		conSlicer() {
+			const g = this.$store.state.machine.model.global || {};
+			return process.env.VUE_APP_SLICER === 'true' || !!g.Slicer_Capable;
+		},
+		printerUrl() {
+			const nombre = (this.$store.state.machine.model.network && this.$store.state.machine.model.network.name) || window.location.hostname;
+			return `http://${nombre}:8086/en/configurer`;
 		},
 		railItemsAbajo() {
 			const items = [{ id: 'settings', icon: 'mdi-cog-outline', label: 'Ajustes', ruta: '/Settings/General' }];
@@ -466,7 +483,8 @@ export default {
 					{ id: 'job', label: t('status'), ruta: '/Job/Status' },
 					{ id: 'tools', label: t('tools'), ruta: '/Files/tools' },
 					{ id: 'move', label: t('move'), ruta: '/' },
-					{ id: 'console', label: t('console'), ruta: '/Console' }
+					{ id: 'console', label: t('console'), ruta: '/Console' },
+					...(this.conSlicer ? [{ id: 'slicer', label: t('slicer'), url: this.printerUrl, externo: true }] : [])
 				] },
 				{ id: 'procesos', titulo: t('processes'), items: procesos },
 				{ id: 'archivos', titulo: t('files'), items: archivos }
@@ -599,6 +617,7 @@ export default {
 			this.codigoEscritorio = '';
 		},
 		railClick(item) { // domotek: barra lateral del tema oscuro
+			if (item.url) { window.location.href = item.url; return; } // slicer: otra aplicación en el puerto 8086
 			if (item.query) {
 				this.mostrarHome = false;
 				this.$router.push({ path: item.ruta, query: item.query }).catch(() => {});

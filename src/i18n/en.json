@@ -1304,7 +1304,8 @@
         "system": "System",
         "settingsGroup": "Settings",
         "settings": "Settings",
-        "machine": "Machine"
+        "machine": "Machine",
+        "slicer": "Slicer"
       }
     },
     "editor": {

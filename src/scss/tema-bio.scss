@@ -1073,3 +1073,5 @@ $bio-marca-2: var(--bio-marca-2);
 	.bio-rail, .bio-nav { border-right: 1px solid $bio-borde !important; }
 	.v-overlay__scrim { background-color: #141A29 !important; }
 }
+
+.tema-bio .bio-nav-item .bio-nav-externo { margin-left: auto; color: $bio-apagado !important; }
