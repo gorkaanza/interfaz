@@ -54,3 +54,8 @@ export function forzarModo(modo) {
 export function modoForzado() {
 	return estado.forzado;
 }
+
+// true si la ventana es lo bastante ancha para el modo escritorio (aunque se haya forzado el táctil)
+export function ventanaAncha() {
+	return estado.ancho >= ANCHO_ESCRITORIO;
+}

@@ -84,7 +84,7 @@ textarea {
 </style>
 
 <template>
-	<v-app :class="{ 'tema-bio': temaBio, 'bio-escritorio': temaBio && escritorio }">
+	<v-app :class="{ 'tema-bio': temaBio, 'bio-escritorio': temaBio && escritorio, 'bio-tactil-ancho': temaBio && !escritorio && ventanaAncha }">
 		<!-- domotek: un único menú lateral para el tema oscuro (táctil: 80 px, escritorio: 232 px).
 		     Se usa un solo componente porque al cambiar entre dos v-navigation-drawer Vuetify
 		     podía quedarse con el ancho del anterior y dejar un hueco a la izquierda. -->
@@ -111,6 +111,9 @@ textarea {
 				<v-icon large>{{ item.icon }}</v-icon>
 			</button>
 			<div class="bio-rail-hueco"></div>
+			<button v-if="ventanaAncha" type="button" class="bio-rail-btn" :aria-label="$t('domotek.desktop.desktopMode')" :title="$t('domotek.desktop.desktopMode')" @click="cambiarModo('auto')">
+				<v-icon large>mdi-monitor</v-icon>
+			</button>
 			<button v-for="item in railItemsAbajo" :key="item.id" type="button" class="bio-rail-btn" :class="{ activo: railActivo === item.id }" :aria-label="item.label" @click="railClick(item)">
 				<v-icon large>{{ item.icon }}</v-icon>
 			</button>
@@ -162,7 +165,7 @@ textarea {
 
 		<v-main id="content" class="blue lighten-4 mb-0 pb-0">
 			<v-scroll-y-transition>
-				<v-container v-show="(!hideGlobalContainer || $vuetify.breakpoint.lgAndUp) && !(temaBio && escritorio)" id="global-container" fluid>
+				<v-container v-show="(!hideGlobalContainer || $vuetify.breakpoint.lgAndUp) && !temaBio" id="global-container" fluid>
 					<v-row>
 						<v-col cols="9">
 							<code-input class="mx-3 hidden-sm-and-down"></code-input>
@@ -340,7 +343,7 @@ import PositionPanel from './components/panels/PositionPanel.vue'
 
 import { MachineMode } from './store/machine/modelEnums.js';
 import { DashboardMode } from './store/settings.js'
-import { esEscritorio, forzarModo } from './utils/modoPantalla.js'
+import { esEscritorio, forzarModo, ventanaAncha } from './utils/modoPantalla.js'
 import { iniciarHistorial } from './utils/historialTemp.js'
 
 
@@ -434,6 +437,7 @@ export default {
 			return items;
 		},
 		escritorio() { return esEscritorio(); }, // domotek
+		ventanaAncha() { return ventanaAncha(); },
 		navEscritorio() { // domotek: menú del modo escritorio
 			const nivel = this.$store.state.nivelUsuario || 0;
 			const g = (this.$store.state.machine.model.global) || {};
