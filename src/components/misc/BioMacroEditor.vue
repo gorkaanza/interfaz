@@ -87,7 +87,7 @@
 			<div class="bio-arbol-busca">
 				<label :for="idBuscar" class="d-sr-only">{{ $t('domotek.editor.search') }}</label>
 				<input :id="idBuscar" v-model="busqueda" type="search" :placeholder="$t('domotek.editor.search')">
-				<button type="button" class="bio-btn-cuadrado" :title="$t('domotek.editor.newFile')" :aria-label="$t('domotek.editor.newFile')" @click="nuevoArchivo"><v-icon>mdi-plus</v-icon></button>
+				<button v-if="puedeCrear" type="button" class="bio-btn-cuadrado" :title="$t('domotek.editor.newFile')" :aria-label="$t('domotek.editor.newFile')" @click="nuevoArchivo"><v-icon>mdi-plus</v-icon></button>
 				<button type="button" class="bio-btn-cuadrado" :title="$t('domotek.editor.refresh')" :aria-label="$t('domotek.editor.refresh')" @click="recargar"><v-icon>mdi-refresh</v-icon></button>
 			</div>
 			<span class="bio-arbol-ruta">{{ raiz }}/</span>
@@ -102,7 +102,7 @@
 				<div v-if="cargando" class="bio-arbol-ruta pa-2">{{ $t('domotek.editor.loading') }}</div>
 				<div v-else-if="!nodosVisibles.length" class="bio-arbol-ruta pa-2">{{ $t('domotek.editor.empty') }}</div>
 			</div>
-			<div class="bio-arbol-pie" :class="{ arrastrando }">{{ $t('domotek.editor.dropHint', [carpetaDestino]) }}</div>
+			<div v-if="puedeCrear" class="bio-arbol-pie" :class="{ arrastrando }">{{ $t('domotek.editor.dropHint', [carpetaDestino]) }}</div>
 		</section>
 
 		<section class="bio-edit" :aria-label="$t('domotek.editor.editor')">
@@ -169,14 +169,22 @@ export default {
 	},
 	computed: {
 		...mapState('machine/model', { macrosDir: state => state.directories.macros, sysDir: state => state.directories.system }),
+		nivel() { return this.$store.state.nivelUsuario || 0; },
+		rutaMacros() { return (this.macrosDir || '0:/macros').replace(/\/$/, ''); },
+		rutaSistema() { return (this.sysDir || '0:/sys').replace(/\/$/, ''); },
+		// E500 (nivel 2) solo entra a sys/domoBIO/UserSettings y solo ve Mod_variables.g (igual que SystemFileList)
+		sistemaRestringido() { return this.nivel === 2; },
+		raizSistema() { return this.sistemaRestringido ? this.rutaSistema + '/domoBIO/UserSettings' : this.rutaSistema; },
 		raices() {
-			return [
-				{ nombre: this.$t('domotek.editor.macros'), ruta: (this.macrosDir || '0:/macros').replace(/\/$/, '') },
-				{ nombre: this.$t('domotek.editor.system'), ruta: (this.sysDir || '0:/sys').replace(/\/$/, '') }
-			];
+			const r = [{ nombre: this.$t('domotek.editor.macros'), ruta: this.rutaMacros }];
+			if (this.nivel >= 2) { r.push({ nombre: this.$t('domotek.editor.system'), ruta: this.raizSistema }); }
+			return r;
 		},
+		enSistema() { return this.raices.length > 1 && this.raiz === this.raices[1].ruta; },
+		// en System restringido no se crean ni suben archivos
+		puedeCrear() { return !(this.enSistema && this.sistemaRestringido); },
 		esMacro() {
-			return !!this.archivo && this.archivo.startsWith(this.raices[0].ruta + '/');
+			return !!this.archivo && this.archivo.startsWith(this.rutaMacros + '/');
 		},
 		cmOptions() {
 			return {
@@ -218,10 +226,35 @@ export default {
 		rutaRelativa(r) {
 			return r.startsWith(this.raiz + '/') ? r.substring(this.raiz.length + 1) : r;
 		},
+		// Mismas reglas que MacroFileList / SystemFileList según el nivel de usuario
+		visible(f, carpeta) {
+			if (carpeta.startsWith(this.rutaSistema)) {
+				if (this.nivel < 2) { return false; }
+				if (!this.sistemaRestringido) { return true; }
+				return !f.isDirectory && carpeta === this.raizSistema && f.name === 'Mod_variables.g';
+			}
+			if (f.isDirectory) {
+				if (this.nivel < 2 && ['Enable-Disable_AUTO-CAL', 'Enable-Disable_DOOR_DETECTION', 'On-Off_CHAMBER_FAN'].includes(f.name)) { return false; }
+				if (this.nivel < 3 && ['Scripts', 'Run scripts'].includes(f.name)) { return false; }
+			}
+			return true;
+		},
+		// ¿Se puede abrir / escribir esta ruta con el nivel actual?
+		permitida(ruta) {
+			const raiz = this.raices.find(r => ruta.startsWith(r.ruta + '/'));
+			if (!raiz) { return false; }
+			const partes = ruta.substring(raiz.ruta.length + 1).split('/');
+			let carpeta = raiz.ruta;
+			return partes.every((parte, i) => {
+				const ok = this.visible({ name: parte, isDirectory: i < partes.length - 1 }, carpeta);
+				carpeta = `${carpeta}/${parte}`;
+				return ok;
+			});
+		},
 		async cargarCarpeta(ruta) {
 			this.cargando = true;
 			try {
-				const lista = await this.getFileList(ruta);
+				const lista = (await this.getFileList(ruta)).filter(f => this.visible(f, ruta));
 				const nodos = lista
 					.map(f => ({ nombre: f.name, ruta: `${ruta}/${f.name}`, carpeta: !!f.isDirectory }))
 					.sort((a, b) => (a.carpeta === b.carpeta) ? a.nombre.localeCompare(b.nombre) : (a.carpeta ? -1 : 1));
@@ -245,6 +278,7 @@ export default {
 			await this.abrir(n.ruta);
 		},
 		async abrir(ruta) {
+			if (!this.permitida(ruta)) { return; }
 			if (this.sucio && !confirm(this.$t('dialog.fileEdit.confirmClose'))) { return; }
 			try {
 				const contenido = await this.download({ filename: ruta, type: 'text', showProgress: false, showSuccess: false });
@@ -256,7 +290,7 @@ export default {
 			}
 		},
 		async guardar() {
-			if (!this.archivo || this.guardando) { return; }
+			if (!this.archivo || this.guardando || !this.permitida(this.archivo)) { return; }
 			this.guardando = true;
 			try {
 				await this.upload({ filename: this.archivo, content: new Blob([this.texto]), showProgress: false });
@@ -273,6 +307,7 @@ export default {
 			this.sendCode(`M98 P"${this.archivo}"`);
 		},
 		async nuevoArchivo() {
+			if (!this.puedeCrear) { return; }
 			const nombre = prompt(this.$t('domotek.editor.newFilePrompt'), 'nueva_macro.g');
 			if (!nombre) { return; }
 			const carpeta = this.archivo ? this.archivo.substring(0, this.archivo.lastIndexOf('/')) : this.raiz;
@@ -286,6 +321,7 @@ export default {
 		},
 		async soltar(e) {
 			this.arrastrando = false;
+			if (!this.puedeCrear) { return; }
 			const archivos = Array.from((e.dataTransfer && e.dataTransfer.files) || []);
 			if (!archivos.length) { return; }
 			const carpeta = this.archivo ? this.archivo.substring(0, this.archivo.lastIndexOf('/')) : this.raiz;
@@ -295,7 +331,7 @@ export default {
 			await this.cargarCarpeta(carpeta);
 		},
 		async cambiarRaiz(ruta) {
-			if (this.raiz === ruta) { return; }
+			if (this.raiz === ruta || !this.raices.some(r => r.ruta === ruta)) { return; }
 			this.raiz = ruta;
 			if (!this.hijos[ruta]) { await this.cargarCarpeta(ruta); }
 		},
@@ -315,6 +351,19 @@ export default {
 		this.raiz = this.raices[0].ruta;
 		this.cargarCarpeta(this.raiz);
 		window.addEventListener('beforeunload', this.antesDeSalir);
+	},
+	watch: {
+		// Al cambiar de usuario (E500 / D500) se vuelve a cargar todo con las reglas nuevas
+		nivel() {
+			this.hijos = {};
+			this.abiertas = {};
+			if (this.archivo && !this.permitida(this.archivo)) { this.archivo = null; this.texto = ''; this.sucio = false; }
+			if (!this.raices.some(r => r.ruta === this.raiz)) { this.raiz = this.raices[0].ruta; }
+			this.cargarCarpeta(this.raiz);
+		},
+		raizSistema(a, b) {
+			if (this.raiz === b) { this.raiz = a; this.cargarCarpeta(a); }
+		}
 	},
 	beforeDestroy() {
 		window.removeEventListener('beforeunload', this.antesDeSalir);
