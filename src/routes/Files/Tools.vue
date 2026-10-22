@@ -1090,7 +1090,11 @@
 								</v-card>
 							</v-dialog>
 							<!-- fullscreen hide-overlay> -->
-							<v-dialog v-model="marcadorMix"> 
+							<!-- domotek: coaxial con el diseño nuevo -->
+							<v-dialog v-if="temaBio" v-model="marcadorMix" max-width="760" content-class="bio-teclado-dialogo">
+								<coaxial-panel v-if="marcadorMix" v-on:close-dialog="closeDialog"></coaxial-panel>
+							</v-dialog>
+							<v-dialog v-else v-model="marcadorMix"> 
 								<v-col cols="12" align="center" class="ma-0 pa-0">
 									<coaxial-panel v-on:close-dialog="closeDialog"></coaxial-panel> 
 								</v-col>

@@ -37,7 +37,59 @@
 	}
 </style>
 <template>
-	<v-row class="mb-0 pb-0"  > 
+	<!-- domotek: coaxial con el diseño nuevo -->
+	<div v-if="temaBio" class="bio-co">
+		<header class="bio-teclado-cab">
+			<span class="bio-teclado-icono acento"><v-icon>mdi-circle-double</v-icon></span>
+			<span class="bio-teclado-nombre">{{ $t('domotek.coaxial.title') }} · {{ $t('domotek.coaxial.group', [grupo]) }}</span>
+			<span class="pildora" :class="{ on: enlazado }">{{ enlazado ? $t('domotek.coaxial.linked') : $t('domotek.coaxial.unlinked') }}</span>
+			<button type="button" class="bio-teclado-cerrar" :aria-label="$t('generic.close')" @click="closeDialog"><v-icon>mdi-close</v-icon></button>
+		</header>
+
+		<div class="bio-co-tools">
+			<div v-for="(t, i) in toolsGrupo" :key="t.id" class="bio-co-tool" :class="{ enlazado }">
+				<span class="n">{{ t.id }}</span>
+				<span class="nom">{{ t.nombre }}</span>
+				<span class="rol">{{ i === 0 ? $t('domotek.coaxial.primary') : $t('domotek.coaxial.secondary') }}</span>
+			</div>
+			<span class="bio-co-union" :class="{ enlazado }"><v-icon>{{ enlazado ? 'mdi-link-variant' : 'mdi-link-variant-off' }}</v-icon></span>
+		</div>
+
+		<!-- Sin enlazar -->
+		<template v-if="!enlazado">
+			<p class="bio-co-nota">{{ $t('domotek.coaxial.linkHint') }}</p>
+			<p v-if="!allAxesHomed" class="bio-co-nota aviso"><v-icon small>mdi-alert-outline</v-icon>{{ $t('domotek.coaxial.homeFirst') }}</p>
+			<div style="flex: 1"></div>
+			<div class="bio-co-pie">
+				<button type="button" class="bio-teclado-sec peligro" @click="UnLinkTools(seleccionado)">{{ $t('domotek.coaxial.remove') }}</button>
+				<button type="button" class="bio-teclado-ok acento" @click="LinkTools(seleccionado)"><v-icon small>mdi-link-variant</v-icon>{{ $t('domotek.coaxial.link') }}</button>
+			</div>
+		</template>
+
+		<!-- Enlazados: proporción de mezcla -->
+		<template v-else>
+			<div class="bio-co-mezcla">
+				<div class="bio-co-valores">
+					<div><span>{{ $t('domotek.coaxial.primary') }}</span><strong>{{ pctPrimario }}<small> %</small></strong></div>
+					<div class="sec"><span>{{ $t('domotek.coaxial.secondary') }}</span><strong>{{ 100 - pctPrimario }}<small> %</small></strong></div>
+				</div>
+				<div class="bio-co-slider">
+					<button type="button" :disabled="pctPrimario <= 0" :aria-label="$t('domotek.coaxial.lessPrimary')" @click="fijarPct(pctPrimario - 5)">−</button>
+					<input type="range" min="0" max="100" step="5" :value="pctPrimario" :aria-label="$t('domotek.coaxial.ratio')" :style="{ '--pct': pctPrimario + '%' }" @input="fijarPct($event.target.value)">
+					<button type="button" :disabled="pctPrimario >= 100" :aria-label="$t('domotek.coaxial.morePrimary')" @click="fijarPct(pctPrimario + 5)">+</button>
+				</div>
+				<div class="bio-co-atajos">
+					<button v-for="v in [0, 25, 50, 75, 100]" :key="v" type="button" :class="{ activo: pctPrimario === v }" @click="fijarPct(v)">{{ v }} / {{ 100 - v }}</button>
+				</div>
+				<p class="bio-co-nota" :class="{ aviso: cambiado }">{{ cambiado ? $t('domotek.coaxial.notApplied') : $t('domotek.coaxial.applied') }}</p>
+			</div>
+			<div class="bio-co-pie">
+				<button type="button" class="bio-teclado-sec peligro" @click="UnLinkTools(seleccionado), closeDialog()"><v-icon small>mdi-link-variant-off</v-icon>{{ $t('domotek.coaxial.unlink') }}</button>
+				<button type="button" class="bio-teclado-ok acento" @click="StartSaveSettings(seleccionado)">{{ $t('domotek.coaxial.apply', [pctPrimario, 100 - pctPrimario]) }}</button>
+			</div>
+		</template>
+	</div>
+	<v-row v-else class="mb-0 pb-0"  > 
 		<v-col cols="12" align="center">
 			<v-btn v-on:click="closeDialog" x-large block class="blue lighten-3">
 				<v-icon style="" class="align-center" x-large>mdi-close</v-icon>
@@ -242,6 +294,27 @@ export default {
 			move: state => state.machine.model.move,
 		}),
 		...mapGetters('machine/model', ['global']),
+		temaBio() { return this.$store.state.settings.temaBio; }, // domotek
+		seleccionado() { return this.$store.state.machine.model.global.TSeleccionado; },
+		grupo() { return this.seleccionado > 1 ? 2 : 1; },
+		enlazado() {
+			const g = this.$store.state.machine.model.global;
+			return (this.grupo === 1 ? g.coaxial1 : g.coaxial2) == 1;
+		},
+		toolsGrupo() {
+			const g = this.$store.state.machine.model.global;
+			const ids = this.grupo === 1 ? [0, 1] : [2, 3];
+			return ids.map(i => ({ id: `T${i + 1}`, nombre: g[`T${i}Name`] || '—' }));
+		},
+		pctPrimario() { // la mezcla se guarda de 0 a 1; aquí en %
+			const v = this.grupo === 1 ? this.sliderG1 : this.sliderG2;
+			return Math.round((Number(v) || 0) * 100);
+		},
+		cambiado() {
+			const g = this.$store.state.machine.model.global;
+			const guardado = this.grupo === 1 ? g.group1T1Mix : g.group2T1Mix;
+			return Math.round((Number(guardado) || 0) * 100) !== this.pctPrimario;
+		},
 		isprinting: {
 			get() {
 				return this.$store.state.machine.model.state.status},
@@ -258,25 +331,19 @@ export default {
 		sliderG22: {
 			get() { return (1-this.sliderG2).toFixed(2)}
 		},
-		allAxesHomed () {
-			if (this.modeloMaquina === '2A') {
-				return this.move.axes[0].homed &&
-						this.move.axes[1].homed &&
-						this.move.axes[2].homed &&
-						this.move.axes[3].homed
-				}
-
-			return this.move.axes[0].homed &&
-				this.move.axes[1].homed &&
-				this.move.axes[2].homed &&
-				this.move.axes[3].homed &&
-				this.move.axes[4].homed &&
-				this.move.axes[5].homed &&
-				this.move.axes[6].homed
+		allAxesHomed () { // domotek: misma regla que el resto (4 ejes en la 2A, 7 en las demás) sin fallar si faltan ejes
+			const a = (this.move && this.move.axes) || [];
+			const n = (this.$store.state.machine.model.global.MachineModel === '2A') ? 4 : 7;
+			for (let i = 0; i < n; i++) { if (!a[i] || !a[i].homed) { return false; } }
+			return true;
 		}
 	},
 	methods: {
 		...mapActions('machine', ['sendCode']),
+		fijarPct(v) { // domotek
+			const n = Math.max(0, Math.min(100, Math.round(Number(v) / 5) * 5)) / 100;
+			if (this.grupo === 1) { this.sliderG1 = n; } else { this.sliderG2 = n; }
+		},
 		closeDialog(){
 			this.$emit('close-dialog');
 		},
@@ -370,6 +437,9 @@ export default {
 	},
 	
 	watch: {
+		// domotek: al abrir para otro grupo o si la placa cambia la mezcla, partir del valor guardado
+		'$store.state.machine.model.global.group1T1Mix'(v) { if (v !== undefined) { this.sliderG1 = v; } },
+		'$store.state.machine.model.global.group2T1Mix'(v) { if (v !== undefined) { this.sliderG2 = v; } },
 	},
 	created() {
 	},

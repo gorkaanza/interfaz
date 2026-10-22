@@ -1112,3 +1112,51 @@ $bio-home-si: var(--bio-home-si);
 		.v-progress-circular { color: $bio-rail; }
 	}
 }
+
+// Coaxial (COPanel)
+.tema-bio {
+	.bio-co {
+		background: $bio-sup; border-radius: 22px; padding: 16px; box-sizing: border-box; color: $bio-texto; font-size: 14px;
+		display: flex; flex-direction: column; gap: 14px; height: min(440px, calc(100vh - 24px));
+		button { font-family: inherit; color: inherit; border: none; cursor: pointer; }
+		button:disabled { cursor: default; opacity: .4; }
+		.pildora { background: $bio-sup2; border-radius: 999px; padding: 4px 12px; font-size: 13px; font-weight: 600; color: $bio-tenue; white-space: nowrap; &.on { background: $bio-acento-bg; color: $bio-acento; } }
+	}
+	.bio-co-tools { position: relative; display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
+	.bio-co-tool {
+		background: $bio-sup2; border-radius: 16px; padding: 10px 14px; display: grid; grid-template-columns: auto minmax(0, 1fr); grid-template-rows: auto auto; column-gap: 10px; align-items: center;
+		border: 2px solid transparent;
+		.n { grid-row: span 2; width: 40px; height: 40px; border-radius: 12px; background: $bio-sup3; display: flex; align-items: center; justify-content: center; font-weight: 700; color: $bio-tenue; }
+		.nom { font-size: 15px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+		.rol { font-size: 12px; color: $bio-tenue; }
+		&.enlazado { border-color: $bio-acento; .n { background: $bio-acento-bg; color: $bio-acento; } }
+	}
+	.bio-co-union {
+		position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 36px; height: 36px; border-radius: 50%;
+		background: $bio-sup3; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 0 4px $bio-sup;
+		.v-icon { color: $bio-tenue !important; font-size: 20px !important; }
+		&.enlazado { background: $bio-acento; .v-icon { color: $bio-rail !important; } }
+	}
+	.bio-co-nota { margin: 0; font-size: 13px; color: $bio-tenue; display: flex; align-items: center; gap: 6px;
+		&.aviso { color: $bio-calor; font-weight: 500; .v-icon { color: inherit !important; } } }
+	.bio-co-pie { display: grid; grid-template-columns: minmax(0, .75fr) minmax(0, 1fr); gap: 10px; flex: none; }
+	.bio-co-pie button { display: inline-flex; align-items: center; justify-content: center; gap: 6px; .v-icon { color: inherit !important; } }
+	.bio-co-mezcla { flex: 1; min-height: 0; display: flex; flex-direction: column; justify-content: center; gap: 12px; }
+	.bio-co-valores { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+	.bio-co-valores > div { background: $bio-sup2; border-radius: 14px; padding: 8px 14px; display: flex; align-items: baseline; justify-content: space-between; gap: 8px;
+		span { font-size: 13px; color: $bio-tenue; } strong { font-size: 30px; font-weight: 600; font-variant-numeric: tabular-nums; color: $bio-acento; small { font-size: 14px; color: $bio-tenue; font-weight: 400; } }
+		&.sec strong { color: $bio-texto; } }
+	.bio-co-slider { display: grid; grid-template-columns: 48px minmax(0, 1fr) 48px; gap: 12px; align-items: center; }
+	.bio-co-slider > button { height: 48px; border-radius: 14px; background: $bio-sup2 !important; font-size: 24px; &:active { background: $bio-acento-bg !important; } }
+	.bio-co-slider input[type=range] {
+		-webkit-appearance: none; appearance: none; width: 100%; height: 36px; background: transparent; margin: 0; cursor: pointer;
+		&::-webkit-slider-runnable-track { height: 10px; border-radius: 5px; background: linear-gradient(to right, $bio-acento 0, $bio-acento var(--pct), $bio-linea2 var(--pct)); }
+		&::-moz-range-track { height: 10px; border-radius: 5px; background: $bio-linea2; }
+		&::-moz-range-progress { height: 10px; border-radius: 5px; background: $bio-acento; }
+		&::-webkit-slider-thumb { -webkit-appearance: none; width: 30px; height: 30px; border-radius: 50%; background: $bio-texto; margin-top: -10px; box-shadow: 0 0 0 4px $bio-acento-sombra; }
+		&::-moz-range-thumb { width: 30px; height: 30px; border: none; border-radius: 50%; background: $bio-texto; }
+	}
+	.bio-co-atajos { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; }
+	.bio-co-atajos button { height: 40px; border-radius: 12px; background: $bio-sup2 !important; font-size: 13px; font-weight: 500; font-variant-numeric: tabular-nums;
+		&.activo { background: $bio-acento-bg !important; color: $bio-acento !important; font-weight: 600; } }
+}

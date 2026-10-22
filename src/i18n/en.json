@@ -1584,6 +1584,25 @@
       "noExtruder": "This tool has no extruder.",
       "printing": "Extrusion is not available while a job is running.",
       "cold": "The tool is cold: heat it above {0} °C to extrude."
+    },
+    "coaxial": {
+      "title": "Coaxial",
+      "group": "Group {0}",
+      "linked": "Linked",
+      "unlinked": "Not linked",
+      "primary": "Primary",
+      "secondary": "Secondary",
+      "linkHint": "Link both tools in the group to extrude the two materials at once through the coaxial nozzle.",
+      "homeFirst": "Home all axes before linking the tools.",
+      "link": "Link tools",
+      "remove": "Remove tools",
+      "unlink": "Unlink",
+      "ratio": "Mixing ratio",
+      "lessPrimary": "Less primary",
+      "morePrimary": "More primary",
+      "applied": "This is the applied mix.",
+      "notApplied": "Not applied: press Apply to save the mix.",
+      "apply": "Apply {0} / {1}"
     }
   }
 }

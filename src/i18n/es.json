@@ -1586,6 +1586,25 @@
       "noExtruder": "Este tool no tiene extrusor.",
       "printing": "No se puede extruir con un trabajo en marcha.",
       "cold": "El tool está frío: caliéntalo por encima de {0} °C para extruir."
+    },
+    "coaxial": {
+      "title": "Coaxial",
+      "group": "Grupo {0}",
+      "linked": "Enlazados",
+      "unlinked": "Sin enlazar",
+      "primary": "Primario",
+      "secondary": "Secundario",
+      "linkHint": "Enlaza los dos tools del grupo para extruir los dos materiales a la vez por la boquilla coaxial.",
+      "homeFirst": "Haz home de todos los ejes antes de enlazar los tools.",
+      "link": "Enlazar tools",
+      "remove": "Quitar tools",
+      "unlink": "Desenlazar",
+      "ratio": "Proporción de mezcla",
+      "lessPrimary": "Menos primario",
+      "morePrimary": "Más primario",
+      "applied": "Esta es la mezcla aplicada.",
+      "notApplied": "Sin aplicar: pulsa Aplicar para guardar la mezcla.",
+      "apply": "Aplicar {0} / {1}"
     }
   }
 }
