@@ -1552,6 +1552,22 @@
     },
     "error": {
       "toolAgotado": "Tool desconectado o sin material"
+    },
+    "ajuste": {
+      "zTitle": "Ajuste Z (babystepping)",
+      "speedTitle": "Velocidad de impresión",
+      "extrusionTitle": "Factor de extrusión",
+      "current": "Desplazamiento actual",
+      "offsetOf": "Desplazamiento {0}",
+      "step": "Paso (mm)",
+      "closer": "Acercar a la cama",
+      "farther": "Alejar de la cama",
+      "zHint": "Se aplica al momento, también durante la impresión.",
+      "resetZ": "Poner a 0",
+      "reset": "Restablecer 100 %",
+      "done": "Hecho",
+      "speedHint": "Multiplica la velocidad de todos los movimientos del trabajo.",
+      "extrusionHint": "Multiplica el material que sale de cada tool."
     }
   }
 }

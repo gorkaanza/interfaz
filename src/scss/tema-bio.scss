@@ -909,3 +909,58 @@ $bio-ambar:      #F5B52E;
 	.bio-proc-cuerpo, .bio-cal-cuerpo { width: 100%; max-width: 1100px; margin: 0 auto; }
 }
 .tema-bio .bio-barra-codigo { display: flex; align-items: center; gap: 16px; max-width: 1040px; margin: 12px auto 0; padding: 0 12px; }
+
+// Ajustes del trabajo: Ajuste Z, velocidad y extrusión (BioAjusteTrabajo)
+.tema-bio {
+	.bio-aj {
+		background: $bio-sup; border-radius: 22px; padding: 16px; box-sizing: border-box; color: $bio-texto; font-size: 14px;
+		display: flex; flex-direction: column; gap: 12px; height: min(440px, calc(100vh - 24px));
+		button { font-family: inherit; color: inherit; border: none; cursor: pointer; }
+		button:disabled { cursor: default; opacity: .4; }
+	}
+	.bio-aj-nota { margin: 0; font-size: 12px; color: $bio-tenue; &.arriba { margin-top: -4px; } }
+	.bio-aj-datos { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 10px; }
+	.bio-aj-datos > div { background: $bio-sup2; border-radius: 14px; padding: 8px 14px; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+	.bio-aj-datos > div > span { font-size: 12px; color: $bio-tenue; }
+	.bio-aj-datos strong { font-size: 30px; font-weight: 600; line-height: 1.15; font-variant-numeric: tabular-nums; small { font-size: 14px; color: $bio-tenue; font-weight: 400; } }
+	.bio-aj-datos > div.paso { grid-column: span 2; }
+	.bio-aj-pasos { display: grid; grid-template-columns: repeat(auto-fit, minmax(0, 1fr)); gap: 6px; margin-top: 4px; }
+	.bio-aj-pasos button { height: 38px; border-radius: 10px; background: #2F363E !important; font-size: 14px; font-weight: 500; font-variant-numeric: tabular-nums;
+		&.activo { background: $bio-acento-bg !important; color: $bio-acento !important; font-weight: 600; box-shadow: inset 0 0 0 2px $bio-acento; } }
+	.bio-aj-z { flex: 1; min-height: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+	.v-btn.bio-aj-zbtn {
+		height: 100% !important; min-height: 120px; border-radius: 18px !important; background: $bio-sup2 !important; box-shadow: none !important;
+		text-transform: none; letter-spacing: 0; color: $bio-texto !important;
+		.v-btn__content { flex-direction: column; gap: 6px; }
+		.v-icon { font-size: 34px !important; color: $bio-acento !important; }
+		strong { font-size: 26px; font-weight: 600; font-variant-numeric: tabular-nums; color: $bio-texto !important; }
+		span { font-size: 13px; color: $bio-tenue !important; font-weight: 400; }
+		&:active { background: $bio-acento-bg !important; }
+	}
+	.bio-aj-pie { display: grid; grid-template-columns: minmax(0, .75fr) minmax(0, 1fr); gap: 10px; flex: none; }
+	.bio-aj-pie .v-btn.bio-teclado-sec { height: 50px !important; border-radius: 14px !important; box-shadow: none !important; text-transform: none; letter-spacing: 0; color: $bio-texto !important; font-size: 15px; }
+	.bio-teclado-ok.acento.v-btn, .bio-aj .bio-teclado-ok { color: $bio-rail !important; }
+
+	.bio-aj-filas { flex: 1; min-height: 0; display: flex; flex-direction: column; justify-content: center; gap: 10px; overflow-y: auto; }
+	.bio-aj-fila {
+		display: grid; grid-template-columns: minmax(70px, 120px) 52px minmax(0, 1fr) 52px 96px; align-items: center; gap: 12px;
+		background: $bio-sup2; border-radius: 16px; padding: 12px 14px;
+		.nombre { font-size: 14px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+		.menos, .mas { height: 52px; border-radius: 14px; background: #2F363E !important; font-size: 26px; line-height: 1; &:active { background: $bio-acento-bg !important; } }
+		.valor { color: $bio-texto; text-align: right; font-size: 30px; font-weight: 600; font-variant-numeric: tabular-nums; small { font-size: 14px; color: $bio-tenue; font-weight: 400; } &.cambiado { color: $bio-calor; } }
+	}
+	.bio-aj-filas:not(.varias) .bio-aj-fila { padding: 22px 16px; .valor { font-size: 40px; } }
+	.bio-aj-filas.varias .bio-aj-fila { padding: 8px 14px; .menos, .mas { height: 44px; } .valor { font-size: 24px; } }
+	.bio-aj input[type=range] {
+		-webkit-appearance: none; appearance: none; width: 100%; height: 36px; background: transparent; margin: 0; cursor: pointer;
+		&::-webkit-slider-runnable-track { height: 8px; border-radius: 4px; background: linear-gradient(to right, $bio-acento 0, $bio-acento var(--pct), #3A444D var(--pct)); }
+		&::-moz-range-track { height: 8px; border-radius: 4px; background: #3A444D; }
+		&::-moz-range-progress { height: 8px; border-radius: 4px; background: $bio-acento; }
+		&::-webkit-slider-thumb { -webkit-appearance: none; width: 28px; height: 28px; border-radius: 50%; background: $bio-texto; margin-top: -10px; box-shadow: 0 0 0 4px rgba(60, 201, 176, .25); }
+		&::-moz-range-thumb { width: 28px; height: 28px; border: none; border-radius: 50%; background: $bio-texto; }
+		&:disabled { opacity: .4; }
+	}
+	.bio-aj-atajos { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; flex: none; }
+	.bio-aj-atajos button { height: 42px; border-radius: 12px; background: $bio-sup2 !important; font-size: 14px; font-weight: 500;
+		&.activo { background: $bio-acento-bg !important; color: $bio-acento !important; font-weight: 600; } }
+}

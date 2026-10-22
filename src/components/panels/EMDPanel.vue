@@ -677,7 +677,6 @@
 'use strict'
 import { mapState, mapActions } from 'vuex'
 import { EMD_MACHINE, viscAt, solve, fit, calibrationGrid } from './emdModel.js'
-import { esEscritorio } from '../../utils/modoPantalla.js'
 
 /*
  * Parámetros que introduce el usuario. Todos se guardan como global.<key>.
@@ -925,6 +924,14 @@ export default {
 		},
 		onWindowResize() {
 			this.windowHeight = window.innerHeight;
+			if (this.temaBio) {
+				// domotek: la rejilla cabe en el hueco libre (cabecera 64 + pie 52 + márgenes y texto ≈ 190 px)
+				const lado = Math.round(Math.max(160, Math.min(420, window.innerHeight - 190, (window.innerWidth - 440) * 0.9)));
+				if (lado !== this.canvasSizePx) {
+					this.canvasSizePx = lado;
+					this.$nextTick(() => { this.updatePxFromMm(); this.drawGrid(); });
+				}
+			}
 		},
 
 		/*
@@ -1227,7 +1234,6 @@ export default {
 	},
 
 	mounted() {
-		if (this.temaBio) { this.canvasSizePx = esEscritorio() ? 420 : 250; } // domotek: rejilla más grande con el tema oscuro
 		window.addEventListener('resize', this.onWindowResize);
 		this.onWindowResize();
 		this.$vuetify.goTo(0);

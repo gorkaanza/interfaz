@@ -1550,6 +1550,22 @@
     },
     "error": {
       "toolAgotado": "Tool disconnected or Out of material"
+    },
+    "ajuste": {
+      "zTitle": "Z adjust (babystepping)",
+      "speedTitle": "Print speed",
+      "extrusionTitle": "Extrusion factor",
+      "current": "Current offset",
+      "offsetOf": "{0} offset",
+      "step": "Step (mm)",
+      "closer": "Closer to the bed",
+      "farther": "Away from the bed",
+      "zHint": "Applied immediately, also while printing.",
+      "resetZ": "Set to 0",
+      "reset": "Reset to 100 %",
+      "done": "Done",
+      "speedHint": "Scales the speed of every move in the job.",
+      "extrusionHint": "Scales the material each tool pushes out."
     }
   }
 }

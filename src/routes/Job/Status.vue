@@ -18,7 +18,11 @@
 				<job-progress class="mb-3"></job-progress>
 			</v-col>
 		</v-row>
-		<v-dialog v-model="DialogBabyStep" class="blue lighten-3">
+		<!-- domotek: z con el diseño nuevo -->
+		<v-dialog v-if="temaBio" v-model="DialogBabyStep" max-width="760" content-class="bio-teclado-dialogo">
+			<bio-ajuste-trabajo v-if="DialogBabyStep" tipo="z" @cerrar="DialogBabyStep = false"></bio-ajuste-trabajo>
+		</v-dialog>
+		<v-dialog v-else v-model="DialogBabyStep" class="blue lighten-3">
 			<v-btn @click="DialogBabyStep = false" x-large block class="blue lighten-3">
 				<v-icon x-large>mdi-close</v-icon>
 			</v-btn>
@@ -26,7 +30,11 @@
 				<z-babystep-panel></z-babystep-panel>
 			</v-col>
 		</v-dialog>
-		<v-dialog v-model="DialogSpeed">
+		<!-- domotek: velocidad con el diseño nuevo -->
+		<v-dialog v-if="temaBio" v-model="DialogSpeed" max-width="760" content-class="bio-teclado-dialogo">
+			<bio-ajuste-trabajo v-if="DialogSpeed" tipo="velocidad" @cerrar="DialogSpeed = false"></bio-ajuste-trabajo>
+		</v-dialog>
+		<v-dialog v-else v-model="DialogSpeed">
 			<v-btn @click="DialogSpeed = false" x-large block class="blue lighten-3">
 				<v-icon x-large>mdi-close</v-icon>
 			</v-btn>
@@ -34,7 +42,11 @@
 				<speed-factor-panel></speed-factor-panel>
 			</v-col>
 		</v-dialog>
-		<v-dialog v-model="DialogExtrusion" content-class="clsDialogExtrusion">
+		<!-- domotek: extrusion con el diseño nuevo -->
+		<v-dialog v-if="temaBio" v-model="DialogExtrusion" max-width="760" content-class="bio-teclado-dialogo">
+			<bio-ajuste-trabajo v-if="DialogExtrusion" tipo="extrusion" @cerrar="DialogExtrusion = false"></bio-ajuste-trabajo>
+		</v-dialog>
+		<v-dialog v-else v-model="DialogExtrusion" content-class="clsDialogExtrusion">
 			<v-btn @click="DialogExtrusion = false" x-large block class="blue lighten-3">
 				<v-icon x-large>mdi-close</v-icon>
 			</v-btn>
