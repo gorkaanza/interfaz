@@ -117,7 +117,8 @@
 					</v-btn>
 				</v-col>
 				
-				<v-col cols="12" v-if="$store.state.nivelUsuario >= 1">
+				<!-- domotek: las actualizaciones solo desde el ordenador, no en la pantalla de la impresora -->
+				<v-col cols="12" v-if="$store.state.nivelUsuario >= 1 && escritorio">
 						<v-btn @click="cambiarRuta('/Files/Updates')" height="70px" block color="blue lighten-4" rounded>
 							<v-row>
 								<v-col>
@@ -239,11 +240,13 @@ import { mapState, mapMutations, mapActions } from 'vuex'
 import { DashboardMode } from '@/store/settings'
 import { UnitOfMeasure } from '../../store/settings';
 import { esClaro, fijarClaro } from '../../utils/temaBio.js'
+import { esEscritorio } from '../../utils/modoPantalla.js'
 
 export default {
 	
 	computed: {
 		...mapState(['settings', "machine"]),
+		escritorio() { return esEscritorio(); }, // domotek
 		modoClaro: { // domotek
 			get() { return esClaro(); },
 			set(value) { fijarClaro(value); }

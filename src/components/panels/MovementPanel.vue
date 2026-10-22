@@ -366,7 +366,11 @@
 			</v-row>
 		</v-card-text>
 
-				<v-dialog v-model="dialogExtrude" class="mb-0 pb-0">
+				<!-- domotek: extruir con el diseño nuevo -->
+				<v-dialog v-if="temaBio" v-model="dialogExtrude" max-width="760" content-class="bio-teclado-dialogo">
+					<extrude-panel v-if="dialogExtrude" @cerrar="dialogExtrude = false"></extrude-panel>
+				</v-dialog>
+				<v-dialog v-else v-model="dialogExtrude" class="mb-0 pb-0">
 					<v-btn @click="dialogExtrude = false" x-large block class="blue lighten-3">
 						<v-icon x-large> mdi-close </v-icon>
 					</v-btn>

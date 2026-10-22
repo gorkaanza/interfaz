@@ -1576,6 +1576,16 @@
       "allTools": "Todos",
       "mixed": "distintos",
       "mixedHint": "Los tools tienen valores distintos: al mover el deslizador se igualan todos."
+    },
+    "extrude": {
+      "title": "Extruir",
+      "amount": "Cantidad",
+      "speed": "Velocidad",
+      "hint": "Mantén pulsado un valor para cambiarlo.",
+      "noTool": "Selecciona un tool para extruir.",
+      "noExtruder": "Este tool no tiene extrusor.",
+      "printing": "No se puede extruir con un trabajo en marcha.",
+      "cold": "El tool está frío: caliéntalo por encima de {0} °C para extruir."
     }
   }
 }

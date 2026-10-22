@@ -505,7 +505,7 @@
       "tools": "Tools",
       "calibration": "calibration",
       "home": "home",
-      "updates": "updates",
+      "updates": "Updates",
       "plugins": "PLUGINS"
     },
     "plugins": {
@@ -1574,6 +1574,16 @@
       "allTools": "All",
       "mixed": "mixed",
       "mixedHint": "The tools have different values: moving the slider sets them all to the same value."
+    },
+    "extrude": {
+      "title": "Extrude",
+      "amount": "Amount",
+      "speed": "Speed",
+      "hint": "Press and hold a value to change it.",
+      "noTool": "Select a tool to extrude.",
+      "noExtruder": "This tool has no extruder.",
+      "printing": "Extrusion is not available while a job is running.",
+      "cold": "The tool is cold: heat it above {0} °C to extrude."
     }
   }
 }
