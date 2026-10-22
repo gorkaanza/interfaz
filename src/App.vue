@@ -122,7 +122,7 @@ textarea {
 		<v-app-bar v-if="temaBio && escritorio" app flat height="64" class="bio-topbar">
 			<span class="bio-maquina"><span>{{ bioNombre.domo }}</span><span class="bio-marca-bio">{{ bioNombre.marca }}</span><span class="bio-tenue" style="font-weight: 500">{{ bioNombre.resto }}</span></span>
 			<status-label v-if="status" class="ml-4"></status-label>
-			<form class="bio-codigo" @submit.prevent="enviarCodigo">
+			<form v-if="$store.state.nivelUsuario >= 1" class="bio-codigo" @submit.prevent="enviarCodigo">
 				<label for="bio-codigo" class="d-sr-only">{{ $t('domotek.desktop.sendCode') }}</label>
 				<input id="bio-codigo" v-model="codigoEscritorio" type="text" autocomplete="off" spellcheck="false" :placeholder="$t('domotek.desktop.sendCodePlaceholder')">
 				<button type="submit" :disabled="!codigoEscritorio.trim()">{{ $t('domotek.desktop.send') }}</button>
@@ -196,6 +196,11 @@ textarea {
 
 			<v-divider v-show="!hideGlobalContainer || $vuetify.breakpoint.mdAndUp"></v-divider>
 
+			<!-- domotek: barra de código en modo táctil con ventana ancha (sustituye al contenedor antiguo) -->
+			<div v-if="temaBio && !escritorio && ventanaAncha" class="bio-barra-codigo">
+				<code-input class="flex-grow-1"></code-input>
+				<div style="width: 220px"><emergency-btn></emergency-btn></div>
+			</div>
 			<!-- domotek: panel de control del modo escritorio -->
 			<div v-if="mostrarHome && temaBio && escritorio" class="pa-4">
 				<bio-escritorio-panel></bio-escritorio-panel>
@@ -570,6 +575,13 @@ export default {
 		enviarCodigo() { // domotek: barra superior del modo escritorio
 			const codigo = this.codigoEscritorio.trim();
 			if (!codigo) { return; }
+			// Códigos de Domotek para cambiar el nivel de usuario (igual que CodeInput): no se envían a la placa
+			const clave = codigo.toUpperCase();
+			if (clave === 'D500' || clave === 'E500') {
+				this.$store.commit('cambiarUsuario', clave);
+				this.codigoEscritorio = '';
+				return;
+			}
 			this.$store.dispatch('machine/sendCode', { code: codigo, fromInput: true });
 			this.codigoEscritorio = '';
 		},
