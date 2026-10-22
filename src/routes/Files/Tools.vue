@@ -29,7 +29,7 @@
 </style>
 
 <template>
-	<v-row class="mb-0 pb-10">
+	<v-row class="mb-0" :class="{ 'pb-10': !temaBio }">
 		<!-- <v-col cols="6" class="ml-2 mt-2">
 			<span> <v-icon small>mdi-screwdriver</v-icon> Tools directory</span>
 		</v-col> -->
@@ -1136,7 +1136,7 @@
 		<!--																						 -->
 		<!-- DOMOTEK DOMOTEK DOMOTEK DOMOTEK DOMOTEK DOMOTEK DOMOTEK DOMOTEK DOMOTEK DOMOTEK DOMOTEK -->
 
-		<v-col cols="12" align="center" class="mt-2">	
+		<v-col v-if="!temaBio" cols="12" align="center" class="mt-2">	
 			<!-- <v-btn-toggle class="blue lighten-4" v-model="numTool" color="teal" rounded>
 				<v-btn v-if="nameTools.length > 0" :value="0" class=" ma-2 blue lighten-5" @click="ChangeTool(0), camaClick = false">{{ $t('domotek.tools.t0') }}</v-btn>
 				<v-btn v-if="nameTools.length > 1" :value="1" class=" ma-2 blue lighten-5" @click="ChangeTool(1), camaClick = false">{{ $t('domotek.tools.t1') }}</v-btn>
