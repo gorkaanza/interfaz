@@ -1565,7 +1565,11 @@
       "reset": "Reset to 100 %",
       "done": "Done",
       "speedHint": "Scales the speed of every move in the job.",
-      "extrusionHint": "Scales the material each tool pushes out."
+      "extrusionHint": "Scales the material each tool pushes out.",
+      "applyTo": "Apply to",
+      "allTools": "All",
+      "mixed": "mixed",
+      "mixedHint": "The tools have different values: moving the slider sets them all to the same value."
     }
   }
 }

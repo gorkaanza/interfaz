@@ -1567,7 +1567,11 @@
       "reset": "Restablecer 100 %",
       "done": "Hecho",
       "speedHint": "Multiplica la velocidad de todos los movimientos del trabajo.",
-      "extrusionHint": "Multiplica el material que sale de cada tool."
+      "extrusionHint": "Multiplica el material que sale de cada tool.",
+      "applyTo": "Aplicar a",
+      "allTools": "Todos",
+      "mixed": "distintos",
+      "mixedHint": "Los tools tienen valores distintos: al mover el deslizador se igualan todos."
     }
   }
 }

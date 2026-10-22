@@ -40,7 +40,14 @@
 		<!-- Velocidad y extrusión -->
 		<template v-else>
 			<p class="bio-aj-nota arriba">{{ tipo === 'velocidad' ? $t('domotek.ajuste.speedHint') : $t('domotek.ajuste.extrusionHint') }}</p>
-			<div class="bio-aj-filas" :class="{ varias: filas.length > 1 }">
+			<!-- Extrusión: el usuario elige a qué tool (o a todos) se aplica el deslizador -->
+			<div v-if="tipo === 'extrusion' && extrusores.length > 1" class="bio-aj-tools" role="radiogroup" :aria-label="$t('domotek.ajuste.applyTo')">
+				<button v-for="e in opcionesTool" :key="e.id" type="button" role="radio" :aria-checked="seleccion === e.id" :class="{ activo: seleccion === e.id }" @click="seleccion = e.id">
+					<span class="nom">{{ e.nombre }}</span>
+					<span class="val" :class="{ cambiado: e.valor !== null && e.valor !== 100 }">{{ e.valor === null ? $t('domotek.ajuste.mixed') : e.valor + ' %' }}</span>
+				</button>
+			</div>
+			<div class="bio-aj-filas">
 				<div v-for="f in filas" :key="f.id" class="bio-aj-fila">
 					<span class="nombre">{{ f.nombre }}</span>
 					<button type="button" class="menos" :disabled="uiFrozen || f.valor <= minimo" :aria-label="`${f.nombre} −${salto} %`" @click="fijar(f, f.valor - salto)">−</button>
@@ -48,13 +55,14 @@
 					<button type="button" class="mas" :disabled="uiFrozen || f.valor >= maximo" :aria-label="`${f.nombre} +${salto} %`" @click="fijar(f, f.valor + salto)">+</button>
 					<strong class="valor" :class="{ cambiado: f.valor !== 100 }">{{ f.valor }}<small> %</small></strong>
 				</div>
+				<p v-if="tipo === 'extrusion' && seleccion === 'todos' && valoresDistintos" class="bio-aj-nota centro">{{ $t('domotek.ajuste.mixedHint') }}</p>
 				<p v-if="!filas.length" class="bio-aj-nota">{{ $t('panel.extrusionFactors.noExtruders') }}</p>
 			</div>
 			<div v-if="filas.length" class="bio-aj-atajos">
-				<button v-for="v in atajos" :key="v" type="button" :class="{ activo: filas.every(f => f.valor === v) }" :disabled="uiFrozen" @click="filas.forEach(f => fijar(f, v))">{{ v }} %</button>
+				<button v-for="v in atajos" :key="v" type="button" :class="{ activo: objetivos.every(f => f.valor === v) }" :disabled="uiFrozen" @click="filas.forEach(f => fijar(f, v))">{{ v }} %</button>
 			</div>
 			<div class="bio-aj-pie">
-				<button type="button" class="bio-teclado-sec" :disabled="uiFrozen || filas.every(f => f.valor === 100)" @click="filas.forEach(f => fijar(f, 100))">{{ $t('domotek.ajuste.reset') }}</button>
+				<button type="button" class="bio-teclado-sec" :disabled="uiFrozen || objetivos.every(f => f.valor === 100)" @click="filas.forEach(f => fijar(f, 100))">{{ $t('domotek.ajuste.reset') }}</button>
 				<button type="button" class="bio-teclado-ok" :class="tipo === 'velocidad' ? 'hum' : ''" @click="$emit('cerrar')">{{ $t('domotek.ajuste.done') }}</button>
 			</div>
 		</template>
@@ -77,6 +85,7 @@ export default {
 			salto: 5,
 			minimo: 10,
 			maximo: 200,
+			seleccion: null,		// extrusión: id del extrusor elegido ('e0', 'e1'…) o 'todos'
 			pendientes: {},		// valores enviados que el object model aún no ha devuelto
 			temporizadores: {}
 		}
@@ -107,14 +116,7 @@ export default {
 			}
 			return [{ id: 'z1', nombre: this.$t('domotek.ajuste.current'), valor: fmt(this.babystepZ) }];
 		},
-		atajos() {
-			return [50, 75, 100, 125, 150];
-		},
-		filas() {
-			if (this.tipo === 'velocidad') {
-				const v = this.pendientes.vel !== undefined ? this.pendientes.vel : Math.round((this.move.speedFactor || 1) * 100);
-				return [{ id: 'vel', nombre: this.$t('domotek.jobs.speed'), valor: v }];
-			}
+		extrusores() {
 			return (this.move.extruders || []).map((e, i) => {
 				const tool = (this.tools || []).find(t => t && (t.extruders || []).includes(i));
 				const id = 'e' + i;
@@ -124,6 +126,35 @@ export default {
 					valor: this.pendientes[id] !== undefined ? this.pendientes[id] : Math.round((e && e.factor !== undefined ? e.factor : 1) * 100)
 				};
 			});
+		},
+		valoresDistintos() {
+			return new Set(this.extrusores.map(e => e.valor)).size > 1;
+		},
+		opcionesTool() {
+			return [
+				{ id: 'todos', nombre: this.$t('domotek.ajuste.allTools'), valor: this.valoresDistintos ? null : (this.extrusores[0] || {}).valor },
+				...this.extrusores
+			];
+		},
+		objetivos() { // valores a los que afectan los atajos y el botón de restablecer
+			return (this.tipo === 'extrusion' && this.filas.length && this.filas[0].todos) ? this.extrusores : this.filas;
+		},
+		atajos() {
+			return [50, 75, 100, 125, 150];
+		},
+		filas() {
+			if (this.tipo === 'velocidad') {
+				const v = this.pendientes.vel !== undefined ? this.pendientes.vel : Math.round((this.move.speedFactor || 1) * 100);
+				return [{ id: 'vel', nombre: this.$t('domotek.jobs.speed'), valor: v }];
+			}
+			// Extrusión: un único deslizador para el tool elegido (o para todos)
+			if (!this.extrusores.length) { return []; }
+			if (this.extrusores.length === 1) { return this.extrusores; }
+			if (this.seleccion === 'todos' || !this.seleccion) {
+				const v = this.pendientes.todos !== undefined ? this.pendientes.todos : this.extrusores[0].valor;
+				return [{ id: 'todos', nombre: this.$t('domotek.ajuste.allTools'), valor: v, todos: true }];
+			}
+			return this.extrusores.filter(e => e.id === this.seleccion);
 		}
 	},
 	methods: {
@@ -142,10 +173,24 @@ export default {
 		fijar(f, v) {
 			const valor = this.limitar(v);
 			this.recordar(f, valor);
-			this.sendCode(this.tipo === 'velocidad' ? `M220 S${valor}` : `M221 D${f.extrusor} S${valor}`);
+			if (this.tipo === 'velocidad') {
+				this.sendCode(`M220 S${valor}`);
+			} else if (f.todos) {
+				this.extrusores.forEach(e => this.recordar(e, valor));
+				this.sendCode(this.extrusores.map(e => `M221 D${e.extrusor} S${valor}`).join('\n'));
+			} else {
+				this.sendCode(`M221 D${f.extrusor} S${valor}`);
+			}
 		}
 	},
 	mounted() {
+		// Extrusión: empieza en el tool seleccionado ahora, si tiene extrusor
+		if (this.tipo === 'extrusion') {
+			const m = this.$store.state.machine.model;
+			const actual = (m.tools || [])[m.state.currentTool];
+			const ext = actual && (actual.extruders || [])[0];
+			this.seleccion = (ext !== undefined && this.extrusores.some(e => e.extrusor === ext)) ? 'e' + ext : 'todos';
+		}
 		if (this.babystepAmount && !this.pasosZ.includes(this.babystepAmount)) {
 			this.pasosZ = [...this.pasosZ, this.babystepAmount].sort((a, b) => a - b);
 		}
