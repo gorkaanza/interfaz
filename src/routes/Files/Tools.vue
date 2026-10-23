@@ -690,7 +690,36 @@
 								</v-col>	
 							</v-row>
 							</template>
-								<v-dialog v-model="dialogOffsetsVisible" max-width="500px">
+								<!-- domotek: offsets de tool / plataforma con el diseño nuevo -->
+								<v-dialog v-if="temaBio" v-model="dialogOffsetsVisible" max-width="620" content-class="bio-teclado-dialogo">
+									<div class="bio-off">
+										<header class="bio-teclado-cab">
+											<span class="bio-teclado-icono" :class="offsetDatos.tipo === 'tool' && !offsetDatos.calibrado ? '' : 'acento'"><v-icon>{{ offsetDatos.tipo === 'plataforma' ? 'mdi-radiator' : 'mdi-tune-variant' }}</v-icon></span>
+											<span class="bio-teclado-nombre">{{ offsetDatos.titulo }}</span>
+											<span v-if="offsetDatos.tipo === 'tool'" class="bio-off-estado" :class="{ ok: offsetDatos.calibrado }">
+												<v-icon small>{{ offsetDatos.calibrado ? 'mdi-check-circle' : 'mdi-alert-circle-outline' }}</v-icon>{{ offsetDatos.calibrado ? $t('panel.tools.calibrado') : $t('panel.tools.noCalibrado') }}
+											</span>
+											<button type="button" class="bio-teclado-cerrar" :aria-label="$t('generic.close')" @click="dialogOffsetsVisible = false"><v-icon>mdi-close</v-icon></button>
+										</header>
+										<p v-if="offsetDatos.tipo === 'error'" class="bio-off-nota aviso">{{ offsetDatos.error }}</p>
+										<div v-else-if="offsetDatos.tipo === 'tool'" class="bio-off-ejes">
+											<div v-for="e in offsetDatos.ejes" :key="e.eje"><span>{{ e.eje }}</span><strong>{{ e.valor }}<small v-if="e.valor !== '—'"> mm</small></strong></div>
+										</div>
+										<div v-else class="bio-off-puentes">
+											<div v-for="pu in offsetDatos.puentes" :key="pu.eje">
+												<span class="tit">{{ pu.titulo }}</span>
+												<div class="mm"><span>{{ $t('domotek.offsets.min') }}</span><strong>{{ pu.min }}<small v-if="pu.min !== '—'"> mm</small></strong></div>
+												<div class="mm"><span>{{ $t('domotek.offsets.max') }}</span><strong>{{ pu.max }}<small v-if="pu.max !== '—'"> mm</small></strong></div>
+											</div>
+										</div>
+										<p v-if="offsetDatos.tipo === 'tool'" class="bio-off-nota" :class="{ aviso: !offsetDatos.calibrado }">{{ offsetDatos.calibrado ? $t('domotek.offsets.calibratedHint') : $t('domotek.offsets.notCalibratedHint') }}</p>
+										<div class="bio-off-pie">
+											<button v-if="offsetDatos.tipo === 'tool'" type="button" class="bio-teclado-sec" @click="dialogOffsetsVisible = false; DialogCalibration = true"><v-icon small>mdi-axis-arrow</v-icon>{{ $t('domotek.offsets.calibrate') }}</button>
+											<button type="button" class="bio-teclado-ok acento" @click="dialogOffsetsVisible = false">{{ $t('generic.close') }}</button>
+										</div>
+									</div>
+								</v-dialog>
+								<v-dialog v-else v-model="dialogOffsetsVisible" max-width="500px">
 									<v-card>
 										<v-card-title class="headline grey lighten-2">
 										{{ offsetTitulo }}
@@ -1381,6 +1410,7 @@ export default {
 			dialogOffsetsVisible: false, 
 			offsetTexto: '',  
 			offsetTitulo: '',
+			offsetDatos: { tipo: 'tool', titulo: '', calibrado: false, ejes: [], puentes: [], error: '' }, // domotek: datos del diálogo nuevo
 			currentTool: null ,
 			toolClickTemperature: null,
 			marcadorHumedad: false,
@@ -2057,9 +2087,20 @@ export default {
 				: this.$t('panel.tools.toolNoCalibrado');
 
 				this.offsetTexto = displayText;
+				const g = this.$store.state.machine.model.global || {};
+				this.offsetDatos = { // domotek
+					tipo: 'tool', calibrado: !!calibrado, puentes: [], error: '',
+					titulo: `T${toolNumber + 1}` + (g[`T${toolNumber}Name`] ? ` · ${g[`T${toolNumber}Name`]}` : ''),
+					ejes: [
+						{ eje: 'X', valor: x ?? '—' },
+						{ eje: axisConfig.label2.replace(/[: ]/g, ''), valor: secondAxis ?? '—' },
+						{ eje: axisConfig.label3.replace(/[: ]/g, ''), valor: zOrA ?? '—' }
+					]
+				};
 			} catch (err) {
 				this.offsetTitulo = '❌ Error al obtener offsets';
 				this.offsetTexto = '';
+				this.offsetDatos = { tipo: 'error', titulo: `T${toolNumber + 1}`, calibrado: false, ejes: [], puentes: [], error: this.$t('domotek.offsets.error') };
 			}
 
 			this.dialogOffsetsVisible = true;
@@ -2090,9 +2131,18 @@ export default {
 
 				this.offsetTitulo = this.$t('panel.tools.platformOffsets'); // o un texto como "Offsets de la plataforma"
 				this.offsetTexto = displayText;
+				const na = v => (v === 'N/A' ? '—' : v);
+				this.offsetDatos = { // domotek
+					tipo: 'plataforma', titulo: this.$t('panel.tools.platformOffsets'), calibrado: true, ejes: [], error: '',
+					puentes: [
+						{ eje: 'Z', titulo: this.$t('domotek.offsets.leftBridge'), min: na(zMin), max: na(zMax) },
+						{ eje: 'A', titulo: this.$t('domotek.offsets.rightBridge'), min: na(aMin), max: na(aMax) }
+					]
+				};
 			} catch (err) {
 				this.offsetTitulo = '❌ Error al obtener offsets de la plataforma';
 				this.offsetTexto = '';
+				this.offsetDatos = { tipo: 'error', titulo: this.$t('panel.tools.platformOffsets'), calibrado: false, ejes: [], puentes: [], error: this.$t('domotek.offsets.error') };
 			}
 
 			this.dialogOffsetsVisible = true;

@@ -1160,3 +1160,24 @@ $bio-home-si: var(--bio-home-si);
 	.bio-co-atajos button { height: 40px; border-radius: 12px; background: $bio-sup2 !important; font-size: 13px; font-weight: 500; font-variant-numeric: tabular-nums;
 		&.activo { background: $bio-acento-bg !important; color: $bio-acento !important; font-weight: 600; } }
 }
+
+// Offsets de tool / plataforma (Tools.vue)
+.tema-bio {
+	.bio-off {
+		background: $bio-sup; border-radius: 22px; padding: 16px; box-sizing: border-box; color: $bio-texto; font-size: 14px;
+		display: flex; flex-direction: column; gap: 14px;
+		button { font-family: inherit; color: inherit; border: none; cursor: pointer; }
+	}
+	.bio-off-estado { display: inline-flex; align-items: center; gap: 5px; border-radius: 999px; padding: 4px 12px; font-size: 13px; font-weight: 600; white-space: nowrap;
+		background: $bio-calor-bg; color: $bio-calor; .v-icon { color: inherit !important; }
+		&.ok { background: $bio-acento-bg; color: $bio-acento; } }
+	.bio-off-ejes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+	.bio-off-ejes > div, .bio-off-puentes .mm { background: $bio-sup2; border-radius: 14px; padding: 10px 14px; display: flex; flex-direction: column; gap: 2px; min-width: 0;
+		span { font-size: 13px; color: $bio-tenue; font-weight: 600; }
+		strong { font-size: 28px; font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; small { font-size: 14px; color: $bio-tenue; font-weight: 400; } } }
+	.bio-off-puentes { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+	.bio-off-puentes > div { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; .tit { grid-column: span 2; font-size: 13px; color: $bio-tenue; } strong { font-size: 22px; } }
+	.bio-off-nota { margin: 0; font-size: 13px; color: $bio-tenue; &.aviso { color: $bio-calor; } }
+	.bio-off-pie { display: flex; justify-content: flex-end; gap: 10px; }
+	.bio-off-pie button { min-width: 140px; padding: 0 18px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; .v-icon { color: inherit !important; } }
+}

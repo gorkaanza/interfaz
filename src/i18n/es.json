@@ -1605,6 +1605,16 @@
       "applied": "Esta es la mezcla aplicada.",
       "notApplied": "Sin aplicar: pulsa Aplicar para guardar la mezcla.",
       "apply": "Aplicar {0} / {1}"
+    },
+    "offsets": {
+      "min": "Mínimo",
+      "max": "Máximo",
+      "leftBridge": "Puente izquierdo (Z)",
+      "rightBridge": "Puente derecho (A)",
+      "calibratedHint": "Offsets guardados en la última calibración de este tool.",
+      "notCalibratedHint": "Este tool aún no está calibrado: los offsets pueden no ser correctos.",
+      "calibrate": "Calibrar",
+      "error": "No se han podido leer los offsets de la impresora."
     }
   }
 }

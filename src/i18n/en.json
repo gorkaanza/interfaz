@@ -1603,6 +1603,16 @@
       "applied": "This is the applied mix.",
       "notApplied": "Not applied: press Apply to save the mix.",
       "apply": "Apply {0} / {1}"
+    },
+    "offsets": {
+      "min": "Minimum",
+      "max": "Maximum",
+      "leftBridge": "Left bridge (Z)",
+      "rightBridge": "Right bridge (A)",
+      "calibratedHint": "Offsets saved in this tool's last calibration.",
+      "notCalibratedHint": "This tool is not calibrated yet: the offsets may be wrong.",
+      "calibrate": "Calibrate",
+      "error": "The offsets could not be read from the printer."
     }
   }
 }
