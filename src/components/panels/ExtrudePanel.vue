@@ -1,5 +1,59 @@
 <template>
-	<v-card class="blue lighten-4">
+	<!-- domotek: extruir con el diseño nuevo (diálogo del panel de movimiento) -->
+	<div v-if="temaBio" class="bio-ex">
+		<header class="bio-teclado-cab">
+			<span class="bio-teclado-icono acento"><v-icon>mdi-printer-3d-nozzle-outline</v-icon></span>
+			<span class="bio-teclado-nombre">{{ $t('domotek.extrude.title') }}</span>
+			<span v-if="bioTool" class="bio-ex-tool">
+				<strong>{{ bioTool }}</strong>
+				<span v-if="bioTemp" :class="{ frio: bioFrio }">{{ bioTemp }}</span>
+			</span>
+			<button type="button" class="bio-teclado-cerrar" :aria-label="$t('generic.close')" @click="$emit('cerrar')"><v-icon>mdi-close</v-icon></button>
+		</header>
+
+		<div class="bio-ex-cuerpo">
+			<section class="bio-ex-ajustes">
+				<div v-if="currentTool && currentTool.extruders.length > 1" class="bio-ex-grupo">
+					<span class="et">{{ $t('panel.extrude.mixRatio') }}</span>
+					<div class="bio-ex-chips">
+						<button type="button" :class="{ activo: mixValue.indexOf('mix') !== -1 }" :disabled="uiFrozen" @click="mix = ['mix']">{{ $t('panel.extrude.mix') }}</button>
+						<button v-for="e in currentTool.extruders" :key="e" type="button" :class="{ activo: mixValue.indexOf(e) !== -1 }" :disabled="uiFrozen" @click="bioAlternarMezcla(e)">E{{ e }}</button>
+					</div>
+				</div>
+				<div class="bio-ex-grupo">
+					<span class="et">{{ $t('domotek.extrude.amount') }} <small>mm</small></span>
+					<div class="bio-ex-chips">
+						<button v-for="(v, i) in extruderAmounts" :key="'a' + i" type="button" :class="{ activo: amount === v }" :disabled="uiFrozen" @click="amount = v" @contextmenu.prevent="editAmount(i)">{{ v }}</button>
+					</div>
+				</div>
+				<div class="bio-ex-grupo">
+					<span class="et">{{ $t('domotek.extrude.speed') }} <small>mm/s</small></span>
+					<div class="bio-ex-chips">
+						<button v-for="(v, i) in currentFeedrates" :key="'f' + i" type="button" :class="{ activo: feedrate === v }" :disabled="uiFrozen" @click="feedrate = v" @contextmenu.prevent="editFeedrate(i)">{{ v }}</button>
+					</div>
+				</div>
+				<p class="bio-ex-nota" :class="{ aviso: !!bioAviso }">{{ bioAviso || $t('domotek.extrude.hint') }}</p>
+			</section>
+
+			<section class="bio-ex-botones">
+				<button type="button" class="bio-ex-btn" :disabled="uiFrozen || !canRetract || busy" @click="buttonClicked(false)">
+					<v-icon>mdi-arrow-up-bold</v-icon>
+					<strong>−{{ amount }} mm</strong>
+					<span>{{ $t('panel.extrude.retract') }}</span>
+				</button>
+				<button type="button" class="bio-ex-btn principal" :disabled="uiFrozen || !canExtrude || busy" @click="buttonClicked(true)">
+					<v-progress-circular v-if="busy" indeterminate size="28" width="3"></v-progress-circular>
+					<v-icon v-else>mdi-arrow-down-bold</v-icon>
+					<strong>+{{ amount }} mm</strong>
+					<span>{{ $t('panel.extrude.extrude') }} · {{ feedrate }} mm/s</span>
+				</button>
+			</section>
+		</div>
+
+		<input-dialog :shown.sync="editAmountDialog.shown" :title="$t('dialog.editExtrusionAmount.title')" :prompt="$t('dialog.editExtrusionAmount.prompt')" :preset="editAmountDialog.preset" is-numeric-value @confirmed="setAmount"></input-dialog>
+		<input-dialog :shown.sync="editFeedrateDialog.shown" :title="$t('dialog.editExtrusionFeedrate.title')" :prompt="$t('dialog.editExtrusionFeedrate.prompt')" :preset="editFeedrateDialog.preset" is-numeric-value @confirmed="setFeedrate"></input-dialog>
+	</div>
+	<v-card v-else class="blue lighten-4">
 		<v-card-title class="pb-0">
 			<v-row>
 				<v-col cols="4">
@@ -311,6 +365,33 @@ export default {
 					}
 			}
 		}, 
+		temaBio() { return this.$store.state.settings.temaBio; }, // domotek
+		bioTool() {
+			const n = this.toolsActiveName;
+			if (n && n !== 'None' && n !== 'active') { return n; }
+			return this.currentTool ? (this.currentTool.name || `T${this.currentTool.number}`) : '';
+		},
+		bioHeater() {
+			const i = this.toolsActiveHeater1Index;
+			return (typeof i === 'number' && i >= 0 && this.heaterTools && this.heaterTools[i]) ? this.heaterTools[i] : null;
+		},
+		bioTemp() {
+			const h = this.bioHeater;
+			if (!h) { return ''; }
+			const actual = (h.current <= -273) ? '—' : this.$display(h.current, 1);
+			return `${actual} / ${this.$display(h.active || 0, 0)} °C`;
+		},
+		bioFrio() {
+			const h = this.bioHeater;
+			return !!h && h.current < (this.heat.coldExtrudeTemperature || 0);
+		},
+		bioAviso() { // por qué no se puede extruir
+			if (!this.currentTool) { return this.$t('domotek.extrude.noTool'); }
+			if (!this.currentTool.extruders.length) { return this.$t('domotek.extrude.noExtruder'); }
+			if (!this.canExtrude && this.state.status === StatusType.processing) { return this.$t('domotek.extrude.printing'); }
+			if (!this.canExtrude) { return this.$t('domotek.extrude.cold', [this.$display(this.heat.coldExtrudeTemperature || 0, 0)]); }
+			return '';
+		},
 		currentFeedrates() {
 			const syrTools = ["SYR-ES", "SYR", "SYR-HEAT", "COAX(P)"];
 			if (syrTools.includes(this.toolsActiveName)) {
@@ -365,6 +446,12 @@ export default {
 				// handled before we get here
 			}
 			this.busy = false;
+		},
+		bioAlternarMezcla(e) {
+			const sel = this.mixValue.filter(x => x !== 'mix');
+			const i = sel.indexOf(e);
+			if (i === -1) { sel.push(e); } else if (sel.length > 1) { sel.splice(i, 1); }
+			this.mixValue = sel;
 		},
 		editAmount(index) {
 			this.editAmountDialog.index = index;

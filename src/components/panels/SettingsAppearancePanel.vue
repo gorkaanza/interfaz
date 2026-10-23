@@ -49,6 +49,16 @@
 						hide-details
 					/>
 				</v-col>
+				<!-- domotek: modo claro / modo oscuro (se guarda en este navegador) -->
+				<v-col cols="12" v-if="settings.temaBio">
+					<div class="bio-ajuste-modo">
+						<span>{{ $t('domotek.settings.colorMode') }}</span>
+						<div class="bio-segmentos" role="radiogroup" :aria-label="$t('domotek.settings.colorMode')">
+							<button type="button" role="radio" class="bio-seg" :class="{ activo: !modoClaro }" :aria-checked="!modoClaro" @click="modoClaro = false"><v-icon small>mdi-weather-night</v-icon>{{ $t('domotek.settings.darkMode') }}</button>
+							<button type="button" role="radio" class="bio-seg" :class="{ activo: modoClaro }" :aria-checked="modoClaro" @click="modoClaro = true"><v-icon small>mdi-white-balance-sunny</v-icon>{{ $t('domotek.settings.lightMode') }}</button>
+						</div>
+					</div>
+				</v-col>
 				<v-col cols="12" v-if="tieneLeds">
 					<div class="d-flex align-center">
 						<span class="mr-4 text-subtitle-2 font-weight-regular black--text">
@@ -107,7 +117,8 @@
 					</v-btn>
 				</v-col>
 				
-				<v-col cols="12" v-if="$store.state.nivelUsuario >= 1">
+				<!-- domotek: las actualizaciones solo desde el ordenador, no en la pantalla de la impresora -->
+				<v-col cols="12" v-if="$store.state.nivelUsuario >= 1 && escritorio">
 						<v-btn @click="cambiarRuta('/Files/Updates')" height="70px" block color="blue lighten-4" rounded>
 							<v-row>
 								<v-col>
@@ -228,11 +239,18 @@ import { mapState, mapMutations, mapActions } from 'vuex'
 
 import { DashboardMode } from '@/store/settings'
 import { UnitOfMeasure } from '../../store/settings';
+import { esClaro, fijarClaro } from '../../utils/temaBio.js'
+import { esEscritorio } from '../../utils/modoPantalla.js'
 
 export default {
 	
 	computed: {
 		...mapState(['settings', "machine"]),
+		escritorio() { return esEscritorio(); }, // domotek
+		modoClaro: { // domotek
+			get() { return esClaro(); },
+			set(value) { fijarClaro(value); }
+		},
 		usuarioAvanzado: {
 			get() { return this.settings.usuarioAvanzado; },
 			set(value) { this.update({ usuarioAvanzado: value }); },

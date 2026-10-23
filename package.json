@@ -8,6 +8,7 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
+    "build:slicer": "vue-cli-service build --mode slicer",
     "build-plugin": "node scripts/build-plugin.js",
     "report": "vue-cli-service build --report",
     "lint": "vue-cli-service lint"
@@ -16,6 +17,8 @@
     "@babylonjs/core": "^5.8.0",
     "@babylonjs/gui": "^5.8.0",
     "@babylonjs/materials": "^5.8.0",
+    "@fontsource/ibm-plex-mono": "^5.2.7",
+    "@fontsource/ibm-plex-sans": "^5.2.8",
     "@sindarius/gcodeviewer": "^3.1.2",
     "chart.js": "^2.9.4",
     "chartjs-adapter-date-fns": "^1.0.0",

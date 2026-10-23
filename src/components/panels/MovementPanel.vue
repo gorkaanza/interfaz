@@ -73,7 +73,56 @@
 			</v-menu> -->
 		<!-- </v-card-title> -->
 
-		<v-card-text v-show="visibleAxes.length !== 0" class="pb-0">
+		<!-- domotek: Movimiento con el tema oscuro -->
+		<div v-if="temaBio" v-show="visibleAxes.length !== 0" class="bio-mov">
+			<section class="bio-pos">
+				<div v-for="(axis, index) in visibleAxes" :key="index" class="bio-pos-eje">
+					<div class="et">{{ bioEtiquetaEje(index, axis) }}</div>
+					<div class="vl" :class="{ 'sin-home': !axis.homed }">{{ bioPosicion(axis) }}</div>
+				</div>
+				<code-btn code="G28" :title="$t('button.home.titleAll')" class="bio-home" :class="{ ok: bioTodoHomed }" no-wait>
+					<v-icon left>mdi-home-outline</v-icon>{{ $t('button.home.captionAll') }}
+				</code-btn>
+			</section>
+
+			<section class="bio-mandos">
+				<div class="bio-cruz">
+					<div></div>
+					<code-btn class="bio-flecha" :code="boards.length > 2 ? `M120\nG91\nG1 Y${sizeMove}\nG90\nM121`:`M120\nG91\nG1 Y-${sizeMove}\nG90\nM121`" no-wait :title="'Y +'"><v-icon>mdi-arrow-up</v-icon>Y</code-btn>
+					<div></div>
+					<code-btn class="bio-flecha col" :code="modeloMaquina != '2A' ? `M120\nG91\nG1 X${sizeMove}\nG90\nM121`:`M120\nG91\nG1 X-${sizeMove}\nG90\nM121`" no-wait :title="'X −'"><v-icon>mdi-arrow-left</v-icon>X</code-btn>
+					<div class="bio-cruz-centro">
+						<div class="bio-segmentos" role="group" :aria-label="$t('domotek.movePanel.toolToMove')">
+							<code-btn v-for="i in (modeloMaquina != '2A' ? [0, 1, 2, 3] : [0, 1])" :key="i" class="bio-seg" :class="{ activo: bioToolActivo === i }" :code="bioToolActivo === i ? `t-1` : `t${i}`" no-wait>
+								{{ $t('domotek.tools.T' + i + 'Mini') }}
+							</code-btn>
+						</div>
+					</div>
+					<code-btn class="bio-flecha col" :code="modeloMaquina != '2A' ? `M120\nG91\nG1 X-${sizeMove}\nG90\nM121`:`M120\nG91\nG1 X${sizeMove}\nG90\nM121`" no-wait :title="'X +'"><v-icon>mdi-arrow-right</v-icon>X</code-btn>
+					<div></div>
+					<code-btn class="bio-flecha" :code="modeloMaquina != '2A' ? `M120\nG91\nG1 Y-${sizeMove}\nG90\nM121`:`M120\nG91\nG1 Y${sizeMove}\nG90\nM121`" no-wait :title="'Y −'"><v-icon>mdi-arrow-down</v-icon>Y</code-btn>
+					<div></div>
+				</div>
+				<div class="bio-z">
+					<code-btn class="bio-flecha" :code="`M120\nG91\nG1 Z${sizeMove} F2000\nG90\nM121`" no-wait :title="'Z +'"><v-icon>mdi-arrow-up</v-icon></code-btn>
+					<span class="bio-tenue">Z</span>
+					<code-btn class="bio-flecha" :code="`M120\nG91\nG1 Z-${sizeMove} F2000\nG90\nM121`" no-wait :title="'Z −'"><v-icon>mdi-arrow-down</v-icon></code-btn>
+				</div>
+			</section>
+
+			<section class="bio-mov-abajo">
+				<div class="bio-segmentos bio-pasos" role="group" :aria-label="$t('domotek.movePanel.stepSize')">
+					<button v-for="(d, k) in [1, 5, 25, 50, 100]" :key="d" type="button" class="bio-seg" :class="{ activo: sizeMove === d }" @click="changeSizeMove(d), toggleMove = k">{{ d }}</button>
+					<span class="bio-tenue bio-mm">mm</span>
+				</div>
+				<div style="flex: 1"></div>
+				<button type="button" class="bio-accion" @click="disableSteppers"><v-icon>mdi-engine-off-outline</v-icon><span class="bio-cap">{{ $t('domotek.movePanel.disableSteppers') }}</span></button>
+				<button type="button" class="bio-accion" @click="dialogExtrude = true"><v-icon>mdi-printer-3d-nozzle-outline</v-icon><span class="bio-cap">{{ $t('domotek.movePanel.extrude') }}</span></button>
+				<button v-if="CLCapable" type="button" class="bio-accion" @click="DialogClean = true"><v-icon>mdi-brush-variant</v-icon><span class="bio-cap">{{ $t('domotek.jobs.clean') }}</span></button>
+			</section>
+		</div>
+
+		<v-card-text v-if="!temaBio" v-show="visibleAxes.length !== 0" class="pb-0">
 			<!-- Mobile home buttons -->
 			<v-row class="mt-2"></v-row>
 			<position-panel></position-panel>
@@ -313,7 +362,15 @@
 						</v-btn>
 					</v-col>	
 
-				<v-dialog v-model="dialogExtrude" class="mb-0 pb-0">
+
+			</v-row>
+		</v-card-text>
+
+				<!-- domotek: extruir con el diseño nuevo -->
+				<v-dialog v-if="temaBio" v-model="dialogExtrude" max-width="760" content-class="bio-teclado-dialogo">
+					<extrude-panel v-if="dialogExtrude" @cerrar="dialogExtrude = false"></extrude-panel>
+				</v-dialog>
+				<v-dialog v-else v-model="dialogExtrude" class="mb-0 pb-0">
 					<v-btn @click="dialogExtrude = false" x-large block class="blue lighten-3">
 						<v-icon x-large> mdi-close </v-icon>
 					</v-btn>
@@ -328,9 +385,6 @@
 					<clean-panel v-on:close-dialog="closeDialog"></clean-panel>
 				</v-col>
 		</v-dialog>
-			</v-row>
-		</v-card-text>
-
 		<mesh-edit-dialog :shown.sync="showMeshEditDialog"></mesh-edit-dialog>
 		<input-dialog :shown.sync="moveStepDialog.shown" :title="$t('dialog.changeMoveStep.title')" :prompt="$t('dialog.changeMoveStep.prompt')" :preset="moveStepDialog.preset" is-numeric-value @confirmed="moveStepDialogConfirmed"></input-dialog>
 			<!-- IVAN - Luis -->
@@ -411,6 +465,20 @@ export default {
 		...mapGetters('machine/settings', ['moveSteps', 'numMoveSteps']),
 		isCompensationEnabled() { return this.move.compensation.type.toLowerCase() !== 'none' },
 		visibleAxes() { return this.move.axes.filter(axis => axis.visible); },
+		temaBio() { return this.$store.state.settings.temaBio; }, // domotek
+		bioTodoHomed() { // domotek: misma condición que el botón Home antiguo
+			const a = this.move.axes;
+			const n = (this.modeloMaquina === '2A') ? 4 : 7;
+			for (let i = 0; i < n; i++) { if (!a[i] || !a[i].homed) { return false; } }
+			return true;
+		},
+		bioToolActivo() {
+			try {
+				const g = this.$store.state.machine.model.global;
+				for (let i = 0; i < 4; i++) { if (g['T' + i + 'Activo']) { return i; } }
+			} catch (e) { /* sin globales */ }
+			return -1;
+		},
 		isDelta() {
 			return (this.move.kinematics.name === KinematicsName.delta ||
 					this.move.kinematics.name === KinematicsName.rotaryDelta);
@@ -636,6 +704,14 @@ export default {
 		},
 		changeAxis(letra){
 			this.letter = letra;
+		},
+		bioEtiquetaEje(index, axis) { // domotek: nombres de ejes como en PositionPanel
+			const nombres = { '2A': ['X0', 'Y', 'Z', 'X1'], '4A': ['X', 'Y1', 'Z1', 'Y2', 'Y3', 'Y4', 'Z2'], 'HK': ['X1', 'Y1', 'Z', 'X2', 'X3', 'X4', 'Y2'] };
+			const lista = nombres[this.modeloMaquina];
+			return (lista && lista[index]) ? lista[index] : axis.letter;
+		},
+		bioPosicion(axis) {
+			return (axis.letter === 'Z') ? this.$displayZ(axis.userPosition, false) : this.$display(axis.userPosition, 1);
 		},
 		changeSizeMove(size){
 			this.sizeMove = size;

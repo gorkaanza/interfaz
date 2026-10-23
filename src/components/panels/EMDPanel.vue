@@ -54,7 +54,169 @@
 </style>
 
 <template>
-	<v-row class="mb-0 pb-0">
+<div class="es-raiz">
+	<!-- domotek: solenoide con el tema oscuro -->
+	<div v-if="temaBio" class="bio-pp">
+		<header class="bio-proc-cab">
+			<button type="button" class="bio-volver" :aria-label="$t('domotek.tools.back')" @click="closeDialog"><v-icon>mdi-chevron-left</v-icon></button>
+			<v-icon color="var(--bio-acento)">mdi-magnet-on</v-icon>
+			<span class="bio-proc-titulo">{{ $t('domotek.proc.solenoid') }}</span>
+			<div style="flex: 1"></div>
+			<ol class="bio-cal-pasos">
+				<li v-for="p in bioPasos" :key="p.id"><button type="button" :class="{ activo: pasos === p.id }" :aria-current="pasos === p.id ? 'step' : null" @click="CambiaStep(p.id)">{{ p.texto }}</button></li>
+			</ol>
+		</header>
+
+		<!-- Resumen -->
+		<main v-show="pasos === 'S'" class="bio-proc-cuerpo">
+			<h2 class="bio-proc-h2">{{ $t('panel.emd.EMDSettings') }}
+				<span class="bio-proc-hv" :class="calculo.ok ? 'ok' : 'mal'"><v-icon small>{{ calculo.ok ? 'mdi-check-circle' : 'mdi-alert-circle' }}</v-icon>{{ calculo.ok ? $t('domotek.proc.calculated') : $t('panel.emd.solve_' + calculo.reason) }}</span>
+			</h2>
+			<div class="bio-proc-datos">
+				<div v-for="p in paramsByGroup('drop')" :key="p.key"><span>{{ $t(p.label) }}</span><strong>{{ bioNum(p) }}<small v-if="p.unit"> {{ p.unit }}</small></strong></div>
+				<div><span>{{ $t('panel.emd.temperature') }}</span><strong v-if="tempEnableEMD">{{ bioNum(param('tempEMD')) }}<small> °C</small></strong><strong v-else class="bio-tenue">{{ $t('domotek.proc.heatingOff') }}</strong></div>
+			</div>
+			<button type="button" class="bio-emd-calc" @click="dialogCalc = true">
+				<div v-for="c in bioCalc" :key="c.id"><span>{{ c.texto }}</span><strong>{{ c.valor }}<small v-if="c.unidad"> {{ c.unidad }}</small></strong></div>
+				<div><span>{{ $t('panel.emd.calibration') }}</span><span class="bio-emd-estado" :class="bioEstadoCalib">{{ estadoCalib.texto }}</span></div>
+				<v-icon>mdi-chevron-right</v-icon>
+			</button>
+			<div class="bio-proc-lista">
+				<div class="fila cab"><span>{{ $t('panel.emd.autoEMDMode') }}</span><span class="pildora" :class="{ on: enableEMD }">{{ enableEMD ? $t('domotek.proc.on') : $t('domotek.proc.off') }}</span></div>
+				<div class="fila" :class="{ tenue: !enableEMD }"><span>{{ $t('domotek.varios.applyEvery') }} {{ g('cadenceAmountEMD') }} {{ $t('domotek.varios.layers') }}</span><span>{{ cadenceEnableEMD ? $t('domotek.varios.yes') : $t('domotek.varios.no') }}</span></div>
+				<div class="fila" :class="{ tenue: !enableEMD }"><span>{{ $t('panel.ultraviolet.applyWhen') }}</span><span>{{ aplicarFinEMD ? $t('domotek.varios.yes') : $t('domotek.varios.no') }}</span></div>
+			</div>
+			<div style="flex: 1"></div>
+			<footer class="bio-cal-pie">
+				<button type="button" class="bio-cal-sec" @click="CambiaStep('1')"><span class="bio-cap">{{ $t('domotek.varios.change') }}</span></button>
+				<button type="button" class="bio-cal-sec listo" @click="StartSaveSettings"><span class="bio-cap">{{ $t('domotek.varios.save') }}</span></button>
+				<button type="button" class="bio-cal-sec" :disabled="!maquinaLibre || !calculo.ok" @click="StartTestShot"><span class="bio-cap">{{ $t('panel.emd.testShot') }}</span></button>
+				<button v-if="maquinaLibre" type="button" class="bio-cal-principal ancho" :disabled="!calculo.ok" @click="StartEMD">{{ $t('domotek.proc.run') }}</button>
+				<button v-else type="button" class="bio-cal-principal ancho aviso" :disabled="!calculo.ok" @click="StartEMDPausing">{{ $t('domotek.proc.pauseAndRun') }}</button>
+			</footer>
+		</main>
+
+		<!-- 1 · Gota y material -->
+		<main v-show="pasos === '1'" class="bio-proc-cuerpo">
+			<h2 class="bio-proc-h2">{{ $t('panel.emd.dropParams') }}</h2>
+			<div class="bio-proc-valores cuatro">
+				<button v-for="p in paramsByGroup('drop')" :key="p.key" type="button" @click="openParamDialog(p)"><span class="ic verde"><v-icon>{{ p.icon }}</v-icon></span><span>{{ $t(p.label) }}</span><strong>{{ bioNum(p) }}<small v-if="p.unit"> {{ p.unit }}</small></strong></button>
+				<button type="button" @click="openParamDialog(param('tempEMD'))"><span class="ic calor"><v-icon>{{ tempEnableEMD ? 'mdi-thermometer' : 'mdi-thermometer-off' }}</v-icon></span><span>{{ $t('panel.emd.temperature') }}</span><strong v-if="tempEnableEMD">{{ bioNum(param('tempEMD')) }}<small> °C</small></strong><strong v-else class="apagado">{{ $t('domotek.proc.heatingOff') }}</strong></button>
+			</div>
+			<button type="button" class="bio-emd-calc" @click="dialogCalc = true">
+				<div v-for="c in bioCalc" :key="c.id"><span>{{ c.texto }}</span><strong>{{ c.valor }}<small v-if="c.unidad"> {{ c.unidad }}</small></strong></div>
+				<div><span>{{ $t('panel.emd.viscAtTemp') }}</span><strong>{{ $display(viscActual, 1) }}<small> mPa·s</small></strong></div>
+				<v-icon>mdi-chevron-right</v-icon>
+			</button>
+			<p v-if="!calculo.ok" class="bio-proc-nota bio-peligro-txt">{{ $t('panel.emd.solve_' + calculo.reason) }}</p>
+			<p v-else class="bio-tenue bio-proc-nota">{{ $t('domotek.proc.tapToChange') }}</p>
+			<div style="flex: 1"></div>
+			<footer class="bio-cal-pie">
+				<button type="button" class="bio-cal-sec" @click="CambiaStep('S')">{{ $t('domotek.tools.back') }}</button>
+				<button type="button" class="bio-cal-principal ancho" @click="CambiaStep('2')">{{ $t('domotek.calibracion.continue') }}</button>
+			</footer>
+		</main>
+
+		<!-- 2 · Calibración -->
+		<main v-show="pasos === '2'" class="bio-proc-cuerpo">
+			<h2 class="bio-proc-h2">{{ $t('panel.emd.calibration') }} <span class="bio-emd-estado" :class="bioEstadoCalib">{{ estadoCalib.texto }}</span></h2>
+			<p class="bio-tenue bio-proc-nota">{{ $t('panel.emd.calibHint') }}</p>
+			<div class="bio-emd-calib">
+				<div class="bio-emd-tabla-caja">
+					<table class="bio-emd-tabla">
+						<thead><tr><th>#</th><th>P <small>bar</small></th><th>t <small>ms</small></th><th>V <small>nL</small></th><th></th></tr></thead>
+						<tbody>
+							<tr v-for="(pt, i) in calibPoints" :key="i" :class="pt.state">
+								<td class="n">{{ i + 1 }}</td><td>{{ pt.P }}</td><td>{{ pt.t }}</td>
+								<td>{{ pt.V !== null && pt.V !== undefined ? $display(pt.V, 1) : '—' }}</td>
+								<td class="est">
+									<v-progress-circular v-if="pt.state === 'running'" indeterminate size="16" width="2" color="var(--bio-acento)" />
+									<v-icon v-else-if="pt.state === 'done'" small color="var(--bio-acento)">mdi-check</v-icon>
+								</td>
+							</tr>
+							<tr v-if="!calibPoints.length"><td colspan="5" class="bio-tenue">{{ $t('panel.emd.solve_missingData') }}</td></tr>
+						</tbody>
+					</table>
+				</div>
+				<div class="bio-emd-calib-lado">
+					<div class="bio-proc-valores uno">
+						<button type="button" :disabled="calibRunning" @click="openParamDialog(param('calibDropsEMD'))"><span>{{ $t('panel.emd.dropsPerPoint') }}</span><strong>{{ bioNum(param('calibDropsEMD')) }}</strong></button>
+					</div>
+					<div class="bio-emd-resultado">
+						<span class="bio-tenue">{{ $t('domotek.proc.result') }}</span>
+						<template v-if="calibResult && calibResult.ok">
+							<div class="vals"><span>k <strong>{{ calibResult.k }}</strong></span><span>t0 <strong>{{ calibResult.t0 }}</strong> ms</span><span>R² <strong>{{ calibResult.r2 }}</strong></span></div>
+							<span v-if="calibResult.r2 < 0.95" class="bio-ambar-txt">{{ $t('panel.emd.lowR2') }}</span>
+						</template>
+						<span v-else-if="!calibError" class="bio-tenue">{{ $t('domotek.proc.runCalibFirst') }}</span>
+						<span v-if="calibError" class="bio-peligro-txt">{{ calibError }}</span>
+					</div>
+				</div>
+			</div>
+			<footer class="bio-cal-pie">
+				<button type="button" class="bio-cal-sec" @click="CambiaStep('1')">{{ $t('domotek.tools.back') }}</button>
+				<button type="button" class="bio-cal-sec" :disabled="calibRunning || !maquinaLibre || !viscRef" @click="dialogCalibConfirm = true"><span class="bio-cap">{{ $t('panel.emd.startCalib') }}</span></button>
+				<button type="button" class="bio-cal-sec listo" :disabled="!calibResult || !calibResult.ok" @click="applyCalibration"><span class="bio-cap">{{ $t('panel.emd.applyCalib') }}</span></button>
+				<button type="button" class="bio-cal-principal ancho" @click="CambiaStep('3')">{{ $t('domotek.calibracion.continue') }}</button>
+			</footer>
+		</main>
+
+		<!-- 3 · Punto -->
+		<main v-show="pasos === '3'" class="bio-proc-cuerpo">
+			<div class="bio-proc-canvas-zona">
+				<div class="bio-proc-lateral">
+					<span class="bio-tenue">{{ $t('domotek.proc.shotPoint') }}</span>
+					<div v-if="isPointSelected" class="bio-emd-xy"><span>X <strong>{{ $display(selectedPointMm.x, 1) }}</strong> mm</span><span>Y <strong>{{ $display(selectedPointMm.y, 1) }}</strong> mm</span></div>
+					<span v-else class="bio-tenue">{{ $t('domotek.proc.noPoint') }}</span>
+					<div class="bio-proc-valores uno">
+						<button type="button" @click="openParamDialog(param('alturaEMD'))"><span>{{ $t('panel.emd.height') }}</span><strong>{{ bioNum(param('alturaEMD')) }}<small> mm</small></strong></button>
+					</div>
+				</div>
+				<div class="bio-proc-lienzo">
+					<canvas ref="gridCanvas" :width="canvasSizePx" :height="canvasSizePx" @click="handleCanvasClick"></canvas>
+					<span>{{ $t('domotek.proc.tapToPick') }} · {{ gridRealSizeMm }} × {{ gridRealSizeMm }} mm</span>
+				</div>
+				<div class="bio-proc-acciones">
+					<button type="button" @click="centerPoint">{{ $t('domotek.varios.center', 'Centro') }}</button>
+					<button type="button" @click="openManualCoordsDialog">{{ $t('domotek.varios.manual', 'Manual') }}</button>
+				</div>
+			</div>
+			<footer class="bio-cal-pie">
+				<button type="button" class="bio-cal-sec" @click="CambiaStep('2')">{{ $t('domotek.tools.back') }}</button>
+				<button type="button" class="bio-cal-principal ancho" :disabled="!isPointSelected" @click="CambiaStep('4')">{{ $t('domotek.calibracion.continue') }}</button>
+			</footer>
+		</main>
+
+		<!-- 4 · Automático -->
+		<main v-show="pasos === '4'" class="bio-proc-cuerpo">
+			<h2 class="bio-proc-h2">{{ $t('domotek.proc.autoMode') }}</h2>
+			<div class="bio-proc-lista">
+				<div class="fila cab">
+					<span><strong>{{ $t('panel.emd.autoEMDMode') }}</strong><small>{{ $t('domotek.proc.appliesDuringPrint') }}</small></span>
+					<button type="button" class="interruptor" :class="{ on: enableEMD }" role="switch" :aria-checked="enableEMD" @click="enableEMD = !enableEMD"><i></i></button>
+				</div>
+				<div class="fila" :class="{ tenue: !enableEMD }">
+					<span>{{ $t('domotek.varios.applyEvery') }}</span>
+					<div class="bio-proc-contador">
+						<button type="button" :disabled="!enableEMD || bioCadencia <= param('cadenceAmountEMD').min" @click="setGlobal('cadenceAmountEMD', bioCadencia - 1)">−</button>
+						<button type="button" class="valor" :disabled="!enableEMD" @click="openParamDialog(param('cadenceAmountEMD'))"><strong>{{ bioCadencia }}</strong> {{ $t('domotek.varios.layers') }}</button>
+						<button type="button" :disabled="!enableEMD || bioCadencia >= param('cadenceAmountEMD').max" @click="setGlobal('cadenceAmountEMD', bioCadencia + 1)">+</button>
+					</div>
+					<button type="button" class="interruptor" :class="{ on: cadenceEnableEMD }" role="switch" :aria-checked="cadenceEnableEMD" :disabled="!enableEMD" @click="cadenceEnableEMD = !cadenceEnableEMD"><i></i></button>
+				</div>
+				<div class="fila" :class="{ tenue: !enableEMD }">
+					<span>{{ $t('panel.ultraviolet.applyWhen') }}</span>
+					<button type="button" class="interruptor" :class="{ on: aplicarFinEMD }" role="switch" :aria-checked="aplicarFinEMD" :disabled="!enableEMD" @click="aplicarFinEMD = !aplicarFinEMD"><i></i></button>
+				</div>
+			</div>
+			<div style="flex: 1"></div>
+			<footer class="bio-cal-pie">
+				<button type="button" class="bio-cal-sec" @click="CambiaStep('3')">{{ $t('domotek.tools.back') }}</button>
+				<button type="button" class="bio-cal-principal ancho" @click="CambiaStep('S')">{{ $t('domotek.proc.seeSummary') }}</button>
+			</footer>
+		</main>
+	</div>
+	<v-row v-else class="mb-0 pb-0">
 		<v-col cols="12" align="center" class="py-0">
 			<v-stepper v-model="pasos" class="blue lighten-5 panelStepper">
 
@@ -276,10 +438,32 @@
 				</v-stepper-items>
 			</v-stepper>
 		</v-col>
+	</v-row>
 
 		<!-- ===================== DIÁLOGO: PARÁMETROS CALCULADOS ===================== -->
-		<v-dialog v-model="dialogCalc" max-width="460px">
-			<v-card>
+		<v-dialog v-model="dialogCalc" :max-width="temaBio ? 520 : '460px'" :content-class="temaBio ? 'bio-teclado-dialogo' : ''">
+			<!-- domotek: cálculo con el diseño nuevo -->
+			<div v-if="temaBio" class="bio-emd-calculo">
+				<header class="bio-teclado-cab">
+					<span class="bio-teclado-icono acento"><v-icon>mdi-calculator-variant-outline</v-icon></span>
+					<span class="bio-teclado-nombre">{{ $t('panel.emd.calcTitle') }}</span>
+					<button type="button" class="bio-teclado-cerrar" :aria-label="$t('generic.close')" @click="dialogCalc = false"><v-icon>mdi-close</v-icon></button>
+				</header>
+				<div v-if="calculo.ok" class="bio-proc-datos tres">
+					<div v-for="c in bioCalc" :key="c.id"><span>{{ c.texto }}</span><strong>{{ c.valor }}<small> {{ c.unidad }}</small></strong></div>
+				</div>
+				<p v-else class="bio-peligro-txt ma-0">{{ $t('panel.emd.solve_' + calculo.reason) }}</p>
+				<div class="bio-proc-lista">
+					<div class="fila cab"><span>{{ $t('panel.emd.viscAtTemp') }}</span><strong>{{ $display(viscActual, 1) }} mPa·s</strong></div>
+					<div class="fila"><span>{{ $t('panel.emd.calibration') }}</span><span class="bio-emd-estado" :class="bioEstadoCalib">{{ estadoCalib.texto }}</span></div>
+					<div class="fila"><span>k</span><strong class="bio-blanco">{{ kActual }}</strong></div>
+					<div class="fila"><span>t0</span><strong class="bio-blanco">{{ t0Actual }} ms</strong></div>
+				</div>
+				<div class="bio-teclado-acciones">
+					<button type="button" class="bio-teclado-ok acento" @click="dialogCalc = false">{{ $t('generic.close') }}</button>
+				</div>
+			</div>
+			<v-card v-else>
 				<v-card-title class="justify-center">{{ $t('panel.emd.calcTitle') }}</v-card-title>
 				<v-card-text class="pb-0">
 					<table class="emd-table mx-auto">
@@ -302,8 +486,48 @@
 		</v-dialog>
 
 		<!-- ===================== DIÁLOGO NUMÉRICO GENÉRICO ===================== -->
-		<v-dialog v-model="dialogParam" persistent max-width="380px">
-			<v-card v-if="editingParam">
+		<v-dialog v-model="dialogParam" persistent :max-width="temaBio ? 760 : '380px'" :content-class="temaBio ? 'bio-teclado-dialogo' : ''">
+			<!-- domotek: teclado con el diseño nuevo -->
+			<div v-if="temaBio && editingParam" class="bio-teclado">
+				<section class="bio-teclado-izq">
+					<header class="bio-teclado-cab">
+						<span class="bio-teclado-icono" :class="editingParam.key === 'tempEMD' ? '' : 'acento'"><v-icon>{{ editingParam.icon }}</v-icon></span>
+						<span class="bio-teclado-nombre">{{ $t(editingParam.label) }}</span>
+						<button type="button" class="bio-teclado-cerrar" :aria-label="$t('generic.cancel')" @click="dialogParam = false"><v-icon>mdi-close</v-icon></button>
+					</header>
+					<div v-if="editingParam.key === 'tempEMD'" class="bio-teclado-fila-switch">
+						<span>{{ $t('panel.emd.heating') }}</span>
+						<button type="button" class="interruptor" :class="{ on: tempEnableEMD }" role="switch" :aria-checked="tempEnableEMD" @click="tempEnableEMD = !tempEnableEMD"><i></i></button>
+					</div>
+					<div class="bio-teclado-datos">
+						<div><span>{{ $t('domotek.keypad.currentValue') }}</span><strong>{{ bioValorActual }}</strong></div>
+						<div><span>{{ $t('domotek.keypad.allowed') }}</span><strong class="peq">{{ editingParam.min }} – {{ editingParam.max }}<small v-if="editingParam.unit"> {{ editingParam.unit }}</small></strong></div>
+					</div>
+					<div class="bio-teclado-valor acento" :class="{ fuera: !!paramError && paramInput !== '', apagado: tempOffEditing }">
+						<span>{{ $t('domotek.keypad.newValue') }}</span>
+						<strong>{{ tempOffEditing ? $t('domotek.keypad.off') : (paramInput === '' ? '—' : paramInput) }}</strong><small v-if="editingParam.unit && !tempOffEditing">{{ editingParam.unit }}</small>
+					</div>
+					<div class="bio-teclado-rango" :class="{ fuera: !!paramError && paramInput !== '' }">{{ tempOffEditing ? $t('domotek.keypad.heatingOffHint') : (paramError && paramInput !== '' ? paramError : rangoTexto(editingParam)) }}</div>
+					<div v-if="bioAtajosParam.length && !tempOffEditing" class="bio-teclado-atajos">
+						<button v-for="v in bioAtajosParam" :key="v" type="button" class="acento" :class="{ activo: String(v) === paramInput }" @click="paramInput = String(v), bioReemplazar = true">{{ v }}</button>
+					</div>
+					<div style="flex: 1"></div>
+					<div class="bio-teclado-acciones">
+						<button type="button" class="bio-teclado-sec" @click="dialogParam = false">{{ $t('generic.cancel') }}</button>
+						<button type="button" class="bio-teclado-ok acento" :disabled="!tempOffEditing && (!!paramError || paramInput === '')" @click="confirmParam">
+							{{ tempOffEditing ? $t('generic.ok') : (paramInput === '' ? $t('domotek.keypad.apply') : $t('domotek.keypad.applyValue', [paramInput + (editingParam.unit ? ' ' + editingParam.unit : '')])) }}
+						</button>
+					</div>
+				</section>
+				<section class="bio-teclado-num" :aria-label="$t('domotek.keypad.keypad')">
+					<button v-for="n in ['7', '8', '9', '4', '5', '6', '1', '2', '3']" :key="n" type="button" :disabled="tempOffEditing" @click="handleParamKeyPress(n)">{{ n }}</button>
+					<button v-if="editingParam.decimals > 0" type="button" :disabled="tempOffEditing" @click="handleParamKeyPress('.')">,</button>
+					<button v-else type="button" class="suave" :aria-label="$t('domotek.keypad.clear')" @click="handleParamKeyPress('CLEAR')">C</button>
+					<button type="button" :disabled="tempOffEditing" @click="handleParamKeyPress('0')">0</button>
+					<button type="button" class="suave" :disabled="tempOffEditing" :aria-label="$t('domotek.keypad.delete')" @click="handleParamKeyPress('DEL')" @contextmenu.prevent="handleParamKeyPress('CLEAR')"><v-icon>mdi-backspace-outline</v-icon></button>
+				</section>
+			</div>
+			<v-card v-else-if="editingParam">
 				<v-card-title class="justify-center text-center" :class="{ 'pb-0': editingParam.key === 'tempEMD' }">
 					<span class="headline">{{ $t(editingParam.label) }}<span v-if="editingParam.unit"> ({{ editingParam.unit }})</span></span>
 					<!-- Solo para la temperatura: activar o no el calentado -->
@@ -338,8 +562,39 @@
 		</v-dialog>
 
 		<!-- ===================== DIÁLOGO COORDENADAS ===================== -->
-		<v-dialog v-model="dialogManualCoords" persistent max-width="380px">
-			<v-card>
+		<v-dialog v-model="dialogManualCoords" persistent :max-width="temaBio ? 760 : '380px'" :content-class="temaBio ? 'bio-teclado-dialogo' : ''">
+			<!-- domotek: coordenadas con el diseño nuevo -->
+			<div v-if="temaBio" class="bio-teclado">
+				<section class="bio-teclado-izq">
+					<header class="bio-teclado-cab">
+						<span class="bio-teclado-icono acento"><v-icon>mdi-crosshairs-gps</v-icon></span>
+						<span class="bio-teclado-nombre">{{ $t('panel.ultraviolet.manualEditCoordsTittle') }}</span>
+						<button type="button" class="bio-teclado-cerrar" :aria-label="$t('generic.cancel')" @click="dialogManualCoords = false"><v-icon>mdi-close</v-icon></button>
+					</header>
+					<div class="bio-teclado-coords">
+						<button v-for="eje in ['x', 'y']" :key="eje" type="button" class="bio-teclado-valor acento" :class="{ inactivo: activeManualInput !== eje, fuera: !!(eje === 'x' ? manualXError : manualYError) }" @click="activeManualInput = eje">
+							<span>{{ eje.toUpperCase() }}</span>
+							<strong>{{ (eje === 'x' ? manualX : manualY) === '' ? '—' : (eje === 'x' ? manualX : manualY) }}</strong><small>mm</small>
+						</button>
+					</div>
+					<div class="bio-teclado-rango" :class="{ fuera: !!(manualXError || manualYError) }">{{ manualXError || manualYError || $t('domotek.keypad.coordRange', [minCoord, maxCoord]) }}</div>
+					<div class="bio-teclado-atajos">
+						<button type="button" class="acento" @click="manualX = String(Math.round(maxCoord / 2)); manualY = String(Math.round(maxCoord / 2)); manualXError = ''; manualYError = ''">{{ $t('domotek.varios.center', 'Centro') }}</button>
+					</div>
+					<div style="flex: 1"></div>
+					<div class="bio-teclado-acciones">
+						<button type="button" class="bio-teclado-sec" @click="dialogManualCoords = false">{{ $t('generic.cancel') }}</button>
+						<button type="button" class="bio-teclado-ok acento" :disabled="!!manualXError || !!manualYError || manualX === '' || manualY === ''" @click="confirmManualInput">{{ $t('domotek.keypad.apply') }}</button>
+					</div>
+				</section>
+				<section class="bio-teclado-num" :aria-label="$t('domotek.keypad.keypad')">
+					<button v-for="n in ['7', '8', '9', '4', '5', '6', '1', '2', '3']" :key="n" type="button" @click="handleCoordKeyPress(n)">{{ n }}</button>
+					<button type="button" @click="handleCoordKeyPress('.')">,</button>
+					<button type="button" @click="handleCoordKeyPress('0')">0</button>
+					<button type="button" class="suave" :aria-label="$t('domotek.keypad.delete')" @click="handleCoordKeyPress('DEL')"><v-icon>mdi-backspace-outline</v-icon></button>
+				</section>
+			</div>
+			<v-card v-else>
 				<v-card-title class="justify-center text-center">
 					<span class="headline">{{ $t('panel.ultraviolet.manualEditCoordsTittle') }}</span>
 				</v-card-title>
@@ -415,13 +670,14 @@
 		<v-snackbar content-class="snack" v-model="snackbar" :timeout="400" absolute left top color="light-blue white--text">
 			{{ snackbarValor }}
 		</v-snackbar>
-	</v-row>
+</div>
 </template>
 
 <script>
 'use strict'
 import { mapState, mapActions } from 'vuex'
 import { EMD_MACHINE, viscAt, solve, fit, calibrationGrid } from './emdModel.js'
+import { paletaBio } from '../../utils/temaBio.js'
 
 /*
  * Parámetros que introduce el usuario. Todos se guardan como global.<key>.
@@ -456,6 +712,7 @@ export default {
 	data() {
 		return {
 			pasos: 'S',
+			bioReemplazar: false,
 			params: EMD_PARAMS,
 
 			dialogConfirm: false,
@@ -531,6 +788,52 @@ export default {
 			},
 		},
 
+		temaBio() { return this.$store.state.settings.temaBio; }, // domotek
+		bioPasos() {
+			return [
+				{ id: 'S', texto: this.$t('domotek.proc.summary') },
+				{ id: '1', texto: `1 · ${this.$t('domotek.proc.drop')}` },
+				{ id: '2', texto: `2 · ${this.$t('panel.emd.calibration')}` },
+				{ id: '3', texto: `3 · ${this.$t('domotek.proc.point')}` },
+				{ id: '4', texto: `4 · ${this.$t('domotek.proc.auto')}` }
+			];
+		},
+		bioCalc() { // presión, apertura y ciclo calculados
+			const ok = this.calculo.ok;
+			return [
+				{ id: 'P', texto: this.$t('panel.emd.pressure'), valor: ok ? this.calculo.P : '—', unidad: ok ? 'bar' : '' },
+				{ id: 't', texto: this.$t('panel.emd.openTime'), valor: ok ? this.calculo.t : '—', unidad: ok ? 'ms' : '' },
+				{ id: 'c', texto: this.$t('panel.emd.cycleTime'), valor: ok ? this.calculo.cycle : '—', unidad: ok ? 'ms' : '' }
+			];
+		},
+		bioEstadoCalib() {
+			if (!this.g('calibratedEMD')) { return 'no'; }
+			return Number(this.g('calibViscEMD')) !== this.viscRef ? 'est' : 'ok';
+		},
+		bioCadencia() { return Number(this.g('cadenceAmountEMD')) || 1; },
+		bioColores() {
+			const c = paletaBio();
+			return this.temaBio
+				? { rejilla: c.linea, borde: c.linea2, punto: c.acento, puntoBorde: c.acentoBg }
+				: { rejilla: '#ddd', borde: '#999', punto: 'red', puntoBorde: 'darkred' };
+		},
+		bioValorActual() {
+			const p = this.editingParam;
+			if (!p) { return '—'; }
+			if (p.key === 'tempEMD' && !this.tempEnableEMD) { return this.$t('domotek.keypad.off'); }
+			const v = this.g(p.key);
+			if (v === undefined || v === null || v === '') { return '—'; }
+			return `${Number(v).toFixed(p.decimals)}${p.unit ? ' ' + p.unit : ''}`;
+		},
+		bioAtajosParam() { // valores típicos de cada parámetro, solo los que caben en su rango
+			const p = this.editingParam;
+			if (!p) { return []; }
+			const tipicos = {
+				volDropEMD: [50, 100, 200, 500], viscEMD: [10, 100, 1000, 10000], nDropsEMD: [1, 10, 50, 100],
+				tempEMD: [25, 30, 37, 45], cadenceAmountEMD: [1, 2, 3, 5], calibDropsEMD: [50, 100, 200, 500], alturaEMD: [5, 10, 20, 50]
+			}[p.key] || [];
+			return tipicos.filter(v => v >= p.min && v <= p.max);
+		},
 		// Editando la temperatura con el calentado apagado: no hace falta valor
 		tempOffEditing() {
 			return !!this.editingParam && this.editingParam.key === 'tempEMD' && !this.tempEnableEMD;
@@ -601,6 +904,11 @@ export default {
 		paramsByGroup(group) {
 			return this.params.filter(p => p.group === group);
 		},
+		bioNum(p) { // valor sin unidad
+			const v = this.g(p.key);
+			if (v === undefined || v === null || v === '') { return '—'; }
+			return Number(v).toFixed(p.decimals);
+		},
 		fmt(p) {
 			const v = this.g(p.key);
 			if (v === undefined || v === null) return '—';
@@ -618,6 +926,14 @@ export default {
 		},
 		onWindowResize() {
 			this.windowHeight = window.innerHeight;
+			if (this.temaBio) {
+				// domotek: la rejilla cabe en el hueco libre (cabecera 64 + pie 52 + márgenes y texto ≈ 190 px)
+				const lado = Math.round(Math.max(160, Math.min(420, window.innerHeight - 190, (window.innerWidth - 440) * 0.9)));
+				if (lado !== this.canvasSizePx) {
+					this.canvasSizePx = lado;
+					this.$nextTick(() => { this.updatePxFromMm(); this.drawGrid(); });
+				}
+			}
 		},
 
 		/*
@@ -649,10 +965,13 @@ export default {
 			const v = this.g(p.key);
 			this.paramInput = v === undefined || v === null ? '' : String(v);
 			this.paramError = '';
+			this.bioReemplazar = true; // domotek: la primera tecla sustituye el valor actual
 			this.dialogParam = true;
 		},
 		handleParamKeyPress(key) {
 			let val = this.paramInput;
+			if (this.bioReemplazar && key !== 'DEL') { val = ''; }
+			this.bioReemplazar = false;
 			if (key === 'CLEAR') val = '';
 			else if (key === 'DEL') val = val.slice(0, -1);
 			else {
@@ -817,21 +1136,22 @@ export default {
 			const ctx = this.ctx;
 			const size = this.canvasSizePx;
 			ctx.clearRect(0, 0, size, size);
-			ctx.strokeStyle = '#ddd';
+			const col = this.bioColores;
+			ctx.strokeStyle = col.rejilla;
 			ctx.lineWidth = 0.5;
 			for (let i = 0; i <= size; i += this.cellSizePx) {
 				ctx.beginPath(); ctx.moveTo(Math.round(i), 0); ctx.lineTo(Math.round(i), size); ctx.stroke();
 				ctx.beginPath(); ctx.moveTo(0, Math.round(i)); ctx.lineTo(size, Math.round(i)); ctx.stroke();
 			}
-			ctx.strokeStyle = '#999';
+			ctx.strokeStyle = col.borde;
 			ctx.lineWidth = 1;
 			ctx.strokeRect(0, 0, size, size);
 			if (this.selectedPointPx.x !== null) {
 				ctx.beginPath();
-				ctx.arc(this.selectedPointPx.x, this.selectedPointPx.y, 3, 0, 2 * Math.PI);
-				ctx.fillStyle = 'red';
+				ctx.arc(this.selectedPointPx.x, this.selectedPointPx.y, this.temaBio ? 5 : 3, 0, 2 * Math.PI);
+				ctx.fillStyle = col.punto;
 				ctx.fill();
-				ctx.strokeStyle = 'darkred';
+				ctx.strokeStyle = col.puntoBorde;
 				ctx.stroke();
 			}
 		},
@@ -874,6 +1194,7 @@ export default {
 		handleCoordKeyPress(key) {
 			const field = this.activeManualInput === 'x' ? 'manualX' : 'manualY';
 			let val = this[field];
+			if (val === '0' && key !== '.' && key !== 'DEL' && key !== 'CLEAR') { val = ''; } // domotek
 			if (key === 'CLEAR') val = '';
 			else if (key === 'DEL') val = val.slice(0, -1);
 			else {
@@ -905,6 +1226,7 @@ export default {
 	},
 
 	watch: {
+		bioColores() { this.$nextTick(() => this.drawGrid()); }, // domotek: repintar al cambiar de modo
 		'globals.posxEMD'(v) { if (v !== this.selectedPointMm.x) this.updateMarkerFromStore(); },
 		'globals.posyEMD'(v) { if (v !== this.selectedPointMm.y) this.updateMarkerFromStore(); },
 		paramInput() { if (this.dialogParam) this.validateParam(); },

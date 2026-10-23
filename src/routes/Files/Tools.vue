@@ -29,20 +29,95 @@
 </style>
 
 <template>
-	<v-row class="mb-0 pb-10">
+	<v-row class="mb-0" :class="{ 'pb-10': !temaBio }">
 		<!-- <v-col cols="6" class="ml-2 mt-2">
 			<span> <v-icon small>mdi-screwdriver</v-icon> Tools directory</span>
 		</v-col> -->
 		
 		
 		<!-- <v-col cols="12" class="mt-10 mb-2"> -->
-		<v-col cols="12" class="mt-5 ">	
+		<v-col cols="12" :class="temaBio ? 'mt-0 pt-0' : 'mt-5'">	
 			<!-- <v-row v-if="!this.toolClick"> -->
 			<v-row>	
-				<v-col cols="12" class="mt-6">  <!--v-show="$vuetify.breakpoint.mdAndDown"> -->
+				<v-col cols="12" :class="temaBio ? 'mt-0 pt-0' : 'mt-6'">  <!--v-show="$vuetify.breakpoint.mdAndDown"> -->
 					
 					<v-row class="templateSlotButtons">
 						<v-col cols="12">
+				<!-- domotek: Herramientas con el tema oscuro -->
+				<div v-if="temaBio">
+					<div class="bio-tools">
+						<h1 class="bio-h1">{{ $t('domotek.tools.toolsTitle') }}</h1>
+						<section class="bio-tools-grid" :style="{ gridTemplateColumns: `repeat(${bioTools.length}, minmax(0, 1fr))` }">
+							<article v-for="t in bioTools" :key="t.i" class="bio-tool" :class="{ 'bio-tool--sel': ClickToolAnterior === t.i && toolClick }">
+								<div class="bio-tool-cab">
+									<button type="button" class="bio-punto" :class="'bio-punto--' + t.estado" :aria-label="$t('domotek.tools.toggleHeater')" @click="toolHeaterClick(nameTools[t.i], heaterTools[t.i + 1])"></button>
+									<button type="button" class="bio-tool-nombre" @click="ChangeTool(t.i), camaClick = false, $vuetify.goTo(pageHeight)"><span class="bio-cap">{{ $t('domotek.tools.t' + t.i) }}</span></button>
+									<button type="button" class="bio-icono" :class="t.cal ? 'ok' : 'aviso'" :aria-label="t.cal ? $t('panel.tools.calibrado') : $t('panel.tools.noCalibrado')" @click="showToolOffsets(t.i)">
+										<v-icon>mdi-tune-variant</v-icon>
+									</button>
+								</div>
+								<button type="button" class="bio-tool-tipo" :class="{ vacio: t.vacio }" @click="ChangeTool(t.i), camaClick = false, $vuetify.goTo(pageHeight)">{{ t.nombre || '—' }}</button>
+								<button type="button" class="bio-tool-temp" :disabled="!t.editable" @click="bioClickTemp(t)">
+									<template v-if="t.temps.length">
+										<span v-for="(h, k) in t.temps" :key="k" class="bio-temp-fila" :class="{ sec: k > 0 }">
+											<span class="nom">{{ h.nombre }}</span>
+											<span class="val">{{ h.actual }}<small> / {{ h.objetivo }} °C</small></span>
+										</span>
+									</template>
+									<span v-else class="bio-tenue">{{ t.vacio ? $t('domotek.tools.noTool') : $t('domotek.tools.noHeater') }}</span>
+								</button>
+							</article>
+						</section>
+
+						<section class="bio-tools-abajo" :class="{ 'sin-chamber': !bioChamberVisible }">
+							<button type="button" class="bio-calib" @click="DialogCalibration = true">
+								<v-icon size="36">mdi-axis-arrow</v-icon>
+								<span class="bio-cap">{{ $t('domotek.tools.calibrationBtn') }}</span>
+							</button>
+
+							<article class="bio-tool">
+								<div class="bio-tool-cab">
+									<span class="bio-punto" :class="'bio-punto--' + bioEstado(heaterTools[0])"></span>
+									<button type="button" class="bio-tool-nombre" @click="ChangeCama(4), camaClick = true, $vuetify.goTo(pageHeight)"><span class="bio-cap">{{ $t('domotek.tools.platform') }}</span></button>
+									<span class="bio-tenue bio-chip">{{ bioNombreCama }}</span>
+								</div>
+								<div class="bio-fila-valor">
+									<template v-if="bedSelected != 'D'">
+										<span class="bio-grande">{{ bioTemp(heaterTools[0]) }} <small>°C</small></span>
+										<button type="button" class="bio-objetivo" :disabled="bedSelected == 'M'" @click="(bedSelected == 'M') ? nothing(4) : keyboardScreen(4)">
+											{{ $t('domotek.tools.target') }} <strong>{{ heaterTools[0] ? heaterTools[0].active : '--' }} °C</strong>
+										</button>
+									</template>
+									<template v-else>
+										<span class="bio-grande">{{ drumSpeed }} <small>rpm</small></span>
+										<button type="button" class="bio-objetivo" @click="keyboardScreenDrum()">
+											{{ $t('domotek.tools.target') }} <strong>{{ drumSpeedSet }} rpm</strong>
+										</button>
+									</template>
+								</div>
+							</article>
+
+							<article v-if="bioChamberVisible" class="bio-tool">
+								<div class="bio-tool-cab">
+									<span class="bio-punto" :class="'bio-punto--' + bioEstado(heaterTools[20])"></span>
+									<span class="bio-tool-nombre"><span class="bio-cap">{{ $t('domotek.tools.chamber') }}</span></span>
+									<v-icon :color="doorStateOpen ? 'var(--bio-acento)' : 'var(--bio-tenue)'">{{ doorStateOpen ? 'mdi-door-open' : 'mdi-door-closed' }}</v-icon>
+								</div>
+								<div class="bio-fila-valor">
+									<template v-if="miniclima_capable && modoInput === 'HUM'">
+										<span class="bio-grande">{{ miniclima_rh !== undefined && miniclima_rh !== null ? Number(miniclima_rh).toFixed(1) : '--' }} <small>%</small></span>
+										<button type="button" class="bio-objetivo hum" @click="keyboardScreen(20)">{{ miniclima_setPoint === 0 ? '--' : miniclima_setPoint }} %</button>
+									</template>
+									<template v-else>
+										<span class="bio-grande">{{ bioTemp(heaterTools[20]) }} <small>°C</small></span>
+										<button type="button" class="bio-objetivo" @click="keyboardScreen(20)">{{ heaterTools[20] ? heaterTools[20].active : '--' }} °C</button>
+									</template>
+								</div>
+							</article>
+						</section>
+					</div>
+				</div>
+							<template v-if="!temaBio">
 							<v-row class="pt-2 pb-4">
 								<!-- TOOL1 -->
 								<v-card v-if="modeloMaquina == '4A' || modeloMaquina == '2A' || modeloMaquina == 'HK' " class=" rounded-xl col blue lighten-5 pa-0 mr-1 " elevation="5">	
@@ -346,20 +421,6 @@
 										</v-card>
 									</v-card-text>
 								</v-card>
-								<v-dialog v-model="dialogOffsetsVisible" max-width="500px">
-									<v-card>
-										<v-card-title class="headline grey lighten-2">
-										{{ offsetTitulo }}
-										</v-card-title>
-										<v-card-text style="white-space: pre-line;">
-										{{ offsetTexto }}
-										</v-card-text>
-										<v-card-actions>
-										<v-spacer></v-spacer>
-										<v-btn color="primary" text @click="dialogOffsetsVisible = false">{{ $t('generic.close') }}</v-btn>
-										</v-card-actions>
-									</v-card>
-								</v-dialog>
 
 
 								<!-- TOOL4 -->
@@ -628,10 +689,99 @@
 								</v-card>	
 								</v-col>	
 							</v-row>
+							</template>
+								<!-- domotek: offsets de tool / plataforma con el diseño nuevo -->
+								<v-dialog v-if="temaBio" v-model="dialogOffsetsVisible" max-width="620" content-class="bio-teclado-dialogo">
+									<div class="bio-off">
+										<header class="bio-teclado-cab">
+											<span class="bio-teclado-icono" :class="offsetDatos.tipo === 'tool' && !offsetDatos.calibrado ? '' : 'acento'"><v-icon>{{ offsetDatos.tipo === 'plataforma' ? 'mdi-radiator' : 'mdi-tune-variant' }}</v-icon></span>
+											<span class="bio-teclado-nombre">{{ offsetDatos.titulo }}</span>
+											<span v-if="offsetDatos.tipo === 'tool'" class="bio-off-estado" :class="{ ok: offsetDatos.calibrado }">
+												<v-icon small>{{ offsetDatos.calibrado ? 'mdi-check-circle' : 'mdi-alert-circle-outline' }}</v-icon>{{ offsetDatos.calibrado ? $t('panel.tools.calibrado') : $t('panel.tools.noCalibrado') }}
+											</span>
+											<button type="button" class="bio-teclado-cerrar" :aria-label="$t('generic.close')" @click="dialogOffsetsVisible = false"><v-icon>mdi-close</v-icon></button>
+										</header>
+										<p v-if="offsetDatos.tipo === 'error'" class="bio-off-nota aviso">{{ offsetDatos.error }}</p>
+										<div v-else-if="offsetDatos.tipo === 'tool'" class="bio-off-ejes">
+											<div v-for="e in offsetDatos.ejes" :key="e.eje"><span>{{ e.eje }}</span><strong>{{ e.valor }}<small v-if="e.valor !== '—'"> mm</small></strong></div>
+										</div>
+										<div v-else class="bio-off-puentes">
+											<div v-for="pu in offsetDatos.puentes" :key="pu.eje">
+												<span class="tit">{{ pu.titulo }}</span>
+												<div class="mm"><span>{{ $t('domotek.offsets.min') }}</span><strong>{{ pu.min }}<small v-if="pu.min !== '—'"> mm</small></strong></div>
+												<div class="mm"><span>{{ $t('domotek.offsets.max') }}</span><strong>{{ pu.max }}<small v-if="pu.max !== '—'"> mm</small></strong></div>
+											</div>
+										</div>
+										<p v-if="offsetDatos.tipo === 'tool'" class="bio-off-nota" :class="{ aviso: !offsetDatos.calibrado }">{{ offsetDatos.calibrado ? $t('domotek.offsets.calibratedHint') : $t('domotek.offsets.notCalibratedHint') }}</p>
+										<div class="bio-off-pie">
+											<button v-if="offsetDatos.tipo === 'tool'" type="button" class="bio-teclado-sec" @click="dialogOffsetsVisible = false; DialogCalibration = true"><v-icon small>mdi-axis-arrow</v-icon>{{ $t('domotek.offsets.calibrate') }}</button>
+											<button type="button" class="bio-teclado-ok acento" @click="dialogOffsetsVisible = false">{{ $t('generic.close') }}</button>
+										</div>
+									</div>
+								</v-dialog>
+								<v-dialog v-else v-model="dialogOffsetsVisible" max-width="500px">
+									<v-card>
+										<v-card-title class="headline grey lighten-2">
+										{{ offsetTitulo }}
+										</v-card-title>
+										<v-card-text style="white-space: pre-line;">
+										{{ offsetTexto }}
+										</v-card-text>
+										<v-card-actions>
+										<v-spacer></v-spacer>
+										<v-btn color="primary" text @click="dialogOffsetsVisible = false">{{ $t('generic.close') }}</v-btn>
+										</v-card-actions>
+									</v-card>
+								</v-dialog>
 							<!-- </v-card> -->
 						</v-col>
 						<v-col cols="12" class="pa-0 ma-0">
-							<v-dialog v-model="marcador">
+							<v-dialog v-model="marcador" :content-class="temaBio ? 'bio-teclado-dialogo' : ''" :max-width="temaBio ? 760 : undefined">
+								<!-- domotek: teclado de temperatura con el tema oscuro -->
+								<div v-if="temaBio" class="bio-teclado">
+									<section class="bio-teclado-izq">
+										<header class="bio-teclado-cab">
+											<span class="bio-teclado-icono" :class="{ hum: bioModoHum }"><v-icon>{{ bioModoHum ? 'mdi-water-percent' : 'mdi-thermometer' }}</v-icon></span>
+											<span class="bio-teclado-nombre">{{ bioTecladoNombre }}</span>
+											<button type="button" class="bio-teclado-cerrar" :aria-label="$t('generic.close')" @click="marcador = false"><v-icon>mdi-close</v-icon></button>
+										</header>
+										<div v-if="modoDialog === 'HUM'" class="bio-segmentos bio-teclado-modo" role="tablist">
+											<button type="button" role="tab" class="bio-seg" :class="{ activo: modoInput === 'TEMP' }" @click="switchToTemp()">{{ $t('domotek.varios.temp') }}</button>
+											<button type="button" role="tab" class="bio-seg" :class="{ activo: modoInput === 'HUM' }" @click="modoInput = 'HUM'">{{ $t('domotek.varios.RH') }}</button>
+										</div>
+										<div class="bio-teclado-datos">
+											<div><span>{{ $t('domotek.keypad.current') }}</span><strong>{{ bioTecladoActual }}</strong></div>
+											<div><span>{{ $t('domotek.keypad.currentTarget') }}</span><strong :class="{ apagado: !bioTecladoObjetivo }">{{ bioTecladoObjetivo || $t('domotek.keypad.off') }}</strong></div>
+										</div>
+										<div class="bio-teclado-valor" :class="{ hum: bioModoHum, fuera: bioFueraRango && !bioValorVacio }">
+											<span>{{ $t('domotek.keypad.newTarget') }}</span>
+											<strong>{{ bioValorVacio ? '—' : (bioModoHum ? humedad : cadenaNum) }}</strong><small>{{ bioModoHum ? '%' : '°C' }}</small>
+										</div>
+										<div class="bio-teclado-rango" :class="{ fuera: bioFueraRango && !bioValorVacio }">{{ bioTecladoRango }}</div>
+										<div class="bio-teclado-atajos">
+											<button v-for="p in bioAtajos" :key="p.valor" type="button" :class="{ activo: String(p.valor) === (bioModoHum ? humedad : cadenaNum), hum: bioModoHum }" @click="bioFijar(p.valor)">{{ p.texto }}</button>
+										</div>
+										<div style="flex: 1"></div>
+										<div class="bio-teclado-acciones">
+											<template v-if="bioModoHum">
+												<button type="button" class="bio-teclado-sec" :disabled="!miniclima_on" @click="stopHumedad()">{{ $t('domotek.keypad.turnOff') }}</button>
+												<button type="button" class="bio-teclado-ok hum" :disabled="bioFueraRango" @click="okHumedad()">{{ bioValorVacio ? $t('domotek.keypad.set') : $t('domotek.keypad.setHumidity', [humedad]) }}</button>
+											</template>
+											<template v-else>
+												<button v-if="bioHeaterTeclado && bioHeaterTeclado.state === 'fault'" type="button" class="bio-teclado-sec peligro" @click="handleFixButton()">{{ $t('domotek.keypad.resetFault') }}</button>
+												<button v-else type="button" class="bio-teclado-sec" :disabled="!bioHeaterTeclado || bioHeaterTeclado.state === 'off'" @click="handleOffButton()">{{ $t('domotek.keypad.turnOff') }}</button>
+												<button type="button" class="bio-teclado-ok" :disabled="bioFueraRango" @click="okNums()">{{ bioValorVacio ? $t('domotek.keypad.heat') : $t('domotek.keypad.heatTo', [cadenaNum]) }}</button>
+											</template>
+										</div>
+									</section>
+									<section class="bio-teclado-num" :aria-label="$t('domotek.keypad.keypad')">
+										<button v-for="n in [7, 8, 9, 4, 5, 6, 1, 2, 3]" :key="n" type="button" @click="bioTecla(n)">{{ n }}</button>
+										<button type="button" class="suave" :aria-label="$t('domotek.keypad.clear')" @click="bioFijar(0)">C</button>
+										<button type="button" @click="bioTecla(0)">0</button>
+										<button type="button" class="suave" :aria-label="$t('domotek.keypad.delete')" @click="bioModoHum ? deleteHumedad() : deleteNums()"><v-icon>mdi-backspace-outline</v-icon></button>
+									</section>
+								</div>
+								<template v-else>
 								<v-btn @click="marcador = false" x-large block class="blue lighten-3">
 									<v-icon x-large>mdi-close</v-icon>
 								</v-btn>
@@ -816,8 +966,12 @@
 									</v-row>
 
 									<!-- Dialog temperatura fuera de rango -->
+
+								</v-card>
+								</template>
+							</v-dialog>
 									<v-dialog v-model="showTemperatureOutOfRangeDialog" persistent width="480">
-										<v-card class="blue lighten-5 mt-3 mb-3 mr-5">
+										<v-card class="blue lighten-5">
 											<v-card-title><span class="headline">{{ $t('generic.warning') }}</span></v-card-title>
 											<v-card-text>{{ $t('domotek.varios.temp_out') }}</v-card-text>
 											<v-card-actions>
@@ -826,9 +980,6 @@
 											</v-card-actions>
 										</v-card>
 									</v-dialog>
-								</v-card>
-							</v-dialog>
-							<!-- Dialog miniclima activo -->
 							<v-dialog v-model="showMiniClimaWarning" persistent width="480">
 								<v-card class="blue lighten-5">
 									<v-card-title>
@@ -968,7 +1119,11 @@
 								</v-card>
 							</v-dialog>
 							<!-- fullscreen hide-overlay> -->
-							<v-dialog v-model="marcadorMix"> 
+							<!-- domotek: coaxial con el diseño nuevo -->
+							<v-dialog v-if="temaBio" v-model="marcadorMix" max-width="760" content-class="bio-teclado-dialogo">
+								<coaxial-panel v-if="marcadorMix" v-on:close-dialog="closeDialog"></coaxial-panel>
+							</v-dialog>
+							<v-dialog v-else v-model="marcadorMix"> 
 								<v-col cols="12" align="center" class="ma-0 pa-0">
 									<coaxial-panel v-on:close-dialog="closeDialog"></coaxial-panel> 
 								</v-col>
@@ -1014,7 +1169,7 @@
 		<!--																						 -->
 		<!-- DOMOTEK DOMOTEK DOMOTEK DOMOTEK DOMOTEK DOMOTEK DOMOTEK DOMOTEK DOMOTEK DOMOTEK DOMOTEK -->
 
-		<v-col cols="12" align="center" class="mt-2">	
+		<v-col v-if="!temaBio" cols="12" align="center" class="mt-2">	
 			<!-- <v-btn-toggle class="blue lighten-4" v-model="numTool" color="teal" rounded>
 				<v-btn v-if="nameTools.length > 0" :value="0" class=" ma-2 blue lighten-5" @click="ChangeTool(0), camaClick = false">{{ $t('domotek.tools.t0') }}</v-btn>
 				<v-btn v-if="nameTools.length > 1" :value="1" class=" ma-2 blue lighten-5" @click="ChangeTool(1), camaClick = false">{{ $t('domotek.tools.t1') }}</v-btn>
@@ -1024,7 +1179,41 @@
 			</v-btn-toggle> -->
 			<v-divider></v-divider>
 		</v-col>
-		<v-col cols="12" v-show="this.toolClick" align="center">
+		<!-- domotek: elegir tool con el tema oscuro (pantalla completa) -->
+		<div v-if="temaBio && toolClick" class="bio-elegir">
+			<header class="bio-elegir-cab">
+				<button type="button" class="bio-volver" :aria-label="$t('domotek.tools.back')" @click="toolClick = false"><v-icon>mdi-chevron-left</v-icon></button>
+				<h1 class="bio-h1" style="flex: 1; margin: 0">{{ camaClick ? $t('domotek.tools.whichPlatform') : $t('domotek.tools.whichTool') }}</h1>
+				<div class="bio-segmentos" role="tablist">
+					<button v-for="t in bioTools" :key="t.i" type="button" role="tab" class="bio-seg" :class="{ activo: !camaClick && ClickToolAnterior === t.i }" :aria-selected="!camaClick && ClickToolAnterior === t.i" @click="bioElegirTab(t.i)">{{ $t('domotek.tools.T' + t.i + 'Mini') }}</button>
+					<button type="button" role="tab" class="bio-seg" :class="{ activo: camaClick }" :aria-selected="camaClick" @click="bioElegirTab(4)">{{ $t('domotek.tools.platformMini') }}</button>
+				</div>
+			</header>
+			<div v-if="!camaClick" class="bio-elegir-grid" role="radiogroup">
+				<button v-for="registro in filterPadresPorTool" :key="registro.idPadre + registro.idHijo + registro.titulo" type="button" role="radio"
+					class="bio-opcion" :class="{ actual: registro.idTool !== -1 && registro.idHijo === '', carpeta: registro.idTool === -1 && registro.idHijo !== '' }"
+					:aria-checked="registro.idTool !== -1 && registro.idHijo === ''"
+					@click="ChangeSelectedFam(registro.idTool, registro.idHijo)">
+					<v-icon>{{ bioIconoTool(registro) }}</v-icon>
+					<span v-html="replaceFilter(registro.titulo)"></span>
+				</button>
+			</div>
+			<div v-else class="bio-elegir-grid" role="radiogroup">
+				<button type="button" class="bio-opcion" @click="ChangeBed(0)"><v-icon>mdi-radiator</v-icon><span>PLTF-HP</span></button>
+				<button type="button" class="bio-opcion" @click="ChangeBed(1)"><v-icon>mdi-snowflake</v-icon><span>PLTF-REF</span></button>
+				<button v-if="MewCapable" type="button" class="bio-opcion" @click="ChangeBed(2)"><v-icon>mdi-grid</v-icon><span>PLTF-MEW</span></button>
+				<button v-if="DrumCapable" type="button" class="bio-opcion" @click="ChangeBed(3)"><v-icon>mdi-rotate-3d-variant</v-icon><span>DRUM-COLL</span></button>
+			</div>
+			<footer class="bio-elegir-pie">
+				<span class="bio-tenue" style="flex: 1">
+					{{ $t('domotek.tools.nowIn', [camaClick ? $t('domotek.tools.platform') : $t('domotek.tools.T' + ClickToolAnterior + 'Mini')]) }}
+					<strong style="color: var(--bio-texto); font-weight: 500">{{ camaClick ? bioNombreCama : (bioTools[ClickToolAnterior] ? bioTools[ClickToolAnterior].nombre : '') }}</strong>
+				</span>
+				<button type="button" class="bio-btn-sec" @click="toolClick = false">{{ $t('domotek.tools.back') }}</button>
+			</footer>
+		</div>
+
+		<v-col cols="12" v-show="toolClick && !temaBio" align="center">
 			<v-btn-toggle v-model="numSelected" color="teal" mandatory>
 				<v-row class="vrcl1 blue lighten-4" style="width:80%">
 		<!-- DOMOTEK DOMOTEK DOMOTEK DOMOTEK DOMOTEK DOMOTEK DOMOTEK DOMOTEK DOMOTEK DOMOTEK DOMOTEK -->
@@ -1221,6 +1410,7 @@ export default {
 			dialogOffsetsVisible: false, 
 			offsetTexto: '',  
 			offsetTitulo: '',
+			offsetDatos: { tipo: 'tool', titulo: '', calibrado: false, ejes: [], puentes: [], error: '' }, // domotek: datos del diálogo nuevo
 			currentTool: null ,
 			toolClickTemperature: null,
 			marcadorHumedad: false,
@@ -1341,6 +1531,89 @@ export default {
 		...mapState('machine/model', {
 			boards: state => state.boards,
 		}),
+		...mapState('settings', ['temaBio']), // domotek
+		bioTools() { // domotek: datos de las tarjetas del tema oscuro
+			const n = (this.modeloMaquina == '2A') ? 2 : 4;
+			const out = [];
+			for (let i = 0; i < n; i++) {
+				const tipo = this['T' + i];
+				const nh = this['nameTools' + i + 'heaterslength'] || 0;
+				const temps = [];
+				[[i + 1, 0], [i + 11, 1]].forEach(([hi, k]) => {
+					if (nh > k && this.heaterTools && this.heaterTools[hi]) {
+						const sensor = this.nameHeaters && this.nameHeaters.analog && this.nameHeaters.analog[hi];
+						temps.push({ nombre: sensor ? sensor.name : '', actual: this.bioTemp(this.heaterTools[hi]), objetivo: this.heaterTools[hi].active });
+					}
+				});
+				out.push({
+					i,
+					tipo,
+					nombre: this['T' + i + 'Name'],
+					cal: !!this['T' + i + 'CAL'],
+					vacio: tipo == 0 || tipo === undefined,
+					estado: this.bioEstado(this.heaterTools && this.heaterTools[i + 1]),
+					editable: tipo == 9 || (tipo != 0 && tipo != 7 && tipo != 8 && tipo != 1 && tipo != 3 && tipo != 15 && tipo != 11),
+					temps
+				});
+			}
+			return out;
+		},
+		bioModoHum() { return this.modoDialog === 'HUM' && this.modoInput === 'HUM'; }, // domotek: teclado
+		bioIndiceTeclado() { const t = this.toolClickTemperature; return t == 4 ? 0 : (t == 20 ? 20 : t + 1); },
+		bioHeaterTeclado() { return this.heaterTools ? this.heaterTools[this.bioIndiceTeclado] : null; },
+		bioTecladoNombre() {
+			const t = this.toolClickTemperature;
+			if (t == 4) { return this.$t('domotek.tools.platform').replace(/^./, c => c.toUpperCase()) + (this.bioNombreCama ? ` · ${this.bioNombreCama}` : ''); }
+			if (t == 20) { return 'Chamber'; }
+			const nombre = this['T' + t + 'Name'];
+			return `T${t + 1}` + (nombre ? ` · ${nombre}` : '');
+		},
+		bioTecladoActual() {
+			if (this.bioModoHum) {
+				return (this.miniclima_rh !== undefined && this.miniclima_rh !== null && this.miniclima_rh !== '--') ? `${Number(this.miniclima_rh).toFixed(1)} %` : '—';
+			}
+			const v = this.bioTemp(this.bioHeaterTeclado);
+			return v === '--' ? '—' : `${v} °C`;
+		},
+		bioTecladoObjetivo() {
+			if (this.bioModoHum) { return (this.miniclima_on && this.miniclima_setPoint) ? `${this.miniclima_setPoint} %` : ''; }
+			const h = this.bioHeaterTeclado;
+			return (h && h.state !== 'off' && h.active) ? `${h.active} °C` : '';
+		},
+		bioRango() {
+			if (this.bioModoHum) { return { min: this.HUMIDITY_min, max: this.HUMIDITY_max }; }
+			if (!this.bioHeaterTeclado) { return { min: 0, max: 0 }; }
+			let min = 0, max = 0;
+			try { min = this.getMinValue(); max = this.getMaxValue(); } catch (e) { /* sin datos */ }
+			return { min, max };
+		},
+		bioValorVacio() { return (this.bioModoHum ? this.humedad : this.cadenaNum) === '0'; },
+		bioFueraRango() {
+			const v = parseInt(this.bioModoHum ? this.humedad : this.cadenaNum, 10);
+			return isNaN(v) || v < this.bioRango.min || v > this.bioRango.max;
+		},
+		bioTecladoRango() {
+			const { min, max } = this.bioRango;
+			if (this.bioModoHum) { return this.$t('domotek.keypad.rangeHum', [min, max]); }
+			return this.$t('domotek.keypad.range', [`${Math.round(min)} °C`, Math.round(max)]);
+		},
+		bioAtajos() {
+			const { min, max } = this.bioRango;
+			if (this.bioModoHum) {
+				return [40, 50, 60, 70, 80, 90].filter(v => v >= min && v <= max).slice(0, 4).map(v => ({ valor: v, texto: `${v} %` }));
+			}
+			const lista = [];
+			[4, 25, 37, 45, 60, 80, 120, 180, 220].forEach(v => {
+				if (v >= min && v <= max && lista.length < 4 && !lista.some(p => p.valor === v)) { lista.push({ valor: v, texto: String(v) }); }
+			});
+			return lista;
+		},
+		bioChamberVisible() {
+			return (this.modeloMaquina != '2A') && (this.chamberMode == true) && !!(this.heaterTools && this.heaterTools[20]);
+		},
+		bioNombreCama() {
+			try { return this.nameCama.analog[0].name; } catch (e) { return ''; }
+		},
 
 
 		...mapGetters('isConnected', 'machine/model', ['global']),
@@ -1718,6 +1991,51 @@ export default {
 
 	},
 	methods: {
+		bioElegirTab(i) { // domotek: cambiar de posición sin cerrar la pantalla
+			if (i === 4) {
+				if (!this.camaClick || this.ClickToolAnterior !== 4) { this.camaClick = true; this.ChangeCama(4); }
+				this.toolClick = true;
+				return;
+			}
+			if (this.camaClick || this.ClickToolAnterior !== i) { this.camaClick = false; this.ChangeTool(i); }
+			this.toolClick = true;
+		},
+		bioIconoTool(r) { // domotek: icono para cada opción del árbol de tools
+			if (r.titulo === this.$t('domotek.toolNames.BACK')) { return 'mdi-arrow-left'; }
+			if (r.titulo === this.$t('domotek.toolNames.CHANGE')) { return 'mdi-swap-horizontal'; }
+			const k = (r.idHijo || r.idPadre || '').toUpperCase();
+			if (k.startsWith('EMPTY') || r.idTool === 0) { return 'mdi-close-circle-outline'; }
+			if (k.startsWith('SYR-HEAT')) { return 'mdi-thermometer'; }
+			if (k.startsWith('SYR-ES')) { return 'mdi-flash-outline'; }
+			if (k.startsWith('COAX')) { return 'mdi-circle-double'; }
+			if (k.startsWith('SYR')) { return 'mdi-needle'; }
+			if (k.startsWith('FIL')) { return 'mdi-printer-3d-nozzle-outline'; }
+			if (k.startsWith('UPE')) { return 'mdi-cube-outline'; }
+			if (k.startsWith('UV')) { return 'mdi-white-balance-sunny'; }
+			if (k.startsWith('AUTOCAL') || r.idTool === 15) { return 'mdi-axis-arrow'; }
+			return 'mdi-tools';
+		},
+		bioTecla(n) { // domotek: teclado sin campo de texto
+			if (this.bioModoHum) { this.clickHumedad(n); return; }
+			if (this.cadenaNum === '0') { this.cadenaNum = ''; }
+			if (this.cadenaNum.length >= 3) { return; }
+			this.cadenaNum = `${this.cadenaNum}${n}`;
+		},
+		bioFijar(v) {
+			if (this.bioModoHum) { this.humedad = String(v); } else { this.cadenaNum = String(v); }
+		},
+		bioTemp(h) { // domotek
+			if (!h || h.current === undefined || h.current <= -273) { return '--'; }
+			return h.current.toFixed(1);
+		},
+		bioEstado(h) { // domotek: off / active / standby / fault
+			return (h && h.state) ? h.state : 'off';
+		},
+		bioClickTemp(t) { // domotek: misma lógica que las tarjetas antiguas
+			if (t.tipo == 9) { this.screenMix(t.i); }
+			else if (t.editable) { this.keyboardScreen(t.i); }
+			else { this.nothing(t.i); }
+		},
 		...mapActions('machine', ['sendCode']),
 		closeDialog(){
 			this.DialogCalibration = false;
@@ -1769,9 +2087,20 @@ export default {
 				: this.$t('panel.tools.toolNoCalibrado');
 
 				this.offsetTexto = displayText;
+				const g = this.$store.state.machine.model.global || {};
+				this.offsetDatos = { // domotek
+					tipo: 'tool', calibrado: !!calibrado, puentes: [], error: '',
+					titulo: `T${toolNumber + 1}` + (g[`T${toolNumber}Name`] ? ` · ${g[`T${toolNumber}Name`]}` : ''),
+					ejes: [
+						{ eje: 'X', valor: x ?? '—' },
+						{ eje: axisConfig.label2.replace(/[: ]/g, ''), valor: secondAxis ?? '—' },
+						{ eje: axisConfig.label3.replace(/[: ]/g, ''), valor: zOrA ?? '—' }
+					]
+				};
 			} catch (err) {
 				this.offsetTitulo = '❌ Error al obtener offsets';
 				this.offsetTexto = '';
+				this.offsetDatos = { tipo: 'error', titulo: `T${toolNumber + 1}`, calibrado: false, ejes: [], puentes: [], error: this.$t('domotek.offsets.error') };
 			}
 
 			this.dialogOffsetsVisible = true;
@@ -1802,9 +2131,18 @@ export default {
 
 				this.offsetTitulo = this.$t('panel.tools.platformOffsets'); // o un texto como "Offsets de la plataforma"
 				this.offsetTexto = displayText;
+				const na = v => (v === 'N/A' ? '—' : v);
+				this.offsetDatos = { // domotek
+					tipo: 'plataforma', titulo: this.$t('panel.tools.platformOffsets'), calibrado: true, ejes: [], error: '',
+					puentes: [
+						{ eje: 'Z', titulo: this.$t('domotek.offsets.leftBridge'), min: na(zMin), max: na(zMax) },
+						{ eje: 'A', titulo: this.$t('domotek.offsets.rightBridge'), min: na(aMin), max: na(aMax) }
+					]
+				};
 			} catch (err) {
 				this.offsetTitulo = '❌ Error al obtener offsets de la plataforma';
 				this.offsetTexto = '';
+				this.offsetDatos = { tipo: 'error', titulo: this.$t('panel.tools.platformOffsets'), calibrado: false, ejes: [], puentes: [], error: this.$t('domotek.offsets.error') };
 			}
 
 			this.dialogOffsetsVisible = true;
@@ -2526,6 +2864,13 @@ export default {
 
 		handleKeyPress(event) {
 			const key = event.key;
+			if (this.temaBio) { // domotek: teclado físico con el tema oscuro (no hay campo de texto)
+				if (!this.marcador) { return; }
+				if (!isNaN(key) && key !== ' ' && key >= 0 && key <= 9) { this.bioTecla(parseInt(key, 10)); }
+				else if (key === 'Backspace') { if (this.bioModoHum) { this.deleteHumedad(); } else { this.deleteNums(); } }
+				else if (key === 'Enter') { if (this.bioModoHum) { this.okHumedad(); } else if (!this.bioFueraRango) { this.okNums(); } }
+				return;
+			}
 			if (this.marcador && this.modoInput === 'HUM') {
 				const key = event.key;
 				if (!isNaN(key) && key >= 0 && key <= 9) {

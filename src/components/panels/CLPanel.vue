@@ -42,7 +42,38 @@
 	}
 </style>
 <template>
-	<v-row class="mb-0 pb-0"  > 
+<div class="es-raiz">
+	<!-- domotek: limpieza con el tema oscuro -->
+	<div v-if="temaBio" class="bio-pp">
+		<header class="bio-proc-cab">
+			<button type="button" class="bio-volver" :aria-label="$t('domotek.tools.back')" @click="closeDialog"><v-icon>mdi-chevron-left</v-icon></button>
+			<v-icon color="var(--bio-azul)">mdi-brush-variant</v-icon>
+			<span class="bio-proc-titulo">{{ $t('domotek.proc.cleaning') }}</span>
+		</header>
+		<main class="bio-proc-cuerpo">
+			<h2 class="bio-proc-h2">{{ $t('domotek.proc.cleanSettings') }}</h2>
+			<div class="bio-proc-lista">
+				<div class="fila grande">
+					<span class="ic verde"><v-icon>mdi-brush-variant</v-icon></span>
+					<span class="txt"><strong>{{ $t('domotek.proc.cleanAuto') }}</strong><small>{{ $t('domotek.proc.cleanAutoHint') }}</small></span>
+					<button type="button" class="interruptor" :class="{ on: !!enableCL }" role="switch" :aria-checked="!!enableCL" @click="enableCL = !enableCL"><i></i></button>
+				</div>
+				<div class="fila grande" :class="{ tenue: !enableCL }">
+					<span class="ic"><v-icon>mdi-timer-outline</v-icon></span>
+					<span class="txt"><strong>{{ $t('domotek.varios.cleanDuringES') }}</strong><small>{{ $t('domotek.proc.interval') }}</small></span>
+					<button type="button" class="bio-proc-valor-btn" :disabled="!enableCL" @click="openTimeDialog"><strong>{{ $display(exposureTimeSeconds / 60, 2) }}</strong> min <v-icon small>mdi-pencil-outline</v-icon></button>
+					<button type="button" class="interruptor" :class="{ on: !!cadenceEnableCL }" role="switch" :aria-checked="!!cadenceEnableCL" :disabled="!enableCL" @click="cadenceEnableCL = !cadenceEnableCL"><i></i></button>
+				</div>
+			</div>
+			<div style="flex: 1"></div>
+			<footer class="bio-cal-pie">
+				<button type="button" class="bio-cal-sec listo" @click="StartSaveSettings()"><span class="bio-cap">{{ $t('domotek.varios.save') }}</span></button>
+				<button v-if="isprinting == 'idle' || isprinting == 'paused'" type="button" class="bio-cal-principal ancho" @click="StartClean()">{{ $t('domotek.proc.runOnce') }}</button>
+				<button v-else type="button" class="bio-cal-principal ancho aviso" @click="StartCleanPausing()">{{ $t('domotek.proc.runOnce') }}</button>
+			</footer>
+		</main>
+	</div>
+	<v-row v-else class="mb-0 pb-0"  > 
 		<v-col cols="12" align="center" class="py-0">
 			<v-stepper v-model="pasos" class="blue lighten-5 panelStepper"  >
 				<v-stepper-header class="Stephead">
@@ -107,8 +138,16 @@
 							<v-btn v-if="isprinting != 'idle' && isprinting != 'paused'" class="btnContinue mt-10 mr-5" color="#fb8c00" @click="StartCleanPausing();" rounded>{{ $t('domotek.varios.runOnce') }}</v-btn>
 							<!-- <v-btn class="btnContinue mt-10 " color="primary" @click="CambiaStep('1')"> Change <v-icon dark right> mdi-wrench-outline </v-icon></v-btn> -->
 						</v-card>
-						<v-dialog v-model="dialogManualTime" persistent max-width="380px">
-							<v-card>
+
+					</v-stepper-content>
+				</v-stepper-items>
+			</v-stepper>
+		</v-col>
+	</v-row>
+			<!-- Dialogos y aviso dentro de la misma columna: asi no crean filas vacias que alargan el panel -->
+						<v-dialog v-model="dialogManualTime" persistent :max-width="temaBio ? 760 : '380px'" :content-class="temaBio ? 'bio-teclado-dialogo' : ''">
+							<bio-teclado-valor v-if="temaBio" :abierto="dialogManualTime" :titulo="$t('domotek.proc.interval')" icono="mdi-timer-outline" color="azul" :valor="manualTimeInput" unidad="min" :error="manualTimeError" :actual="$display(exposureTimeSeconds / 60, 2)" :permitido="`${minTiempo} – ${maxTiempo} min`" :rango="$t('domotek.keypad.rangeGeneric', [minTiempo, maxTiempo, 'min'])" :atajos="[1, 5, 10, 30].map(v => ({ valor: v }))" @tecla="handleTimeKeyPress" @atajo="v => { manualTimeInput = String(v); validateTime(); }" @aceptar="confirmManualTime" @cancelar="cancelManualTime"></bio-teclado-valor>
+							<v-card v-else>
 								<v-card-title class="justify-center text-center">
 									<span class="headline">{{ $t('panel.electrospinning.timeInMinutes') }} </span>
 								</v-card-title>
@@ -151,10 +190,6 @@
 								</v-card-actions>
 							</v-card>
 						</v-dialog>
-					</v-stepper-content>
-				</v-stepper-items>
-			</v-stepper>
-			<!-- Dialogos y aviso dentro de la misma columna: asi no crean filas vacias que alargan el panel -->
 			<v-dialog v-model="dialogCL" max-width="500">
 				<v-card>                                                                                  
 					<v-card-title class="headline">
@@ -208,8 +243,7 @@
 			<v-snackbar content-class="snack" v-model="snackbar" :timeout="400" absolute left top :min-width="50"   color="light-blue white--text" >
 				{{this.snackbarValor}}
 			</v-snackbar>
-		</v-col>
-	</v-row>
+</div>
 </template>
 <script>
 'use strict'
@@ -238,6 +272,8 @@ export default {
 			panelOffsetPx: 80,		// alto que ocupan cabecera del stepper + margenes (subir si vuelve a salir scroll)
 			panelMinPx: 350,		// altura minima de la tarjeta
 			panelMaxPx: 400,		// altura maxima: en la pantalla de la impresora llena el hueco y en el PC no crece mas
+			minTiempo: 0.1,		// minutos
+			maxTiempo: 120,
 			dialogManualTime: false,
 			dialogTimePicker: false,
 			manualTimeInput: '',
@@ -310,6 +346,7 @@ export default {
 			}			
 		},
 
+		temaBio() { return this.$store.state.settings.temaBio; }, // domotek
 		isprinting: {
 			get() {
 				return this.$store.state.machine.model.state.status},
@@ -391,6 +428,12 @@ export default {
 			const rulePositive = this.rules.positiveNumber(value);
 			if (rulePositive !== true) {
 				this.manualTimeError = rulePositive;
+				return;
+			}
+
+			const ruleRange = this.rules.timeRange(value);
+			if (ruleRange !== true) {
+				this.manualTimeError = ruleRange;
 				return;
 			}
 

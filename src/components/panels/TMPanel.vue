@@ -42,7 +42,31 @@
 	}
 </style>
 <template>
-	<v-row class="mb-0 pb-0"  > 
+<div class="es-raiz">
+	<!-- domotek: mantener temperaturas con el tema oscuro -->
+	<div v-if="temaBio" class="bio-pp">
+		<header class="bio-proc-cab">
+			<button type="button" class="bio-volver" :aria-label="$t('domotek.tools.back')" @click="closeDialog"><v-icon>mdi-chevron-left</v-icon></button>
+			<v-icon color="var(--bio-calor)">mdi-thermometer-lines</v-icon>
+			<span class="bio-proc-titulo">{{ $t('domotek.jobs.keepTemps') }}</span>
+		</header>
+		<main class="bio-proc-cuerpo">
+			<p class="bio-tenue bio-proc-nota">{{ $t('domotek.proc.keepTempsHint') }}</p>
+			<div class="bio-proc-lista">
+				<div v-for="f in bioFilas" :key="f.id" class="fila grande">
+					<span class="ic"><v-icon>{{ f.icono }}</v-icon></span>
+					<span class="txt"><strong>{{ f.nombre }}</strong><small>{{ f.detalle }}</small></span>
+					<span class="pildora" :class="{ on: f.valor }">{{ f.valor ? $t('domotek.proc.on') : $t('domotek.proc.off') }}</span>
+					<button type="button" class="interruptor" :class="{ on: f.valor }" role="switch" :aria-checked="f.valor" :aria-label="f.nombre" @click="f.cambiar(!f.valor)"><i></i></button>
+				</div>
+			</div>
+			<div style="flex: 1"></div>
+			<footer class="bio-cal-pie">
+				<button type="button" class="bio-cal-principal ancho" @click="StartSaveSettings()"><span class="bio-cap">{{ $t('domotek.varios.save') }}</span></button>
+			</footer>
+		</main>
+	</div>
+	<v-row v-else class="mb-0 pb-0"  > 
 		<v-col cols="12" align="center" class="py-0">
 			<v-stepper v-model="pasos" class="blue lighten-5 panelStepper"  >
 				<v-stepper-header class="Stephead">
@@ -97,6 +121,8 @@
 					</v-stepper-content>
 				</v-stepper-items>
 			</v-stepper>
+		</v-col>
+	</v-row>
 			<!-- Dialogos y aviso dentro de la misma columna: asi no crean filas vacias que alargan el panel -->
 			<v-dialog v-model="dialogTMP" max-width="500">
 				<v-card>                                                                                  
@@ -151,8 +177,7 @@
 			<v-snackbar content-class="snack" v-model="snackbar" :timeout="400" absolute left top :min-width="50"   color="light-blue white--text" >
 				{{this.snackbarValor}}
 			</v-snackbar>
-		</v-col>
-	</v-row>
+</div>
 </template>
 <script>
 'use strict'
@@ -211,6 +236,24 @@ export default {
 			set(value){
 				this.sendCode(`set global.enableTMPChamber = ${value}`);
 			}			
+		},
+		temaBio() { return this.$store.state.settings.temaBio; }, // domotek
+		bioFilas() {
+			const m = this.$store.state.machine.model;
+			const heat = m.heat || {};
+			const actual = lista => {
+				const h = (lista || []).filter(i => i !== null && i >= 0).map(i => (heat.heaters || [])[i]).find(x => x);
+				return (h && typeof h.current === 'number') ? `${this.$t('domotek.keypad.current')} ${this.$display(h.current, 1)} °C` : '';
+			};
+			const nombresTools = (m.tools || []).filter(t => t).map(t => t.name || `T${t.number}`).join(' · ');
+			const filas = [
+				{ id: 'tools', icono: 'mdi-printer-3d-nozzle-outline', nombre: this.$t('panel.temperatures.toolTemperatures'), detalle: nombresTools, valor: !!this.enableTMPTools, cambiar: v => { this.enableTMPTools = v; } },
+				{ id: 'bed', icono: 'mdi-radiator', nombre: this.$t('panel.temperatures.bedTemperatures'), detalle: actual(heat.bedHeaters), valor: !!this.enableTMPBed, cambiar: v => { this.enableTMPBed = v; } }
+			];
+			if (this.ChamberMode) {
+				filas.push({ id: 'chamber', icono: 'mdi-cube-outline', nombre: this.$t('panel.temperatures.chamberTemperatures'), detalle: actual(heat.chamberHeaters), valor: !!this.enableTMPChamber, cambiar: v => { this.enableTMPChamber = v; } });
+			}
+			return filas;
 		},
 		isprinting: {
 			get() {

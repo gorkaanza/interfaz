@@ -11,6 +11,12 @@
 		<v-card-text>
 			<v-row :dense="$vuetify.breakpoint.mobile">
 				<v-col cols="12" sm="6">
+					<v-switch v-model="temaBio" :label="$t('panel.settingsAppearance.darkTheme')" hide-details></v-switch>
+				</v-col>
+				<v-col cols="12" sm="6">
+					<v-select v-model="modoPantalla" :items="modosPantalla" :label="$t('domotek.desktop.screenMode')" hide-details></v-select>
+				</v-col>
+				<v-col cols="12" sm="6">
 					<v-switch v-model="settingsStorageLocal" :label="$t('panel.settingsGeneral.settingsStorageLocal')" :disabled="!supportsLocalStorage" hide-details></v-switch>
 				</v-col>
 				<v-col cols="12" sm="6">
@@ -35,6 +41,7 @@
 import { mapState, mapGetters, mapActions, mapMutations } from 'vuex'
 
 import { localStorageSupported } from '../../utils/localStorage.js'
+import { forzarModo, modoForzado } from '../../utils/modoPantalla.js'
 
 export default {
 	computed: {
@@ -44,6 +51,21 @@ export default {
 		darkTheme: {
 			get() { return this.settings.darkTheme; },
 			set(value) { this.update({ darkTheme: value }); }
+		},
+		modosPantalla() { // domotek
+			return [
+				{ value: 'auto', text: this.$t('domotek.desktop.modeAuto') },
+				{ value: 'tactil', text: this.$t('domotek.desktop.touchMode') },
+				{ value: 'escritorio', text: this.$t('domotek.desktop.desktopMode') }
+			];
+		},
+		modoPantalla: {
+			get() { return modoForzado() || 'auto'; },
+			set(value) { forzarModo(value); }
+		},
+		temaBio: {
+			get() { return this.settings.temaBio; },
+			set(value) { this.update({ temaBio: value }); }
 		},
 		settingsStorageLocal: {
 			get() { return this.settings.settingsStorageLocal; },

@@ -1,0 +1,1183 @@
+// ---------------------------------------------------------------------------
+// Tema oscuro domoBIO
+// Se activa cuando <v-app> tiene la clase .tema-bio (Ajustes > Apariencia >
+// Tema oscuro). Recolorea los paneles existentes sin tocar su lógica: las
+// clases "blue lighten-*" y "teal" que usan los paneles se traducen aquí a
+// la paleta nueva.
+// ---------------------------------------------------------------------------
+
+// Paleta: cada color es una variable CSS para poder cambiar entre modo oscuro y modo claro
+$bio-fondo: var(--bio-fondo);
+$bio-rail: var(--bio-rail);
+$bio-sup: var(--bio-sup);
+$bio-sup2: var(--bio-sup2);
+$bio-sup3: var(--bio-sup3);
+$bio-borde: var(--bio-borde);
+$bio-linea: var(--bio-linea);
+$bio-linea2: var(--bio-linea2);
+$bio-texto: var(--bio-texto);
+$bio-tenue: var(--bio-tenue);
+$bio-apagado: var(--bio-apagado);
+$bio-hondo: var(--bio-hondo);
+$bio-codigo: var(--bio-codigo);
+$bio-acento: var(--bio-acento);
+$bio-acento-bg: var(--bio-acento-bg);
+$bio-acento-suave: var(--bio-acento-suave);
+$bio-acento-sombra: var(--bio-acento-sombra);
+$bio-calor: var(--bio-calor);
+$bio-calor-bg: var(--bio-calor-bg);
+$bio-peligro: var(--bio-peligro);
+$bio-peligro-bg: var(--bio-peligro-bg);
+$bio-ambar: var(--bio-ambar);
+$bio-ambar-bg: var(--bio-ambar-bg);
+$bio-azul: var(--bio-azul);
+$bio-azul-bg: var(--bio-azul-bg);
+$bio-lila: var(--bio-lila);
+$bio-lila-bg: var(--bio-lila-bg);
+$bio-amarillo: var(--bio-amarillo);
+$bio-verde: var(--bio-verde);
+$bio-verde-bg: var(--bio-verde-bg);
+$bio-desactivado: var(--bio-desactivado);
+$bio-marca-1: var(--bio-marca-1);
+$bio-marca-2: var(--bio-marca-2);
+$bio-home-no: var(--bio-home-no);
+$bio-home-si: var(--bio-home-si);
+
+.tema-bio {
+	--bio-fondo: #14171A;
+	--bio-rail: #0E1013;
+	--bio-sup: #1E2328;
+	--bio-sup2: #262C33;
+	--bio-sup3: #2F363E;
+	--bio-borde: #2F363E;
+	--bio-linea: #2A3138;
+	--bio-linea2: #3A444D;
+	--bio-texto: #E8EDF1;
+	--bio-tenue: #9AA5AF;
+	--bio-apagado: #5A6670;
+	--bio-hondo: #14171A;
+	--bio-codigo: #181C20;
+	--bio-acento: #3CC9B0;
+	--bio-acento-bg: #1F3B37;
+	--bio-acento-suave: rgba(60, 201, 176, .06);
+	--bio-acento-sombra: rgba(60, 201, 176, .25);
+	--bio-calor: #F2A65A;
+	--bio-calor-bg: #3A2E1C;
+	--bio-peligro: #F08A83;
+	--bio-peligro-bg: #3A1D1C;
+	--bio-ambar: #F5B52E;
+	--bio-ambar-bg: #3A321C;
+	--bio-azul: #6CB8E6;
+	--bio-azul-bg: #1C2F3A;
+	--bio-lila: #B49CF2;
+	--bio-lila-bg: #2B2540;
+	--bio-amarillo: #F2D35A;
+	--bio-verde: #6EDDA9;
+	--bio-verde-bg: #183A30;
+	--bio-desactivado: rgba(38, 44, 51, .5);
+	--bio-marca-1: #E8EDF1;
+	--bio-marca-2: #F5B52E;
+	--bio-home-no: #F2A65A;	// botón Home: ejes sin referenciar (naranja)
+	--bio-home-si: #3CC9B0;	// botón Home: todos los ejes referenciados (verde azulado)
+}
+// Modo claro: blancos y grises muy claros con el azul y el amarillo del logo de domoBIO
+.tema-bio.bio-claro {
+	--bio-fondo: #F3F5F8;
+	--bio-rail: #FFFFFF;
+	--bio-sup: #FFFFFF;
+	--bio-sup2: #EEF1F5;
+	--bio-sup3: #E3E7ED;
+	--bio-borde: #DDE2E9;
+	--bio-linea: #E4E8EE;
+	--bio-linea2: #C9D0DA;
+	--bio-texto: #141A29;
+	--bio-tenue: #5D6878;
+	--bio-apagado: #98A2AE;
+	--bio-hondo: #F6F8FB;
+	--bio-codigo: #FAFBFD;
+	--bio-acento: #0A21AD;
+	--bio-acento-bg: #E3E7FA;
+	--bio-acento-suave: rgba(10, 33, 173, .05);
+	--bio-acento-sombra: rgba(10, 33, 173, .18);
+	--bio-calor: #B87400;
+	--bio-calor-bg: #FFF2D1;
+	--bio-peligro: #C62828;
+	--bio-peligro-bg: #FDECEA;
+	--bio-ambar: #A86B00;
+	--bio-ambar-bg: #FFF4D6;
+	--bio-azul: #1F6FB8;
+	--bio-azul-bg: #E3EFFA;
+	--bio-lila: #6A4CC9;
+	--bio-lila-bg: #EEEAFB;
+	--bio-amarillo: #B58300;
+	--bio-verde: #16865A;
+	--bio-verde-bg: #E2F5EC;
+	--bio-desactivado: rgba(20, 26, 41, .06);
+	--bio-marca-1: #0A21AD;
+	--bio-marca-2: #FFB812;
+	--bio-home-no: #E8710A;	// naranja
+	--bio-home-si: #0A21AD;	// azul del logo
+}
+
+.tema-bio {
+
+	font-family: 'IBM Plex Sans', 'Roboto', system-ui, sans-serif !important;
+	font-variant-numeric: tabular-nums;
+	background: $bio-fondo !important;
+	color: $bio-texto;
+
+	.v-application--wrap { background: $bio-fondo; }
+
+	// Tipografía: Vuetify fija Roboto en varias clases
+	.text-h1, .text-h2, .text-h3, .text-h4, .text-h5, .text-h6,
+	.text-subtitle-1, .text-subtitle-2, .text-body-1, .text-body-2,
+	.text-caption, .text-button, .text-overline, .v-btn, .headline, .title {
+		font-family: inherit !important;
+	}
+	.v-btn { text-transform: none; letter-spacing: 0; font-weight: 500; }
+
+	// --- Superficies: mapa de las clases antiguas -------------------------
+	.blue.lighten-4 { background-color: $bio-fondo !important; border-color: $bio-fondo !important; }
+	.blue.lighten-5 { background-color: $bio-sup !important;   border-color: $bio-sup !important; }
+	.blue.lighten-3 { background-color: $bio-sup2 !important;  border-color: $bio-sup2 !important; }
+	.blue.lighten-2, .blue.lighten-1 { background-color: $bio-sup2 !important; }
+	.grey.darken-3, .grey.darken-4 { background-color: $bio-sup !important; }
+	.grey.darken-2, .blue.darken-3, .blue.darken-2 { background-color: $bio-sup2 !important; }
+	.blue--text { color: $bio-acento !important; caret-color: $bio-acento !important; }
+
+	.teal { background-color: $bio-acento !important; border-color: $bio-acento !important; color: $bio-rail !important; }
+	.teal .v-icon, .teal .v-btn__content { color: $bio-rail !important; }
+	.teal--text { color: $bio-acento !important; }
+
+	// Textos con color en línea pensados para fondo claro
+	// (Vue serializa los estilos en línea como rgb(), así que se cubren ambas formas)
+	[style*="0a21ad"], [style*="1565C0"], [style*="1565c0"],
+	[style*="rgb(10, 33, 173)"], [style*="rgb(21, 101, 192)"] { color: $bio-texto !important; }
+	[style*="ffb812"], [style*="rgb(255, 184, 18)"] { color: $bio-ambar !important; }
+	[style*="e2f1fc"], [style*="E3F2FD"], [style*="e3f2fd"], [style*="F5F5F5"],
+	[style*="rgb(226, 241, 252)"], [style*="rgb(227, 242, 253)"], [style*="rgb(245, 245, 245)"] {
+		background-color: $bio-sup2 !important;
+		color: $bio-texto !important;
+	}
+	.v-btn.blue.lighten-5, .v-btn.blue.lighten-4, .v-btn.blue.lighten-3 { color: $bio-texto !important; }
+	.v-icon:is(.theme--dark, .theme--light) { color: $bio-texto; }
+	.black--text { color: $bio-texto !important; caret-color: $bio-texto !important; }
+
+	// --- Tarjetas -----------------------------------------------------------
+	.v-card:is(.theme--dark, .theme--light), .v-sheet:is(.theme--dark, .theme--light):not(.v-btn) {
+		background-color: $bio-sup;
+		color: $bio-texto;
+	}
+	.v-card { border-radius: 16px !important; box-shadow: none !important; }
+	.v-card .v-card { background-color: $bio-sup2; }
+	.v-card.rounded-xl { border-radius: 16px !important; }
+	#global-container .v-card:is(.theme--dark, .theme--light) { background-color: $bio-sup !important; }
+	.v-divider:is(.theme--dark, .theme--light) { border-color: $bio-borde !important; }
+
+	// --- Botones --------------------------------------------------------------
+	.v-btn:not(.v-btn--text):not(.v-btn--icon):not(.v-btn--outlined):is(.theme--dark, .theme--light) {
+		background-color: $bio-sup2;
+		box-shadow: none !important;
+	}
+	.v-btn:not(.v-btn--round):not(.v-btn--fab) { border-radius: 12px; }
+	.v-btn--outlined:is(.theme--dark, .theme--light) {
+		background-color: $bio-sup2 !important;
+		border: 1px solid $bio-borde !important;
+		color: $bio-texto !important;
+	}
+	.v-btn--outlined:is(.theme--dark, .theme--light) .v-icon { color: inherit; }
+	.v-btn.primary, .v-btn.success { color: $bio-rail !important; }
+	.v-btn.primary .v-icon, .v-btn.success .v-icon { color: $bio-rail !important; }
+	.v-btn.error { background-color: $bio-peligro-bg !important; color: $bio-peligro !important; }
+	.v-btn.error .v-icon { color: $bio-peligro !important; }
+	.v-btn.v-btn--disabled:is(.theme--dark, .theme--light) { background-color: $bio-desactivado !important; }
+	.v-btn-toggle:is(.theme--dark, .theme--light) { background: $bio-fondo; border-radius: 12px; }
+	.v-btn-toggle > .v-btn.v-btn--active { background-color: $bio-acento !important; color: $bio-rail !important; }
+	.v-btn-toggle > .v-btn.v-btn--active .v-icon { color: $bio-rail !important; }
+
+	// --- Diálogos -------------------------------------------------------------
+	.v-dialog > .v-card, .v-dialog > .v-sheet { background-color: $bio-sup !important; border: 1px solid $bio-borde; }
+	.v-overlay__scrim { background-color: #000 !important; }
+
+	// --- Stepper (ES / UV / EMD) --------------------------------------------
+	.v-stepper:is(.theme--dark, .theme--light) { background: $bio-fondo !important; box-shadow: none !important; }
+	.v-stepper__header { background: $bio-rail; box-shadow: none !important; border-radius: 14px; }
+	.v-stepper__step__step { background-color: $bio-sup2 !important; color: $bio-tenue !important; }
+	.v-stepper__step--active .v-stepper__step__step,
+	.v-stepper__step--complete .v-stepper__step__step { background-color: $bio-acento !important; color: $bio-rail !important; }
+	.v-stepper__items, .v-stepper__content { background: transparent; }
+
+	// --- Tablas, listas, campos ------------------------------------------
+	.v-data-table:is(.theme--dark, .theme--light), .v-list:is(.theme--dark, .theme--light) { background-color: $bio-sup; }
+	.v-data-table:is(.theme--dark, .theme--light) tbody tr:hover:not(.v-data-table__expanded__content) { background: $bio-sup2 !important; }
+	.v-data-table:is(.theme--dark, .theme--light) th { color: $bio-tenue !important; }
+	.v-text-field--outlined:is(.theme--dark, .theme--light) fieldset { border-color: $bio-borde; }
+	.v-input--switch .v-input--switch__track { opacity: .5; }
+	.v-tabs:is(.theme--dark, .theme--light) > .v-tabs-bar { background: $bio-rail; }
+	.v-chip:is(.theme--dark, .theme--light) { background: $bio-sup2; }
+	.v-label, .v-select__selection, .v-input input, .v-input textarea { color: $bio-texto !important; }
+	.v-input .v-label { color: $bio-tenue !important; }
+	.v-text-field > .v-input__control > .v-input__slot:before { border-color: $bio-borde !important; }
+
+	// Colores semánticos de iconos
+	.v-icon.teal--text, .v-icon.success--text { color: $bio-acento !important; }
+	.v-icon.warning--text, .v-icon.orange--text { color: $bio-calor !important; }
+
+	// --- Barra lateral nueva -------------------------------------------------
+	.bio-rail {
+		background: $bio-rail !important;
+		border: none !important;
+		.v-navigation-drawer__border { display: none; }
+		.v-navigation-drawer__content { display: flex; flex-direction: column; align-items: center; padding: 16px 0; gap: 8px; }
+	}
+	.bio-rail-btn {
+		width: 56px; height: 56px; border-radius: 14px; border: none; cursor: pointer;
+		background: transparent; color: $bio-tenue;
+		display: flex; align-items: center; justify-content: center; position: relative;
+		.v-icon { color: inherit !important; }
+		&:hover { background: $bio-sup; }
+		&.activo { background: $bio-acento-bg; color: $bio-acento; }
+		.anillo { position: absolute; inset: 4px; pointer-events: none; }
+	}
+	.bio-rail-hueco { flex: 1; }
+}
+
+// ---------------------------------------------------------------------------
+// Pantalla Herramientas (Tools.vue)
+// ---------------------------------------------------------------------------
+.tema-bio {
+	.bio-h1 { margin: 0 0 2px; font-size: 20px; font-weight: 600; line-height: 1.2; }
+	.bio-tenue { color: $bio-tenue; }
+	.bio-cap { display: inline-block; text-transform: lowercase; }
+	.bio-cap::first-letter { text-transform: uppercase; }
+
+	.bio-tools { display: flex; flex-direction: column; gap: 10px; padding-top: 16px; height: calc(100vh - 24px); min-height: 440px; box-sizing: border-box; }
+	.bio-tools button { font-family: inherit; color: inherit; background: none; border: none; cursor: pointer; text-align: left; padding: 0; }
+	.bio-tools button:disabled { cursor: default; }
+
+	.bio-tools-grid { display: grid; gap: 10px; flex: 1.15; min-height: 0; }
+	.bio-tool {
+		background: $bio-sup; border-radius: 16px; padding: 12px;
+		display: flex; flex-direction: column; gap: 10px; min-width: 0; box-sizing: border-box;
+		border: 2px solid transparent;
+	}
+	.bio-tool--sel { border-color: $bio-acento; }
+	.bio-tool-cab { display: flex; align-items: center; gap: 8px; min-height: 36px; }
+	.bio-tool-nombre { flex: 1; font-size: 14px; font-weight: 600; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-height: 36px; }
+
+	.bio-punto {
+		flex: none; width: 28px; height: 28px; border-radius: 50% !important;
+		border: 2px solid $bio-apagado !important; box-sizing: border-box; display: inline-block;
+	}
+	.bio-punto--active { border-color: $bio-acento !important; background: $bio-acento !important; box-shadow: inset 0 0 0 4px $bio-sup; }
+	.bio-punto--standby { border-color: $bio-calor !important; background: $bio-calor !important; box-shadow: inset 0 0 0 4px $bio-sup; }
+	.bio-punto--fault { border-color: $bio-peligro !important; background: $bio-peligro !important; box-shadow: inset 0 0 0 4px $bio-sup; }
+
+	.bio-icono {
+		flex: none; width: 36px; height: 36px; border-radius: 10px !important;
+		background: $bio-sup2 !important; display: flex !important; align-items: center; justify-content: center;
+		.v-icon { font-size: 20px; }
+		&.ok .v-icon { color: $bio-acento !important; }
+		&.aviso .v-icon { color: $bio-calor !important; }
+	}
+	.bio-tool-tipo {
+		font-size: 17px !important; font-weight: 600; line-height: 1.25;
+		overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+		&.vacio { color: $bio-tenue !important; }
+	}
+	.bio-tool-temp {
+		flex: 1; min-height: 64px; border-radius: 10px !important; background: $bio-codigo !important;
+		display: flex !important; flex-direction: column; justify-content: center; gap: 4px;
+		padding: 8px 10px !important; font-size: 13px;
+		&:not(:disabled):active { background: $bio-sup2 !important; }
+		.bio-tenue { text-align: center; }
+	}
+	.bio-temp-fila {
+		display: flex; justify-content: space-between; align-items: baseline; gap: 6px;
+		.nom { color: $bio-tenue; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+		.val { font-size: 17px; font-weight: 600; white-space: nowrap; flex: none; }
+		.val small { font-size: 12px; font-weight: 500; color: $bio-calor; }
+		&.sec .val { font-size: 14px; }
+	}
+
+	.bio-tools-abajo {
+		display: grid; grid-template-columns: 110px minmax(0, 1.6fr) minmax(0, 1fr); gap: 10px; flex: 1; min-height: 0;
+		&.sin-chamber { grid-template-columns: 110px minmax(0, 1fr); }
+	}
+	.bio-calib {
+		border-radius: 16px !important; background: $bio-acento-bg !important; color: $bio-acento !important;
+		display: flex !important; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
+		font-size: 12px; font-weight: 600; text-align: center !important;
+		.v-icon { color: $bio-acento !important; }
+	}
+	.bio-chip { font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 45%; }
+	.bio-fila-valor { flex: 1; display: flex; align-items: flex-end; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+	.bio-grande { font-size: 32px; font-weight: 500; line-height: 1; white-space: nowrap; small { font-size: 16px; color: $bio-tenue; } }
+	.bio-objetivo {
+		height: 44px; padding: 0 14px !important; border-radius: 12px !important; background: $bio-sup2 !important;
+		font-size: 14px; white-space: nowrap;
+		strong { color: $bio-calor; }
+		&.hum { color: $bio-azul !important; font-weight: 600; }
+		&:disabled { opacity: .5; }
+	}
+}
+
+// ---------------------------------------------------------------------------
+// Inicio
+// ---------------------------------------------------------------------------
+.tema-bio {
+	.bio-estado {
+		display: inline-flex; align-items: center; gap: 8px; background: $bio-sup; border-radius: 999px;
+		padding: 6px 14px; font-size: 14px; font-weight: 500; white-space: nowrap;
+	}
+	.bio-estado-punto { width: 8px; height: 8px; border-radius: 50%; flex: none; }
+
+	.bio-inicio {
+		height: calc(100vh - 24px); min-height: 440px; box-sizing: border-box; padding: 16px 6px 0;
+		display: flex; flex-direction: column; gap: 12px;
+	}
+	.bio-inicio-cab { display: flex; align-items: center; gap: 12px; min-width: 0; }
+	.bio-maquina { font-size: 18px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+	.bio-marca-bio { color: $bio-marca-2; }
+	.bio-inicio-marca { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; min-height: 0; }
+	.bio-inicio-logo { width: 96px; height: 96px; object-fit: contain; background: #fff; border-radius: 50%; }
+	.bio-inicio-nombre { font-size: 52px; font-weight: 700; letter-spacing: -1px; line-height: 1; }
+	.bio-temps { display: grid; gap: 8px; }
+	.bio-temp {
+		background: $bio-sup; border-radius: 14px; padding: 10px 12px; min-width: 0;
+		.et { font-size: 12px; color: $bio-tenue; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+		.vl { font-size: 20px; font-weight: 500; white-space: nowrap; }
+		.vl.vacio { color: $bio-tenue; }
+	}
+}
+
+// ---------------------------------------------------------------------------
+// Movimiento
+// ---------------------------------------------------------------------------
+.tema-bio {
+	.bio-mov {
+		height: calc(100vh - 36px); min-height: 430px; box-sizing: border-box; padding-top: 8px;
+		display: flex; flex-direction: column; gap: 10px;
+		button { font-family: inherit; color: inherit; border: none; cursor: pointer; }
+	}
+	.bio-pos {
+		background: $bio-sup; border-radius: 14px; padding: 8px 8px 8px 14px;
+		display: flex; align-items: center; gap: 6px;
+	}
+	.bio-pos-eje {
+		flex: 1; min-width: 0;
+		.et { font-size: 11px; color: $bio-tenue; }
+		.vl { font-size: 16px; font-weight: 500; white-space: nowrap; }
+		.vl.sin-home { color: $bio-calor; }
+	}
+	.v-btn.bio-home {
+		height: 44px !important; padding: 0 16px !important; border-radius: 12px !important;
+		background: $bio-home-no !important; color: $bio-rail !important; font-size: 14px; font-weight: 600;
+		.v-icon { color: $bio-rail !important; }
+		&.ok { background: $bio-home-si !important; }
+	}
+	.bio-mandos { flex: 1; display: grid; grid-template-columns: minmax(0, 1fr) 96px; gap: 10px; min-height: 0; }
+	.bio-cruz {
+		background: $bio-sup; border-radius: 16px; padding: 10px; box-sizing: border-box;
+		display: grid; grid-template-columns: 76px minmax(0, 1fr) 76px; grid-template-rows: 64px minmax(0, 1fr) 64px; gap: 8px;
+	}
+	.bio-cruz-centro { display: flex; align-items: center; justify-content: center; }
+	.v-btn.bio-flecha {
+		height: 100% !important; width: 100% !important; min-width: 0 !important; border-radius: 14px !important;
+		background: $bio-sup2 !important; color: $bio-texto !important; font-size: 14px; font-weight: 600;
+		.v-btn__content { gap: 8px; }
+		&.col .v-btn__content { flex-direction: column; gap: 2px; }
+		.v-icon { font-size: 26px; }
+		&:active { background: $bio-acento-bg !important; }
+	}
+	.bio-z {
+		background: $bio-sup; border-radius: 16px; padding: 10px; box-sizing: border-box;
+		display: flex; flex-direction: column; gap: 8px;
+		.v-btn.bio-flecha { flex: 1; height: auto !important; }
+		> span { text-align: center; font-size: 14px; font-weight: 600; }
+	}
+	.bio-segmentos { display: flex; align-items: center; background: $bio-fondo; border-radius: 12px; padding: 4px; gap: 4px; }
+	.bio-seg, .v-btn.bio-seg {
+		height: 44px !important; min-width: 52px !important; padding: 0 10px !important; border-radius: 9px !important;
+		background: transparent !important; color: $bio-texto !important; font-size: 14px; box-shadow: none !important;
+		&.activo { background: $bio-acento !important; color: $bio-rail !important; font-weight: 600; }
+	}
+	.bio-mov-abajo { display: flex; gap: 10px; align-items: stretch; min-height: 60px; }
+	.bio-pasos { background: $bio-sup; border-radius: 14px; }
+	.bio-mm { font-size: 13px; padding: 0 8px 0 4px; }
+	.bio-accion {
+		width: 96px; border-radius: 14px; background: $bio-sup !important; font-size: 12px; font-weight: 500;
+		display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+		.v-icon { color: $bio-texto !important; }
+		&:active { background: $bio-sup2 !important; }
+	}
+}
+
+// ---------------------------------------------------------------------------
+// Trabajos (pestañas Trabajo y Procesos)
+// ---------------------------------------------------------------------------
+.tema-bio {
+	.bio-job {
+		height: calc(100vh - 28px); min-height: 440px; box-sizing: border-box; padding-top: 4px;
+		display: flex; flex-direction: column; gap: 8px;
+		button { font-family: inherit; color: inherit; border: none; cursor: pointer; }
+	}
+	.bio-job-tabs { align-self: flex-start; background: $bio-sup; padding: 3px; }
+	.bio-job-tabs .bio-seg { height: 34px !important; padding: 0 16px !important; font-size: 13px; }
+	.bio-job-tab-n { display: inline-flex; align-items: center; justify-content: center; min-width: 18px; height: 18px; border-radius: 9px; margin-left: 6px; font-size: 11px; font-weight: 600; background: $bio-acento-bg; color: $bio-acento; }
+	.bio-seg.activo .bio-job-tab-n { background: $bio-rail; }
+
+	.bio-job-cab { background: $bio-sup; border-radius: 16px; padding: 10px 16px; display: flex; flex-direction: column; gap: 6px; }
+	.bio-job-fila { display: flex; align-items: center; gap: 10px; min-height: 36px; }
+	.bio-job-cab .bio-estado { background: $bio-sup2; font-size: 12px; font-weight: 600; padding: 4px 10px; }
+	.bio-job-cab .bio-estado.activo { background: $bio-acento-bg; color: $bio-acento; }
+	.bio-job-cab .bio-estado.pausa { background: $bio-calor-bg; color: $bio-calor; }
+	.bio-job-archivo { flex: 1; min-width: 0; font-size: 16px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+	.bio-job-pct { font-size: 24px; font-weight: 600; color: $bio-acento; line-height: 1; }
+	.bio-btn-acento { height: 36px; padding: 0 14px; border-radius: 10px; background: $bio-acento !important; color: $bio-rail !important; font-size: 13px; font-weight: 600; }
+	.v-btn.bio-btn-sec-peq { height: 36px !important; padding: 0 12px !important; border-radius: 10px !important; background: $bio-sup2 !important; color: $bio-texto !important; font-size: 13px; box-shadow: none !important; }
+	.bio-barra { height: 8px; border-radius: 4px; background: $bio-linea; overflow: hidden; div { height: 100%; background: $bio-acento; border-radius: 4px; transition: width .4s; } }
+	.bio-job-datos { display: flex; gap: 16px; font-size: 13px; color: $bio-tenue; align-items: center; white-space: nowrap; overflow: hidden; strong { color: $bio-texto; font-weight: 500; } }
+	.bio-aviso { display: inline-flex; align-items: center; gap: 4px; color: $bio-texto; font-weight: 600; }
+
+	.bio-job-cuerpo { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) 236px; gap: 8px; }
+	.bio-job-vista { position: relative; background: $bio-sup; border-radius: 16px; min-height: 0; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+	.bio-job-vista-tabs { position: absolute; left: 8px; top: 8px; z-index: 1; padding: 3px; }
+	.bio-job-vista-tabs .bio-seg { height: 30px !important; min-width: 0 !important; padding: 0 12px !important; font-size: 12px; }
+	.bio-job-vista-tabs .bio-seg.activo { background: $bio-sup2 !important; color: $bio-texto !important; }
+	.bio-job-webcam { width: 100%; height: 100%; }
+	.bio-job-webcam .v-card__title { display: none; }
+	.bio-job-capas { position: absolute; inset: 44px 8px 8px; }
+	.bio-job-capas .v-card { background: transparent !important; }
+	.bio-job-chips { position: absolute; right: 8px; bottom: 8px; display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+	.bio-chip-proc { background: $bio-fondo; border-radius: 999px; padding: 4px 10px; font-size: 12px; }
+
+	.bio-job-controles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: repeat(3, minmax(0, 1fr)); gap: 8px; min-height: 0; }
+	.bio-tile, .v-btn.bio-tile {
+		height: auto !important; min-height: 0 !important; width: 100%; border-radius: 14px !important;
+		background: $bio-sup !important; color: $bio-texto !important; box-shadow: none !important;
+		display: flex !important; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+		font-size: 12px; font-weight: 500; text-align: center; padding: 6px !important; letter-spacing: 0;
+		.v-btn__content { flex-direction: column; gap: 4px; white-space: normal; }
+		.v-icon { font-size: 24px; }
+		.v-icon:not([style*="color"]) { color: $bio-texto !important; }
+		&:active { background: $bio-sup2 !important; }
+		&.peligro { background: $bio-peligro-bg !important; color: $bio-peligro !important; .v-icon { color: $bio-peligro !important; } }
+		&.v-btn--disabled, &:disabled { opacity: .45; }
+		&.valor { gap: 2px; .et { font-size: 11px; color: $bio-tenue; } .vl { font-size: 17px; font-weight: 600; } }
+	}
+	.v-btn.bio-tile:not(.peligro):not(.v-btn--disabled) { background: $bio-sup2 !important; }
+
+	.bio-job-procesos { flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: minmax(0, 1fr); gap: 8px; }
+	.bio-proc {
+		background: $bio-sup !important; border-radius: 16px; padding: 10px 16px;
+		display: grid; grid-template-columns: 40px minmax(0, 1fr); grid-template-rows: auto auto; column-gap: 12px; align-items: center; align-content: center; text-align: left;
+		.v-icon { grid-row: 1 / span 2; font-size: 32px; }
+		.v-icon:not([style*="color"]) { color: $bio-texto !important; }
+		.nom { font-size: 16px; font-weight: 600; }
+		.est { font-size: 13px; color: $bio-tenue; }
+		.est.on { color: $bio-acento; }
+		&:active { background: $bio-sup2 !important; }
+	}
+
+	.bio-job-temps {
+		display: flex; gap: 8px; font-size: 13px;
+		> span { flex: 1; min-width: 0; background: $bio-sup; border-radius: 10px; padding: 8px 10px; color: $bio-tenue; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+		strong { color: $bio-texto; font-weight: 500; }
+		.obj, .ud { color: $bio-calor; }
+		.ud { color: $bio-tenue; }
+	}
+}
+
+// Herramientas · elegir tool (pantalla completa sobre el contenido)
+.tema-bio {
+	.bio-elegir {
+		position: fixed; top: 0; right: 0; bottom: 0; left: 80px; z-index: 6;
+		background: $bio-fondo; padding: 14px 18px; box-sizing: border-box;
+		display: flex; flex-direction: column; gap: 12px;
+		button { font-family: inherit; color: inherit; border: none; cursor: pointer; }
+	}
+	.bio-elegir-cab { display: flex; align-items: center; gap: 12px; }
+	.bio-elegir-cab .bio-segmentos { background: $bio-sup; }
+	.bio-volver { width: 44px; height: 44px; border-radius: 12px; background: $bio-sup !important; display: flex; align-items: center; justify-content: center; .v-icon { color: $bio-texto !important; } }
+	.bio-elegir-grid { flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); grid-auto-rows: minmax(0, 150px); align-content: start; gap: 10px; }
+	.bio-opcion {
+		border-radius: 16px; border: 2px solid transparent !important; background: $bio-sup !important;
+		display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
+		font-size: 13px; font-weight: 500; padding: 8px; text-align: center; min-height: 110px;
+		.v-icon { font-size: 30px; color: $bio-texto !important; }
+		&.actual { border-color: $bio-acento !important; background: $bio-acento-bg !important; font-weight: 600; .v-icon { color: $bio-acento !important; } }
+		&.carpeta::after { content: '›'; color: $bio-tenue; font-size: 16px; line-height: 1; }
+		&:active { background: $bio-sup2 !important; }
+	}
+	.bio-elegir-pie { display: flex; align-items: center; gap: 12px; font-size: 13px; }
+	.bio-btn-sec { width: 150px; height: 52px; border-radius: 14px; background: $bio-sup !important; font-size: 15px; font-weight: 500; }
+}
+
+// Diálogos y paneles: botones de teclado y colores semánticos
+.tema-bio {
+	.v-dialog .v-btn.blue.lighten-4, .v-dialog .v-btn.blue.lighten-5 { background-color: $bio-sup2 !important; }
+	.v-dialog .v-btn.blue.lighten-4:active { background-color: $bio-acento-bg !important; }
+	.v-btn.red.lighten-3, .v-btn.red.lighten-2, .v-btn.red.lighten-1, .v-btn.red {
+		background-color: $bio-peligro-bg !important; color: $bio-peligro !important;
+		.v-icon { color: $bio-peligro !important; }
+	}
+	.v-btn.green.lighten-3, .v-btn.green.lighten-2, .v-btn.green.lighten-1, .v-btn.green {
+		background-color: $bio-acento-bg !important; color: $bio-acento !important;
+		.v-icon { color: $bio-acento !important; }
+	}
+	// icono "salir" de los paneles (SVG oscuro pensado para fondo claro)
+	.v-image__image[style*="exit-2860"], .v-image__image[style*="exit."] { filter: brightness(0) invert(.85); }
+}
+
+// ---------------------------------------------------------------------------
+// Modo escritorio: menú lateral y barra superior
+// ---------------------------------------------------------------------------
+.tema-bio {
+	.bio-nav {
+		background: $bio-rail !important; border: none !important;
+		.v-navigation-drawer__border { display: none; }
+		.v-navigation-drawer__content { display: flex; flex-direction: column; padding: 18px 12px; gap: 2px; }
+	}
+	.bio-nav-logo { font-size: 22px; font-weight: 700; padding: 0 10px 14px; letter-spacing: -.3px; color: $bio-marca-1; }
+	.bio-nav-grupo { font-size: 11px; font-weight: 600; letter-spacing: .08em; color: $bio-apagado; padding: 14px 10px 6px; text-transform: uppercase; }
+	.bio-nav-item {
+		display: flex; align-items: center; gap: 10px; height: 38px; padding: 0 10px; border-radius: 10px;
+		border: none; background: transparent; color: $bio-tenue; font-family: inherit; font-size: 14px; text-align: left; cursor: pointer;
+		.v-icon { color: inherit !important; }
+		&:hover { background: $bio-sup; color: $bio-texto; }
+		&.activo { background: $bio-acento-bg; color: $bio-acento; font-weight: 500; }
+	}
+	.bio-nav-pct { margin-left: auto; font-size: 12px; color: $bio-acento; }
+	.bio-topbar.v-app-bar.v-toolbar.v-sheet { background: $bio-fondo !important; border-bottom: 1px solid $bio-sup !important; }
+	.bio-topbar .v-toolbar__content { padding: 0 24px; }
+	.bio-topbar .clsvbtn2 { height: 40px !important; }
+}
+
+// ---------------------------------------------------------------------------
+// Modo escritorio (según la maqueta Escritorio_Panel)
+// ---------------------------------------------------------------------------
+.tema-bio.bio-escritorio {
+	.bio-nav .v-navigation-drawer__content { padding: 20px 14px; gap: 4px; }
+	.bio-nav-logo { font-size: 22px; padding: 0 10px 18px; }
+	.bio-nav-grupo { font-size: 11px; color: $bio-tenue; letter-spacing: .06em; padding: 14px 10px 4px; }
+	.bio-nav-grupo:first-of-type { padding-top: 8px; }
+	.bio-nav-item { height: 40px; font-size: 14px; gap: 10px; color: $bio-texto; flex: none; }
+	.bio-nav-item.activo { color: $bio-acento; }
+	.bio-nav-item.tenue { color: $bio-tenue; font-size: 13px; height: 34px; }
+	.bio-nav-punto { width: 8px; height: 8px; border-radius: 50%; flex: none; }
+
+	.bio-topbar.v-app-bar.v-toolbar.v-sheet { border-bottom: 1px solid $bio-linea !important; }
+	.bio-topbar .v-toolbar__content { padding: 0 24px; gap: 16px; }
+	.bio-topbar .bio-maquina { font-size: 16px; font-weight: 600; }
+	.bio-topbar .bio-estado { font-size: 13px; font-weight: 600; padding: 4px 12px; background: $bio-acento-bg; color: $bio-acento; }
+	.bio-codigo { flex: 1; max-width: 560px; margin-left: 24px; display: flex; gap: 8px; }
+	.bio-codigo input {
+		flex: 1; min-width: 0; height: 40px; border-radius: 10px; border: 1px solid $bio-linea; background: $bio-sup; color: $bio-texto;
+		padding: 0 14px; font-size: 14px; font-family: 'IBM Plex Mono', ui-monospace, monospace; outline: none;
+		&:focus { border-color: $bio-acento; }
+		&::placeholder { color: $bio-apagado; }
+	}
+	.bio-codigo button { height: 40px; padding: 0 16px; border-radius: 10px; border: none; background: $bio-sup2; color: $bio-texto; font: inherit; font-size: 14px; cursor: pointer; &:disabled { opacity: .5; cursor: default; } }
+	.bio-parada.v-btn, .bio-parada .v-btn, .bio-topbar .clsvbtn2 {
+		width: auto !important; height: 42px !important; padding: 0 18px !important; border-radius: 10px !important;
+		background: #C93C35 !important; color: #fff !important; font-size: 14px; font-weight: 600;
+		.v-icon { color: #fff !important; }
+	}
+	.bio-topbar .v-btn--block { display: inline-flex; flex: none; min-width: 0 !important; }
+
+	// Las pantallas táctiles se ven a su tamaño y centradas, sin estirarse por el monitor
+	.bio-inicio, .bio-tools, .bio-mov, .bio-job {
+		height: min(calc(100vh - 64px - 40px), 600px); min-height: 0;
+		width: 100%; max-width: 1040px; margin: 8px auto 0;
+	}
+	.bio-elegir { left: 240px; top: 64px; }
+	.bio-elegir .bio-elegir-grid { max-width: 1040px; }
+	.bio-editor { height: calc(100vh - 64px - 40px); }
+}
+
+// vista de la figura dentro de Trabajos
+.tema-bio .bio-job-vista > .bio-vista { width: 100%; height: 100%; background: transparent; border-radius: 0; }
+
+// ---------------------------------------------------------------------------
+// Calibración (CalibrationPanel) · 3 pasos a pantalla completa
+// ---------------------------------------------------------------------------
+.tema-bio {
+	.v-dialog--fullscreen > .col:has(> .bio-cal) { padding: 0 !important; }
+	.bio-cal {
+		position: fixed; inset: 0; z-index: 1; background: $bio-fondo; color: $bio-texto;
+		display: flex; flex-direction: column; text-align: left; font-size: 14px;
+		button { font-family: inherit; color: inherit; border: none; cursor: pointer; }
+		button:disabled { cursor: default; }
+	}
+	.bio-cal-cab { height: 64px; flex: none; display: flex; align-items: center; gap: 12px; padding: 0 16px; background: $bio-rail; box-sizing: border-box; }
+	.bio-cal-titulo { font-size: 17px; font-weight: 600; }
+	.bio-cal-pasos { list-style: none; margin: 0; padding: 0; display: flex; gap: 6px; }
+	.bio-cal-pasos button {
+		height: 34px; padding: 0 12px; border-radius: 999px; background: $bio-sup !important; color: $bio-tenue !important;
+		font-size: 13px; font-weight: 500; display: inline-flex; align-items: center; gap: 4px; white-space: nowrap;
+		.v-icon { color: $bio-acento !important; }
+		&.activo { background: $bio-acento !important; color: $bio-rail !important; }
+		&.hecho { color: $bio-texto !important; }
+	}
+	.bio-cal-cuerpo { flex: 1; min-height: 0; padding: 14px 24px 16px; box-sizing: border-box; display: flex; flex-direction: column; gap: 10px; }
+	.bio-cal-tarjeta { background: $bio-sup; border-radius: 16px; min-height: 0; }
+	.bio-cal-paso1 { flex: 1; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); align-items: center; gap: 24px; padding: 16px 28px; }
+	.bio-cal-dibujo { width: 100%; max-height: 220px; }
+	.bio-cal-texto { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+	.bio-cal-texto h2 { margin: 0; font-size: 22px; font-weight: 600; line-height: 1.2; }
+	.bio-cal-texto p { margin: 0; color: $bio-tenue; font-size: 14px; line-height: 1.45; }
+	.bio-cal-check { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; font-size: 14px; }
+	.bio-cal-check li { display: flex; align-items: center; gap: 8px; color: $bio-texto; .v-icon { color: $bio-calor !important; } }
+	.bio-cal-check li.ok .v-icon { color: $bio-acento !important; }
+	.bio-cal-marcar { display: flex; align-items: center; gap: 8px; background: none; padding: 0; font-size: 14px; min-height: 28px; }
+	.bio-cal-check li .bio-cal-marcar .v-icon { color: $bio-tenue !important; }
+	.bio-cal-check li.ok .bio-cal-marcar .v-icon { color: $bio-acento !important; }
+	.bio-cal-principal {
+		height: 52px; border-radius: 14px; background: $bio-acento !important; color: $bio-rail !important; font-size: 15px; font-weight: 600; padding: 0 20px;
+		&.corto { min-width: 130px; }
+		&:disabled { opacity: .5; }
+	}
+	.bio-cal-sec {
+		height: 52px; min-width: 130px; padding: 0 18px; border-radius: 14px; background: $bio-sup !important; color: $bio-texto !important; font-size: 15px; font-weight: 500;
+		&.listo { background: $bio-sup2 !important; }
+		&:disabled { color: $bio-apagado !important; }
+	}
+	.bio-cal-progreso { display: flex; flex-direction: column; gap: 6px; color: $bio-tenue; font-size: 13px; padding: 10px 0; }
+	.bio-cal-pie { display: flex; justify-content: flex-end; gap: 10px; flex: none; }
+	.bio-cal-pie.dentro { margin-top: 4px; .bio-cal-sec { flex: 1; } }
+
+	// paso 2
+	.bio-cal-dos { flex-direction: row; gap: 16px; }
+	.bio-cal-dos > .bio-cal-texto { flex: 1.1; }
+	.bio-cal-cama { flex: 1; padding: 14px; display: flex; }
+	.bio-cal-cama-placa {
+		flex: 1; background: $bio-sup2; border-radius: 12px; padding: 22px 12px; position: relative;
+		display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: repeat(2, minmax(0, 1fr)); gap: 30px 24px;
+	}
+	.bio-cal-lado { position: absolute; left: 0; right: 0; text-align: center; font-size: 11px; color: $bio-tenue; }
+	.bio-cal-lado.arriba { top: 4px; } .bio-cal-lado.abajo { bottom: 4px; }
+	.bio-cal-esquina {
+		border-radius: 12px; background: $bio-sup; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+		.v-icon { font-size: 26px; color: $bio-tenue !important; }
+		strong { font-size: 22px; font-weight: 600; line-height: 1.1; }
+		span { font-size: 12px; color: $bio-tenue; }
+		&.ok { background: $bio-verde-bg; color: $bio-verde; .v-icon, span { color: $bio-verde !important; } }
+		&.mal { background: $bio-peligro-bg; color: $bio-peligro; .v-icon, span { color: $bio-peligro !important; } }
+	}
+	.bio-cal-leyenda { background: $bio-sup; border-radius: 12px; padding: 10px 14px; display: flex; flex-direction: column; gap: 6px; font-size: 13px; }
+	.bio-cal-leyenda span { display: flex; align-items: center; gap: 10px; }
+	.bio-cal-leyenda i { width: 14px; height: 14px; border-radius: 4px; display: inline-block; }
+	.bio-cal-leyenda i.verde { background: $bio-verde; } .bio-cal-leyenda i.rojo { background: $bio-peligro; }
+	.bio-cal-resumen { border-radius: 12px; padding: 10px 14px; background: $bio-peligro-bg; color: $bio-peligro; font-size: 13.5px; }
+	.bio-cal-resumen.ok { background: $bio-verde-bg; color: $bio-verde; }
+
+	// paso 3
+	.bio-cal-mandos { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) 96px 170px; gap: 10px; }
+	.bio-cal-pos {
+		background: $bio-sup; border-radius: 16px; padding: 12px 14px; display: flex; flex-direction: column; gap: 4px; font-size: 14px; min-height: 0; overflow: hidden;
+		strong { font-weight: 600; } strong.sin-home { color: $bio-calor; }
+		.bio-tenue { font-size: 12px; }
+	}
+	.bio-cal-offset { font-size: 20px; font-weight: 600; color: $bio-acento; }
+	.bio-cal-pie3 { align-items: stretch; .bio-cal-sec, .bio-cal-principal, .bio-cal-home { height: auto; min-height: 52px; } }
+	.bio-cal-home { min-width: 120px; padding: 0 16px; border-radius: 14px; background: $bio-home-no !important; color: $bio-rail !important; font-size: 14px; font-weight: 600; &.ok { background: $bio-home-si !important; } &:disabled { opacity: .5; } }
+
+	.bio-cal-dialogo { padding: 8px 8px 12px; }
+	.bio-cal-dialogo .v-card__title { font-size: 16px !important; word-break: normal; }
+	.bio-cal-dialogo .v-card__actions { justify-content: flex-end; gap: 10px; }
+}
+.tema-bio.bio-escritorio .bio-cal-cuerpo { width: 100%; max-width: 1100px; margin: 0 auto; }
+
+// ---------------------------------------------------------------------------
+// Teclado de temperatura / humedad (Tools.vue · marcador)
+// ---------------------------------------------------------------------------
+.tema-bio {
+	.bio-teclado-dialogo { box-shadow: none !important; border-radius: 22px !important; overflow: visible; margin: 12px !important; max-height: calc(100vh - 24px) !important; }
+	.bio-teclado {
+		background: $bio-sup; border-radius: 22px; padding: 16px; box-sizing: border-box;
+		display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; height: min(440px, calc(100vh - 24px));
+		color: $bio-texto; font-size: 14px;
+		button { font-family: inherit; color: inherit; border: none; cursor: pointer; }
+		button:disabled { cursor: default; opacity: .45; }
+	}
+	.bio-teclado-izq { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+	.bio-teclado-cab { display: flex; align-items: center; gap: 12px; }
+	.bio-teclado-icono { width: 40px; height: 40px; border-radius: 12px; background: $bio-calor-bg; display: flex; align-items: center; justify-content: center; flex: none; .v-icon { color: $bio-calor !important; } &.hum { background: $bio-azul-bg; .v-icon { color: $bio-azul !important; } } }
+	.bio-teclado-nombre { flex: 1; min-width: 0; font-size: 17px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+	.bio-teclado-cerrar { width: 40px; height: 40px; border-radius: 12px; background: $bio-sup2 !important; display: flex; align-items: center; justify-content: center; flex: none; .v-icon { color: $bio-texto !important; } }
+	.bio-teclado-modo { align-self: flex-start; }
+	.bio-teclado-modo .bio-seg { height: 34px !important; }
+	.bio-teclado-datos { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+	.bio-teclado-datos > div { background: $bio-sup2; border-radius: 12px; padding: 8px 12px; display: flex; flex-direction: column; min-width: 0; }
+	.bio-teclado-datos span { font-size: 12px; color: $bio-tenue; }
+	.bio-teclado-datos strong { font-size: 20px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+	.bio-teclado-datos strong.apagado { color: $bio-tenue; }
+	.bio-teclado-valor {
+		display: flex; align-items: baseline; gap: 6px; padding: 8px 16px; border-radius: 14px; background: $bio-hondo; border: 2px solid $bio-calor;
+		span { flex: 1; font-size: 13px; color: $bio-tenue; }
+		strong { font-size: 40px; font-weight: 600; line-height: 1; }
+		small { font-size: 16px; color: $bio-tenue; }
+		&.hum { border-color: $bio-azul; }
+		&.fuera { border-color: $bio-peligro; }
+	}
+	.bio-teclado-rango { font-size: 12px; color: $bio-tenue; margin-top: -4px; &.fuera { color: $bio-peligro; } }
+	.bio-teclado-atajos { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+	.bio-teclado-atajos button {
+		height: 40px; border-radius: 12px; background: $bio-sup2 !important; font-size: 14px; padding: 0 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+		&.activo { background: $bio-calor-bg !important; color: $bio-calor !important; font-weight: 600; }
+		&.activo.hum { background: $bio-azul-bg !important; color: $bio-azul !important; }
+	}
+	.bio-teclado-acciones { display: grid; grid-template-columns: minmax(0, .75fr) minmax(0, 1fr); gap: 10px; }
+	.bio-teclado-sec { height: 50px; border-radius: 14px; background: $bio-sup2 !important; font-size: 15px; font-weight: 500; &.peligro { background: $bio-peligro-bg !important; color: $bio-peligro !important; } }
+	.bio-teclado-ok { height: 50px; border-radius: 14px; background: $bio-calor !important; color: $bio-rail !important; font-size: 15px; font-weight: 600; white-space: nowrap; &.hum { background: $bio-azul !important; } }
+	.bio-teclado-num { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: repeat(4, minmax(0, 1fr)); gap: 8px; }
+	.bio-teclado-num button {
+		border-radius: 14px; background: $bio-sup2 !important; font-size: 24px; font-weight: 500;
+		display: flex; align-items: center; justify-content: center;
+		.v-icon { color: $bio-texto !important; font-size: 26px; }
+		&.suave { background: $bio-sup3 !important; font-size: 18px; }
+		&:active { background: $bio-acento-bg !important; }
+	}
+}
+
+// ---------------------------------------------------------------------------
+// Paneles de procesos (Electrospinning; reutilizable para UV y EMD)
+// ---------------------------------------------------------------------------
+.tema-bio {
+	.v-dialog--fullscreen > .col:has(> .es-raiz > .bio-pp) { padding: 0 !important; }
+	canvas[style*="background-color: white"] { background-color: $bio-hondo !important; border-color: $bio-linea2 !important; }
+	.bio-pp {
+		position: fixed; inset: 0; z-index: 1; background: $bio-fondo; color: $bio-texto;
+		display: flex; flex-direction: column; text-align: left; font-size: 14px;
+		button { font-family: inherit; color: inherit; border: none; cursor: pointer; }
+		button:disabled { cursor: default; opacity: .45; }
+	}
+	.bio-proc-cab { height: 64px; flex: none; display: flex; align-items: center; gap: 12px; padding: 0 16px; background: $bio-rail; box-sizing: border-box; }
+	.bio-proc-titulo { font-size: 17px; font-weight: 600; white-space: nowrap; }
+	.bio-proc-cab .bio-cal-pasos button { padding: 0 11px; }
+	.bio-proc-cuerpo { flex: 1; min-height: 0; padding: 12px 22px 14px; box-sizing: border-box; display: flex; flex-direction: column; gap: 10px; }
+	.bio-proc-h2 { margin: 0; font-size: 18px; font-weight: 600; display: flex; align-items: center; gap: 14px; }
+	.bio-proc-hv { display: inline-flex; align-items: center; gap: 4px; font-size: 13px; color: $bio-ambar; font-weight: 600; }
+	.bio-proc-datos { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+	.bio-proc-datos > div { background: $bio-sup; border-radius: 14px; padding: 10px 14px; display: flex; flex-direction: column; min-width: 0; }
+	.bio-proc-datos span { font-size: 12px; color: $bio-tenue; }
+	.bio-proc-datos strong { font-size: 18px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; small { font-size: 13px; color: $bio-tenue; font-weight: 400; } }
+	.bio-proc-lista { background: $bio-sup; border-radius: 16px; padding: 4px 16px; }
+	.bio-proc-lista .fila { display: flex; align-items: center; gap: 12px; min-height: 38px; padding: 4px 0 4px 16px; border-top: 1px solid $bio-linea; color: $bio-tenue; }
+	.bio-proc-lista .fila > span:first-child { flex: 1; }
+	.bio-proc-lista .fila.cab { padding-left: 0; border-top: none; color: $bio-texto; min-height: 46px; }
+	.bio-proc-lista .fila.cab small { display: block; font-size: 12px; color: $bio-tenue; }
+	.bio-proc-lista .fila.cab strong { font-weight: 500; font-size: 15px; }
+	.bio-proc-lista .fila.tenue { opacity: .55; }
+	.bio-proc-lista .pildora { background: $bio-sup2; border-radius: 999px; padding: 4px 12px; font-size: 13px; font-weight: 600; color: $bio-tenue; &.on { background: $bio-acento-bg; color: $bio-acento; } }
+	.bio-proc-avisos { display: flex; gap: 18px; font-size: 13px; color: $bio-acento; flex-wrap: wrap; }
+	.bio-proc-avisos span { display: inline-flex; align-items: center; gap: 6px; .v-icon { color: inherit !important; } }
+	.bio-proc-avisos span.off { color: $bio-calor; }
+	.bio-cal-principal.ancho { min-width: 150px; }
+	.bio-cal-principal.aviso { background: $bio-calor !important; }
+
+	.bio-proc-patrones { display: grid; grid-template-columns: repeat(auto-fit, minmax(0, 1fr)); grid-auto-flow: column; gap: 12px; }
+	.bio-proc-patron {
+		background: $bio-sup !important; border: 2px solid transparent !important; border-radius: 16px; padding: 18px 10px;
+		display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center; color: $bio-texto !important;
+		.icono { width: 48px; height: 48px; color: $bio-tenue; display: block; }
+		strong { font-size: 15px; font-weight: 600; margin-top: 6px; }
+		span:last-child { font-size: 13px; color: $bio-tenue; }
+		&.activo { border-color: $bio-acento !important; background: $bio-acento-bg !important; .icono { color: $bio-acento; } }
+	}
+	.bio-proc-patron .icono svg { width: 48px; height: 48px; }
+
+	.bio-proc-canvas-zona { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) auto 150px; gap: 16px; align-items: center; }
+	.bio-proc-lateral { background: $bio-sup; border-radius: 14px; padding: 10px 12px; display: flex; flex-direction: column; gap: 6px; min-height: 0; max-height: 100%; box-sizing: border-box; }
+	.bio-blanco { color: $bio-texto; }
+	.bio-proc-puntos { overflow-y: auto; display: flex; flex-direction: column; gap: 2px; min-height: 0; }
+	.bio-proc-punto { display: grid; grid-template-columns: 22px minmax(0, 1fr) 32px 32px; align-items: center; height: 34px; border-radius: 8px; padding: 0 2px; font-size: 14px; }
+	.bio-proc-punto.editando { background: $bio-acento-bg; }
+	.bio-proc-punto .n, .bio-proc-relleno .n { color: $bio-acento; font-weight: 600; }
+	.bio-proc-punto button { height: 32px; border-radius: 8px; background: transparent; display: flex; align-items: center; justify-content: center; .v-icon { color: $bio-tenue !important; } }
+	.bio-proc-punto button.borrar .v-icon { color: $bio-peligro !important; }
+	.bio-proc-relleno { display: grid; grid-template-columns: 22px minmax(0, 1fr) auto; align-items: center; gap: 6px; height: 38px; background: transparent; text-align: left; font-size: 14px; }
+	.bio-proc-ayuda { font-size: 12px; line-height: 1.4; }
+	.bio-proc-lienzo { display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 12px; color: $bio-tenue; }
+	.bio-proc-lienzo canvas { border-radius: 8px; border: 1px solid $bio-linea2; background: $bio-hondo; cursor: crosshair; display: block; }
+	.bio-proc-acciones { display: flex; flex-direction: column; gap: 8px; }
+	.bio-proc-acciones button { height: 44px; border-radius: 12px; background: $bio-sup !important; font-size: 14px; font-weight: 500; display: flex; align-items: center; justify-content: center; gap: 6px; .v-icon { color: inherit !important; } &.peligro { background: $bio-peligro-bg !important; color: $bio-peligro !important; } }
+
+	.bio-proc-valores { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+	.bio-proc-valores button {
+		background: $bio-sup !important; border-radius: 16px; padding: 14px 16px; text-align: left;
+		display: flex; flex-direction: column; gap: 2px; min-width: 0;
+		.ic { width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 14px; }
+		.ic.verde { background: $bio-acento-bg; .v-icon { color: $bio-acento !important; } }
+		.ic.azul { background: $bio-azul-bg; .v-icon { color: $bio-azul !important; } }
+		.ic.lila { background: $bio-lila-bg; .v-icon { color: $bio-lila !important; } }
+		> span:not(.ic) { font-size: 13px; color: $bio-tenue; }
+		strong { font-size: 28px; font-weight: 500; white-space: nowrap; small { font-size: 15px; color: $bio-tenue; } }
+		&:active { background: $bio-sup2 !important; }
+	}
+	.bio-proc-nota { margin: 0; font-size: 13px; }
+
+	.interruptor {
+		width: 52px; height: 30px; border-radius: 15px; background: $bio-linea2 !important; position: relative; flex: none; padding: 0;
+		i { position: absolute; top: 4px; left: 4px; width: 22px; height: 22px; border-radius: 50%; background: $bio-tenue; transition: left .15s; }
+		&.on { background: $bio-acento !important; i { left: 26px; background: $bio-rail; } }
+	}
+	span.interruptor { display: inline-block; }
+	.bio-proc-contador { display: flex; align-items: center; gap: 8px; }
+	.bio-proc-contador button { width: 40px; height: 40px; border-radius: 10px; background: $bio-sup2 !important; font-size: 20px; }
+	.bio-proc-contador button.valor { width: auto; min-width: 80px; background: transparent !important; font-size: 13px; color: $bio-tenue; strong { font-size: 20px; color: $bio-texto; margin-right: 4px; } }
+}
+.tema-bio.bio-escritorio .bio-proc-cuerpo { width: 100%; max-width: 1100px; margin: 0 auto; }
+
+// Variante en verde del teclado (parámetros del solenoide y coordenadas)
+.tema-bio {
+	.bio-teclado-icono.acento { background: $bio-acento-bg; .v-icon { color: $bio-acento !important; } }
+	.bio-teclado-valor.acento { border-color: $bio-acento; }
+	.bio-teclado-valor.acento.fuera { border-color: $bio-peligro; }
+	.bio-teclado-valor.apagado { border-color: $bio-linea2; strong { font-size: 28px; color: $bio-tenue; } }
+	.bio-teclado-atajos button.acento.activo { background: $bio-acento-bg !important; color: $bio-acento !important; }
+	.bio-teclado-ok.acento { background: $bio-acento !important; }
+	.bio-teclado-datos strong.peq { font-size: 16px; padding-top: 4px; small { color: $bio-tenue; font-size: 13px; } }
+	.bio-teclado-fila-switch { display: flex; align-items: center; justify-content: space-between; background: $bio-sup2; border-radius: 12px; padding: 6px 12px; font-size: 14px; }
+	.bio-teclado-coords { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+	.bio-teclado-coords .bio-teclado-valor { border: 2px solid $bio-acento !important; text-align: left; color: $bio-texto; strong { font-size: 32px; } &.inactivo { border-color: $bio-linea2 !important; } &.fuera { border-color: $bio-peligro !important; } }
+	.bio-teclado-num button:disabled { opacity: .35; }
+}
+.tema-bio .bio-proc-hv.uv { color: $bio-lila; }
+
+// Solenoide (EMD), limpieza y mantener temperaturas
+.tema-bio {
+	.bio-proc-hv.ok { color: $bio-acento; .v-icon { color: inherit !important; } }
+	.bio-proc-hv.mal { color: $bio-peligro; .v-icon { color: inherit !important; } }
+	.bio-peligro-txt { color: $bio-peligro; }
+	.bio-ambar-txt { color: $bio-ambar; }
+	.bio-proc-valores.cuatro { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+	.bio-proc-valores.uno { grid-template-columns: minmax(0, 1fr); }
+	.bio-proc-valores.uno button { padding: 10px 14px; strong { font-size: 24px; } }
+	.bio-proc-valores button .ic.calor { background: $bio-calor-bg; .v-icon { color: $bio-calor !important; } }
+	.bio-proc-valores button strong.apagado { font-size: 18px; color: $bio-tenue; line-height: 34px; }
+	.bio-proc-datos.tres { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+	.bio-proc-datos > div > strong.bio-tenue { font-size: 15px; font-weight: 500; line-height: 25px; }
+	.bio-emd-calc {
+		display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)) 24px; align-items: center; gap: 10px;
+		background: $bio-sup !important; border-radius: 14px; padding: 8px 14px; text-align: left; width: 100%;
+		> div { display: flex; flex-direction: column; min-width: 0; }
+		> div > span:first-child { font-size: 12px; color: $bio-tenue; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+		strong { font-size: 17px; font-weight: 600; white-space: nowrap; small { font-size: 12px; color: $bio-tenue; font-weight: 400; } }
+		.v-icon { color: $bio-tenue !important; }
+		&:active { background: $bio-sup2 !important; }
+	}
+	.bio-emd-estado {
+		display: inline-block; align-self: flex-start; border-radius: 999px; padding: 3px 10px; font-size: 12px; font-weight: 600;
+		white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;
+		background: $bio-sup2; color: $bio-tenue;
+		&.ok { background: $bio-acento-bg; color: $bio-acento; }
+		&.est { background: $bio-ambar-bg; color: $bio-ambar; }
+	}
+	.bio-proc-h2 .bio-emd-estado { font-size: 12px; }
+	.bio-emd-calib { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 12px; }
+	.bio-emd-tabla-caja { background: $bio-sup; border-radius: 16px; padding: 6px 14px; overflow-y: auto; min-height: 0; }
+	.bio-emd-tabla {
+		width: 100%; border-collapse: collapse; font-size: 15px;
+		th { font-size: 12px; color: $bio-tenue; font-weight: 500; text-align: left; padding: 6px 4px; small { font-size: 11px; } }
+		td { padding: 6px 4px; border-top: 1px solid $bio-linea; font-variant-numeric: tabular-nums; }
+		td.n { color: $bio-acento; font-weight: 600; width: 26px; }
+		td.est { width: 26px; text-align: center; }
+		tr.running td { background: $bio-acento-suave; }
+	}
+	.bio-emd-calib-lado { display: flex; flex-direction: column; gap: 10px; min-height: 0; }
+	.bio-emd-resultado {
+		flex: 1; background: $bio-sup; border-radius: 16px; padding: 10px 14px; display: flex; flex-direction: column; gap: 6px; font-size: 13px;
+		.vals { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 14px; color: $bio-tenue; strong { color: $bio-texto; font-size: 17px; font-weight: 600; } }
+	}
+	.bio-emd-xy { display: flex; flex-direction: column; gap: 2px; font-size: 13px; color: $bio-tenue; strong { color: $bio-texto; font-size: 20px; font-weight: 600; } }
+	.bio-emd-calculo {
+		background: $bio-sup; border-radius: 22px; padding: 16px; color: $bio-texto; display: flex; flex-direction: column; gap: 12px; font-size: 14px;
+		button { font-family: inherit; color: inherit; border: none; cursor: pointer; }
+		.bio-proc-datos > div { background: $bio-sup2; }
+		.bio-proc-lista { background: $bio-sup2; .fila { border-top-color: $bio-sup3; } }
+		.bio-teclado-acciones { grid-template-columns: 1fr; }
+	}
+
+	// Limpieza y temperaturas: filas grandes con icono
+	.bio-proc-lista .fila.grande { min-height: 60px; padding-left: 0; color: $bio-texto; &:first-child { border-top: none; } }
+	.bio-proc-lateral .bio-proc-valores button { background: $bio-sup2 !important; }
+	.bio-proc-lista .fila.grande .ic { width: 40px; height: 40px; border-radius: 12px; flex: none; display: flex; align-items: center; justify-content: center; background: $bio-calor-bg; .v-icon { color: $bio-calor !important; } &.verde { background: $bio-acento-bg; .v-icon { color: $bio-acento !important; } } }
+	.bio-proc-lista .fila.grande > span.txt { flex: 1; min-width: 0; strong { display: block; font-weight: 500; font-size: 15px; } small { display: block; font-size: 12px; color: $bio-tenue; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } }
+	.bio-proc-lista .fila.grande.tenue { opacity: .55; }
+	.bio-proc-valor-btn {
+		height: 44px; border-radius: 12px; background: $bio-sup2 !important; padding: 0 14px; font-size: 13px; color: $bio-tenue !important;
+		display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;
+		strong { font-size: 20px; color: $bio-texto; font-weight: 600; }
+		.v-icon { color: $bio-tenue !important; }
+	}
+}
+
+// Colores del teclado genérico (BioTecladoValor)
+.tema-bio {
+	.bio-teclado-icono.lila { background: $bio-lila-bg; .v-icon { color: $bio-lila !important; } }
+	.bio-teclado-icono.azul { background: $bio-azul-bg; .v-icon { color: $bio-azul !important; } }
+	.bio-teclado-valor.lila { border-color: $bio-lila; } .bio-teclado-valor.azul { border-color: $bio-azul; }
+	.bio-teclado-valor.lila.fuera, .bio-teclado-valor.azul.fuera { border-color: $bio-peligro; }
+	.bio-teclado-coords .bio-teclado-valor.lila { border-color: $bio-lila !important; }
+	.bio-teclado-coords .bio-teclado-valor.azul { border-color: $bio-azul !important; }
+	.bio-teclado-coords .bio-teclado-valor.inactivo { border-color: $bio-linea2 !important; }
+	.bio-teclado-atajos button.lila.activo { background: $bio-lila-bg !important; color: $bio-lila !important; }
+	.bio-teclado-atajos button.azul.activo { background: $bio-azul-bg !important; color: $bio-azul !important; }
+	.bio-teclado-ok.lila { background: $bio-lila !important; } .bio-teclado-ok.azul { background: $bio-azul !important; }
+}
+
+// ---------------------------------------------------------------------------
+// Modo escritorio: acabado de las pantallas de DWC (listas, consola, ajustes)
+// ---------------------------------------------------------------------------
+.tema-bio.bio-escritorio {
+	// Menú: se puede desplazar y se compacta en pantallas bajas
+	.bio-nav .v-navigation-drawer__content { overflow-y: auto; }
+	@media (max-height: 860px) {
+		.bio-nav-item { height: 34px; }
+		.bio-nav-grupo { padding: 10px 10px 2px; }
+		.bio-nav-logo { padding-bottom: 10px; }
+	}
+
+	// Contenido de las rutas: márgenes y ancho máximo como en el panel de control
+	#content > .v-main__wrap > .container { padding: 20px 24px 24px; max-width: 1688px; margin: 0 auto; }
+
+	// Tablas (Trabajos, Macros, Sistema, Consola...)
+	.v-data-table:is(.theme--dark, .theme--light) {
+		background: $bio-sup !important; border-radius: 16px !important; overflow: hidden; box-shadow: none !important;
+		> .v-data-table__wrapper > table > thead > tr > th { background: $bio-sup; color: $bio-tenue !important; font-size: 12px; font-weight: 500; border-bottom: 1px solid $bio-linea !important; height: 44px; }
+		> .v-data-table__wrapper > table > tbody > tr > td { border-bottom: 1px solid $bio-sup2 !important; font-size: 14px; height: 44px; }
+		> .v-data-table__wrapper > table > tbody > tr:hover:not(.v-data-table__expanded__content):not(.v-data-table__empty-wrapper) { background: $bio-sup2 !important; }
+		.v-data-footer { border-top: 1px solid $bio-linea !important; color: $bio-tenue; }
+	}
+	.v-data-table .v-alert, .component .v-alert {
+		background: transparent !important; color: $bio-tenue !important; border: none !important; box-shadow: none !important; padding: 28px 16px;
+		.v-alert__icon { color: $bio-tenue !important; }
+	}
+	// barras de herramientas encima de las listas
+	.v-toolbar:is(.theme--dark, .theme--light):not(.bio-topbar) { background: $bio-sup !important; border-radius: 16px 16px 0 0; box-shadow: none !important; }
+	.v-toolbar:is(.theme--dark, .theme--light):not(.bio-topbar) .v-btn { background: $bio-sup2 !important; border-radius: 10px !important; height: 36px !important; font-size: 13px; }
+	.v-card .v-toolbar + .v-data-table, .v-toolbar + .v-data-table { border-radius: 0 0 16px 16px !important; }
+
+	// Consola: filas con una franja de color en vez de fondos saturados
+	.v-data-table tbody tr.red, .v-data-table tbody tr.amber, .v-data-table tbody tr.green, .v-data-table tbody tr.blue, .v-data-table tbody tr.light-blue {
+		background: transparent !important; color: $bio-texto !important;
+		td:first-child { box-shadow: inset 3px 0 0 $bio-tenue; color: $bio-tenue; font-size: 12px; white-space: nowrap; }
+		.message { color: $bio-tenue; }
+	}
+	.v-data-table tbody tr.red td:first-child { box-shadow: inset 3px 0 0 $bio-peligro; }
+	.v-data-table tbody tr.red .title-cell strong, .v-data-table tbody tr.red td strong { color: $bio-peligro; }
+	.v-data-table tbody tr.amber td:first-child { box-shadow: inset 3px 0 0 $bio-calor; }
+	.v-data-table tbody tr.green td:first-child { box-shadow: inset 3px 0 0 $bio-acento; }
+	.v-data-table tbody tr.blue td:first-child, .v-data-table tbody tr.light-blue td:first-child { box-shadow: inset 3px 0 0 $bio-azul; }
+
+	// Campos de texto (consola, diálogos)
+	.v-text-field--solo > .v-input__control > .v-input__slot, .v-text-field--outlined > .v-input__control > .v-input__slot { background: $bio-sup !important; border-radius: 12px !important; box-shadow: none !important; }
+	.v-text-field--solo > .v-input__control > .v-input__slot { border: 1px solid $bio-linea; }
+
+	// Ajustes: pestañas y tarjetas
+	.v-tabs:is(.theme--dark, .theme--light) > .v-tabs-bar { background: transparent !important; border-bottom: 1px solid $bio-linea; }
+	.v-tab { text-transform: none !important; letter-spacing: 0 !important; font-size: 14px; }
+	.v-tabs-items:is(.theme--dark, .theme--light), .v-window-item { background: transparent !important; }
+	.v-card:is(.theme--dark, .theme--light) { border: 1px solid $bio-linea; }
+	.v-card .v-card { border: none; }
+	.v-card__title { font-size: 15px !important; font-weight: 600; }
+
+	// Las pantallas táctiles (Herramientas, Movimiento) dentro del escritorio
+	.bio-tools, .bio-mov { max-width: 1100px; }
+}
+
+// Modo táctil forzado en una ventana ancha (ordenador): las pantallas se ven
+// a su tamaño y centradas en vez de estirarse a todo el monitor
+.tema-bio.bio-tactil-ancho {
+	.bio-inicio, .bio-tools, .bio-mov, .bio-job {
+		height: min(calc(100vh - 40px), 620px); min-height: 0;
+		width: 100%; max-width: 1040px; margin: 16px auto 0;
+	}
+	.bio-proc-cuerpo, .bio-cal-cuerpo { width: 100%; max-width: 1100px; margin: 0 auto; }
+}
+.tema-bio .bio-barra-codigo { display: flex; align-items: center; gap: 16px; max-width: 1040px; margin: 12px auto 0; padding: 0 12px; }
+
+// Ajustes del trabajo: Ajuste Z, velocidad y extrusión (BioAjusteTrabajo)
+.tema-bio {
+	.bio-aj {
+		background: $bio-sup; border-radius: 22px; padding: 16px; box-sizing: border-box; color: $bio-texto; font-size: 14px;
+		display: flex; flex-direction: column; gap: 12px; height: min(440px, calc(100vh - 24px));
+		button { font-family: inherit; color: inherit; border: none; cursor: pointer; }
+		button:disabled { cursor: default; opacity: .4; }
+	}
+	.bio-aj-nota { margin: 0; font-size: 12px; color: $bio-tenue; &.arriba { margin-top: -4px; } }
+	.bio-aj-datos { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 10px; }
+	.bio-aj-datos > div { background: $bio-sup2; border-radius: 14px; padding: 8px 14px; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+	.bio-aj-datos > div > span { font-size: 12px; color: $bio-tenue; }
+	.bio-aj-datos strong { font-size: 30px; font-weight: 600; line-height: 1.15; font-variant-numeric: tabular-nums; small { font-size: 14px; color: $bio-tenue; font-weight: 400; } }
+	.bio-aj-datos > div.paso { grid-column: span 2; }
+	.bio-aj-pasos { display: grid; grid-template-columns: repeat(auto-fit, minmax(0, 1fr)); gap: 6px; margin-top: 4px; }
+	.bio-aj-pasos button { height: 38px; border-radius: 10px; background: $bio-sup3 !important; font-size: 14px; font-weight: 500; font-variant-numeric: tabular-nums;
+		&.activo { background: $bio-acento-bg !important; color: $bio-acento !important; font-weight: 600; box-shadow: inset 0 0 0 2px $bio-acento; } }
+	.bio-aj-z { flex: 1; min-height: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+	.v-btn.bio-aj-zbtn {
+		height: 100% !important; min-height: 120px; border-radius: 18px !important; background: $bio-sup2 !important; box-shadow: none !important;
+		text-transform: none; letter-spacing: 0; color: $bio-texto !important;
+		.v-btn__content { flex-direction: column; gap: 6px; }
+		.v-icon { font-size: 34px !important; color: $bio-acento !important; }
+		strong { font-size: 26px; font-weight: 600; font-variant-numeric: tabular-nums; color: $bio-texto !important; }
+		span { font-size: 13px; color: $bio-tenue !important; font-weight: 400; }
+		&:active { background: $bio-acento-bg !important; }
+	}
+	.bio-aj-pie { display: grid; grid-template-columns: minmax(0, .75fr) minmax(0, 1fr); gap: 10px; flex: none; }
+	.bio-aj-pie .v-btn.bio-teclado-sec { height: 50px !important; border-radius: 14px !important; box-shadow: none !important; text-transform: none; letter-spacing: 0; color: $bio-texto !important; font-size: 15px; }
+	.bio-teclado-ok.acento.v-btn, .bio-aj .bio-teclado-ok { color: $bio-rail !important; }
+
+	.bio-aj-filas { flex: 1; min-height: 0; display: flex; flex-direction: column; justify-content: center; gap: 10px; overflow-y: auto; }
+	.bio-aj-fila {
+		display: grid; grid-template-columns: minmax(70px, 120px) 52px minmax(0, 1fr) 52px 96px; align-items: center; gap: 12px;
+		background: $bio-sup2; border-radius: 16px; padding: 12px 14px;
+		.nombre { font-size: 14px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+		.menos, .mas { height: 52px; border-radius: 14px; background: $bio-sup3 !important; font-size: 26px; line-height: 1; &:active { background: $bio-acento-bg !important; } }
+		.valor { color: $bio-texto; text-align: right; font-size: 30px; font-weight: 600; font-variant-numeric: tabular-nums; small { font-size: 14px; color: $bio-tenue; font-weight: 400; } &.cambiado { color: $bio-calor; } }
+	}
+	.bio-aj-filas:not(.varias) .bio-aj-fila { padding: 22px 16px; .valor { font-size: 40px; } }
+	.bio-aj-filas.varias .bio-aj-fila { padding: 8px 14px; .menos, .mas { height: 44px; } .valor { font-size: 24px; } }
+	.bio-aj input[type=range] {
+		-webkit-appearance: none; appearance: none; width: 100%; height: 36px; background: transparent; margin: 0; cursor: pointer;
+		&::-webkit-slider-runnable-track { height: 8px; border-radius: 4px; background: linear-gradient(to right, $bio-acento 0, $bio-acento var(--pct), $bio-linea2 var(--pct)); }
+		&::-moz-range-track { height: 8px; border-radius: 4px; background: $bio-linea2; }
+		&::-moz-range-progress { height: 8px; border-radius: 4px; background: $bio-acento; }
+		&::-webkit-slider-thumb { -webkit-appearance: none; width: 28px; height: 28px; border-radius: 50%; background: $bio-texto; margin-top: -10px; box-shadow: 0 0 0 4px $bio-acento-sombra; }
+		&::-moz-range-thumb { width: 28px; height: 28px; border: none; border-radius: 50%; background: $bio-texto; }
+		&:disabled { opacity: .4; }
+	}
+	.bio-aj-atajos { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; flex: none; }
+	.bio-aj-atajos button { height: 42px; border-radius: 12px; background: $bio-sup2 !important; font-size: 14px; font-weight: 500;
+		&.activo { background: $bio-acento-bg !important; color: $bio-acento !important; font-weight: 600; } }
+}
+
+.tema-bio {
+	.bio-aj-tools { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 8px; flex: none; }
+	.bio-aj-tools button {
+		height: 58px; border-radius: 14px; background: $bio-sup2 !important; padding: 0 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; min-width: 0;
+		.nom { font-size: 14px; font-weight: 500; max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+		.val { font-size: 12px; color: $bio-tenue; font-variant-numeric: tabular-nums; &.cambiado { color: $bio-calor; } }
+		&.activo { background: $bio-calor-bg !important; box-shadow: inset 0 0 0 2px $bio-calor; .nom { color: $bio-calor; font-weight: 600; } }
+	}
+	.bio-aj-nota.centro { text-align: center; }
+}
+
+// Ajustes: selector de modo claro / oscuro y logotipo con los colores de la marca
+.tema-bio {
+	.bio-ajuste-modo { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; font-size: 15px; color: $bio-texto; }
+	.bio-ajuste-modo .bio-seg { display: inline-flex; align-items: center; gap: 6px; .v-icon { color: inherit !important; } }
+	.bio-maquina > span:first-child, .bio-inicio-nombre > span:first-child { color: $bio-marca-1; }
+}
+
+// Retoques del modo claro: separar cabeceras y barra lateral del fondo
+.tema-bio.bio-claro {
+	.bio-volver { background: $bio-sup2 !important; }
+	.bio-proc-cab, .bio-cal-cab, .bio-elegir-cab { border-bottom: 1px solid $bio-borde; }
+	.bio-rail, .bio-nav { border-right: 1px solid $bio-borde !important; }
+	.v-overlay__scrim { background-color: #141A29 !important; }
+}
+
+.tema-bio .bio-nav-item .bio-nav-externo { margin-left: auto; color: $bio-apagado !important; }
+
+// Extruir (ExtrudePanel en el diálogo de Movimiento)
+.tema-bio {
+	.bio-ex {
+		background: $bio-sup; border-radius: 22px; padding: 16px; box-sizing: border-box; color: $bio-texto; font-size: 14px;
+		display: flex; flex-direction: column; gap: 14px; height: min(440px, calc(100vh - 24px));
+		button { font-family: inherit; color: inherit; border: none; cursor: pointer; }
+		button:disabled { cursor: default; opacity: .4; }
+	}
+	.bio-ex-tool { display: flex; flex-direction: column; align-items: flex-end; font-size: 13px; line-height: 1.25; min-width: 0;
+		strong { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 220px; }
+		span { color: $bio-tenue; font-variant-numeric: tabular-nums; &.frio { color: $bio-calor; } } }
+	.bio-ex-cuerpo { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 14px; }
+	.bio-ex-ajustes { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+	.bio-ex-grupo { background: $bio-sup2; border-radius: 16px; padding: 10px 12px; display: flex; flex-direction: column; gap: 8px; }
+	.bio-ex-grupo .et { font-size: 12px; color: $bio-tenue; small { font-size: 11px; } }
+	.bio-ex-chips { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 6px; }
+	.bio-ex-chips button { height: 44px; border-radius: 12px; background: $bio-sup3 !important; font-size: 16px; font-weight: 500; font-variant-numeric: tabular-nums;
+		&.activo { background: $bio-acento-bg !important; color: $bio-acento !important; font-weight: 600; box-shadow: inset 0 0 0 2px $bio-acento; } }
+	.bio-ex-nota { margin: auto 0 0; font-size: 12px; color: $bio-tenue; &.aviso { color: $bio-calor; font-size: 13px; font-weight: 500; } }
+	.bio-ex-botones { display: grid; grid-template-rows: 1fr 1fr; gap: 12px; min-height: 0; }
+	.bio-ex-btn {
+		border-radius: 18px; background: $bio-sup2 !important; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+		.v-icon { font-size: 32px !important; color: $bio-acento !important; }
+		strong { font-size: 26px; font-weight: 600; font-variant-numeric: tabular-nums; }
+		span { font-size: 13px; color: $bio-tenue; }
+		&:active:not(:disabled) { background: $bio-acento-bg !important; }
+		&.principal { background: $bio-acento !important; color: $bio-rail !important; .v-icon, span { color: $bio-rail !important; } span { opacity: .85; } }
+		.v-progress-circular { color: $bio-rail; }
+	}
+}
+
+// Coaxial (COPanel)
+.tema-bio {
+	.bio-co {
+		background: $bio-sup; border-radius: 22px; padding: 16px; box-sizing: border-box; color: $bio-texto; font-size: 14px;
+		display: flex; flex-direction: column; gap: 14px; height: min(440px, calc(100vh - 24px));
+		button { font-family: inherit; color: inherit; border: none; cursor: pointer; }
+		button:disabled { cursor: default; opacity: .4; }
+		.pildora { background: $bio-sup2; border-radius: 999px; padding: 4px 12px; font-size: 13px; font-weight: 600; color: $bio-tenue; white-space: nowrap; &.on { background: $bio-acento-bg; color: $bio-acento; } }
+	}
+	.bio-co-tools { position: relative; display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
+	.bio-co-tool {
+		background: $bio-sup2; border-radius: 16px; padding: 10px 14px; display: grid; grid-template-columns: auto minmax(0, 1fr); grid-template-rows: auto auto; column-gap: 10px; align-items: center;
+		border: 2px solid transparent;
+		.n { grid-row: span 2; width: 40px; height: 40px; border-radius: 12px; background: $bio-sup3; display: flex; align-items: center; justify-content: center; font-weight: 700; color: $bio-tenue; }
+		.nom { font-size: 15px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+		.rol { font-size: 12px; color: $bio-tenue; }
+		&.enlazado { border-color: $bio-acento; .n { background: $bio-acento-bg; color: $bio-acento; } }
+	}
+	.bio-co-union {
+		position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 36px; height: 36px; border-radius: 50%;
+		background: $bio-sup3; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 0 4px $bio-sup;
+		.v-icon { color: $bio-tenue !important; font-size: 20px !important; }
+		&.enlazado { background: $bio-acento; .v-icon { color: $bio-rail !important; } }
+	}
+	.bio-co-nota { margin: 0; font-size: 13px; color: $bio-tenue; display: flex; align-items: center; gap: 6px;
+		&.aviso { color: $bio-calor; font-weight: 500; .v-icon { color: inherit !important; } } }
+	.bio-co-pie { display: grid; grid-template-columns: minmax(0, .75fr) minmax(0, 1fr); gap: 10px; flex: none; }
+	.bio-co-pie button { display: inline-flex; align-items: center; justify-content: center; gap: 6px; .v-icon { color: inherit !important; } }
+	.bio-co-mezcla { flex: 1; min-height: 0; display: flex; flex-direction: column; justify-content: center; gap: 12px; }
+	.bio-co-valores { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+	.bio-co-valores > div { background: $bio-sup2; border-radius: 14px; padding: 8px 14px; display: flex; align-items: baseline; justify-content: space-between; gap: 8px;
+		span { font-size: 13px; color: $bio-tenue; } strong { font-size: 30px; font-weight: 600; font-variant-numeric: tabular-nums; color: $bio-acento; small { font-size: 14px; color: $bio-tenue; font-weight: 400; } }
+		&.sec strong { color: $bio-texto; } }
+	.bio-co-slider { display: grid; grid-template-columns: 48px minmax(0, 1fr) 48px; gap: 12px; align-items: center; }
+	.bio-co-slider > button { height: 48px; border-radius: 14px; background: $bio-sup2 !important; font-size: 24px; &:active { background: $bio-acento-bg !important; } }
+	.bio-co-slider input[type=range] {
+		-webkit-appearance: none; appearance: none; width: 100%; height: 36px; background: transparent; margin: 0; cursor: pointer;
+		&::-webkit-slider-runnable-track { height: 10px; border-radius: 5px; background: linear-gradient(to right, $bio-acento 0, $bio-acento var(--pct), $bio-linea2 var(--pct)); }
+		&::-moz-range-track { height: 10px; border-radius: 5px; background: $bio-linea2; }
+		&::-moz-range-progress { height: 10px; border-radius: 5px; background: $bio-acento; }
+		&::-webkit-slider-thumb { -webkit-appearance: none; width: 30px; height: 30px; border-radius: 50%; background: $bio-texto; margin-top: -10px; box-shadow: 0 0 0 4px $bio-acento-sombra; }
+		&::-moz-range-thumb { width: 30px; height: 30px; border: none; border-radius: 50%; background: $bio-texto; }
+	}
+	.bio-co-atajos { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; }
+	.bio-co-atajos button { height: 40px; border-radius: 12px; background: $bio-sup2 !important; font-size: 13px; font-weight: 500; font-variant-numeric: tabular-nums;
+		&.activo { background: $bio-acento-bg !important; color: $bio-acento !important; font-weight: 600; } }
+}
+
+// Offsets de tool / plataforma (Tools.vue)
+.tema-bio {
+	.bio-off {
+		background: $bio-sup; border-radius: 22px; padding: 16px; box-sizing: border-box; color: $bio-texto; font-size: 14px;
+		display: flex; flex-direction: column; gap: 14px;
+		button { font-family: inherit; color: inherit; border: none; cursor: pointer; }
+	}
+	.bio-off-estado { display: inline-flex; align-items: center; gap: 5px; border-radius: 999px; padding: 4px 12px; font-size: 13px; font-weight: 600; white-space: nowrap;
+		background: $bio-calor-bg; color: $bio-calor; .v-icon { color: inherit !important; }
+		&.ok { background: $bio-acento-bg; color: $bio-acento; } }
+	.bio-off-ejes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+	.bio-off-ejes > div, .bio-off-puentes .mm { background: $bio-sup2; border-radius: 14px; padding: 10px 14px; display: flex; flex-direction: column; gap: 2px; min-width: 0;
+		span { font-size: 13px; color: $bio-tenue; font-weight: 600; }
+		strong { font-size: 28px; font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; small { font-size: 14px; color: $bio-tenue; font-weight: 400; } } }
+	.bio-off-puentes { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+	.bio-off-puentes > div { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; .tit { grid-column: span 2; font-size: 13px; color: $bio-tenue; } strong { font-size: 22px; } }
+	.bio-off-nota { margin: 0; font-size: 13px; color: $bio-tenue; &.aviso { color: $bio-calor; } }
+	.bio-off-pie { display: flex; justify-content: flex-end; gap: 10px; }
+	.bio-off-pie button { min-width: 140px; padding: 0 18px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; .v-icon { color: inherit !important; } }
+}

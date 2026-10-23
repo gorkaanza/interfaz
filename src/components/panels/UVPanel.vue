@@ -46,7 +46,180 @@
 	}
 </style>
 <template>
-	<v-row class="mb-0 pb-0"  > 
+<div class="es-raiz">
+	<!-- domotek: ultravioleta con el tema oscuro -->
+	<div v-if="temaBio" class="bio-pp">
+		<header class="bio-proc-cab">
+			<button type="button" class="bio-volver" :aria-label="$t('domotek.tools.back')" @click="closeDialog"><v-icon>mdi-chevron-left</v-icon></button>
+			<v-icon color="var(--bio-lila)">mdi-white-balance-sunny</v-icon>
+			<span class="bio-proc-titulo">{{ $t('domotek.jobs.ultraviolet') }}</span>
+			<div style="flex: 1"></div>
+			<ol class="bio-cal-pasos">
+				<li v-for="p in bioPasos" :key="p.id"><button type="button" :class="{ activo: pasos === p.id }" :aria-current="pasos === p.id ? 'step' : null" @click="CambiaStep(p.id)">{{ p.texto }}</button></li>
+			</ol>
+		</header>
+
+		<!-- Resumen -->
+		<main v-show="pasos === 'S'" class="bio-proc-cuerpo">
+			<h2 class="bio-proc-h2">{{ $t('domotek.proc.uvSettings') }}
+				<span v-if="uvProbe" class="bio-proc-hv uv"><v-icon small color="var(--bio-lila)">mdi-flash</v-icon>{{ $t('panel.jobControl.warninguv') }}</span>
+			</h2>
+			<div class="bio-proc-datos">
+				<div><span>{{ $t('domotek.proc.pattern') }}</span><strong>{{ bioNombrePatron }}<small v-if="patronUV == 2 && uvPointsCount > 1"> ({{ uvPointsCount }})</small></strong></div>
+				<div><span>{{ $t('domotek.proc.height') }}</span><strong>{{ alturaUV }}<small> mm</small></strong></div>
+				<div><span>{{ $t('domotek.proc.power') }}</span><strong>{{ potenciaUV }}<small> %</small></strong></div>
+				<div><span>{{ $t('domotek.proc.time') }}</span><strong>{{ $display(exposicionUV / 60, 2) }}<small> min</small></strong></div>
+			</div>
+			<div class="bio-proc-lista">
+				<div class="fila cab"><span>{{ $t('panel.ultraviolet.autoUvMode') }}</span><span class="pildora" :class="{ on: enableUV }">{{ enableUV ? $t('domotek.proc.on') : $t('domotek.proc.off') }}</span></div>
+				<div class="fila" :class="{ tenue: !enableUV }"><span>{{ $t('panel.ultraviolet.applyBefore') }}</span><span>{{ firstLayerUV ? $t('domotek.varios.yes') : $t('domotek.varios.no') }}</span></div>
+				<div class="fila" :class="{ tenue: !enableUV }"><span>{{ $t('domotek.varios.applyEvery') }} {{ cadenceAmountUV }} {{ $t('domotek.varios.layers') }}</span><span>{{ cadenceEnableUV ? $t('domotek.varios.yes') : $t('domotek.varios.no') }}</span></div>
+				<div class="fila" :class="{ tenue: !enableUV }"><span>{{ $t('panel.ultraviolet.applyWhen') }}</span><span>{{ aplicarFinUV ? $t('domotek.varios.yes') : $t('domotek.varios.no') }}</span></div>
+			</div>
+			<div class="bio-proc-avisos">
+				<span v-if="ChamberMode" :class="{ off: enableDoorDetection }"><v-icon small>{{ enableDoorDetection ? 'mdi-lock-open-variant-outline' : 'mdi-lock-outline' }}</v-icon>{{ enableDoorDetection ? $t('domotek.varios.door_interlock_disabled') : $t('domotek.varios.door_interlock_enabled') }}</span>
+			</div>
+			<div style="flex: 1"></div>
+			<footer class="bio-cal-pie">
+				<button type="button" class="bio-cal-sec" @click="CambiaStep('1')"><span class="bio-cap">{{ $t('domotek.varios.change') }}</span></button>
+				<button type="button" class="bio-cal-sec listo" @click="StartSaveSettings()"><span class="bio-cap">{{ $t('domotek.varios.save') }}</span></button>
+				<button v-if="isprinting == 'idle' || isprinting == 'paused'" type="button" class="bio-cal-principal ancho" @click="StartUltraviolet()">{{ $t('domotek.proc.run') }}</button>
+				<button v-else type="button" class="bio-cal-principal ancho aviso" @click="StartUltravioletPausing()">{{ $t('domotek.proc.pauseAndRun') }}</button>
+			</footer>
+		</main>
+
+		<!-- 1 · Patrón -->
+		<main v-show="pasos === '1'" class="bio-proc-cuerpo">
+			<h2 class="bio-proc-h2">{{ $t('domotek.proc.pattern') }}</h2>
+			<div class="bio-proc-patrones">
+				<button v-for="pt in bioPatrones" :key="pt.id" type="button" class="bio-proc-patron" :class="{ activo: patronUV === pt.id }" :aria-pressed="patronUV === pt.id" @click="patronUV = pt.id">
+					<span class="icono" v-html="pt.svg"></span>
+					<strong>{{ pt.nombre }}</strong>
+					<span>{{ pt.desc }}</span>
+				</button>
+			</div>
+			<div style="flex: 1"></div>
+			<footer class="bio-cal-pie">
+				<button type="button" class="bio-cal-sec" @click="CambiaStep('S')">{{ $t('domotek.tools.back') }}</button>
+				<button type="button" class="bio-cal-principal ancho" @click="handleContinue">{{ $t('domotek.calibracion.continue') }}</button>
+			</footer>
+		</main>
+
+		<!-- 1.5 · Puntos -->
+		<main v-if="patronUV === 2" v-show="pasos === '1.5'" class="bio-proc-cuerpo">
+			<div class="bio-proc-canvas-zona">
+				<div class="bio-proc-lateral">
+					<span class="bio-tenue"><strong class="bio-blanco">{{ customPoints.length }}</strong> {{ $t('domotek.proc.points') }}</span>
+					<div class="bio-proc-puntos">
+						<div v-for="(pt, i) in customPoints" :key="i" class="bio-proc-punto" :class="{ editando: i === editingPointIndex }">
+							<span class="n">{{ i + 1 }}</span>
+							<span class="xy">{{ $display(pt.x, 1) }} · {{ $display(pt.y, 1) }}</span>
+							<button type="button" :aria-label="$t('domotek.proc.edit')" @click="editPoint(i)"><v-icon small>mdi-pencil-outline</v-icon></button>
+							<button type="button" class="borrar" :aria-label="$t('domotek.proc.remove')" @click="removePoint(i)"><v-icon small>mdi-close</v-icon></button>
+						</div>
+						<span v-if="!customPoints.length" class="bio-tenue">{{ $t('domotek.proc.noPoints') }}</span>
+					</div>
+				</div>
+				<div class="bio-proc-lienzo">
+					<canvas ref="gridCanvas" :width="canvasSizePx" :height="canvasSizePx" @click="handleCanvasClick"></canvas>
+					<span>{{ $t('domotek.proc.tapToAdd') }} · {{ gridRealSizeMm }} × {{ gridRealSizeMm }} mm</span>
+				</div>
+				<div class="bio-proc-acciones">
+					<button type="button" @click="centerPoint">{{ $t('domotek.varios.center', 'Centro') }}</button>
+					<button type="button" @click="openManualCoordsDialog">{{ $t('domotek.varios.manual', 'Manual') }}</button>
+					<button type="button" :disabled="!customPoints.length" @click="undoLastPoint">{{ $t('panel.ultraviolet.undoStroke') }}</button>
+					<button type="button" class="peligro" :disabled="!customPoints.length" @click="clearPoints">{{ $t('domotek.proc.clearAll') }}</button>
+				</div>
+			</div>
+			<footer class="bio-cal-pie">
+				<button type="button" class="bio-cal-sec" @click="CambiaStep('1')">{{ $t('domotek.tools.back') }}</button>
+				<button type="button" class="bio-cal-principal ancho" :disabled="!isPointSelected" @click="CambiaStep('2')">{{ $t('domotek.calibracion.continue') }}</button>
+			</footer>
+		</main>
+
+		<!-- 1.5 · Trazo libre -->
+		<main v-if="patronUV === 3" v-show="pasos === '1.5'" class="bio-proc-cuerpo">
+			<div class="bio-proc-canvas-zona">
+				<div class="bio-proc-lateral">
+					<span class="bio-tenue"><strong class="bio-blanco">{{ strokes.length }}</strong> {{ $tc('domotek.proc.strokes', strokes.length) }}</span>
+					<div class="bio-proc-puntos">
+						<template v-for="(st, i) in strokes">
+							<button v-if="isClosedStroke(st)" :key="i" type="button" class="bio-proc-relleno" @click="toggleStrokeFill(i)">
+								<span class="n">{{ i + 1 }}</span><span>{{ $t('panel.ultraviolet.fillArea') }}</span>
+								<span class="interruptor" :class="{ on: strokeFill[i] }"><i></i></span>
+							</button>
+						</template>
+					</div>
+					<span class="bio-tenue bio-proc-ayuda">{{ $t('panel.ultraviolet.ultravioletDrawPathHelp') }}</span>
+				</div>
+				<div class="bio-proc-lienzo">
+					<canvas ref="freehandCanvas" :width="canvasSizePx" :height="canvasSizePx"
+						@pointerdown="handleFreehandPointerDown" @pointermove="handleFreehandPointerMove"
+						@pointerup="handleFreehandPointerUp" @pointerleave="handleFreehandPointerUp" style="touch-action: none;"></canvas>
+					<span>{{ gridRealSizeMm }} × {{ gridRealSizeMm }} mm</span>
+				</div>
+				<div class="bio-proc-acciones">
+					<button type="button" @click="openFreehandBig"><v-icon small>mdi-arrow-expand-all</v-icon>{{ $t('domotek.proc.enlarge') }}</button>
+					<button type="button" :disabled="!strokes.length" @click="undoLastFreehandStroke">{{ $t('panel.ultraviolet.undoStroke') }}</button>
+					<button type="button" class="peligro" :disabled="!strokes.length" @click="clearFreehandPath">{{ $t('domotek.proc.clearAll') }}</button>
+				</div>
+			</div>
+			<footer class="bio-cal-pie">
+				<button type="button" class="bio-cal-sec" @click="CambiaStep('1')">{{ $t('domotek.tools.back') }}</button>
+				<button type="button" class="bio-cal-principal ancho" :disabled="!strokes.length" @click="confirmFreehandPath">{{ $t('domotek.calibracion.continue') }}</button>
+			</footer>
+		</main>
+
+		<!-- 2 · Parámetros -->
+		<main v-show="pasos === '2'" class="bio-proc-cuerpo">
+			<h2 class="bio-proc-h2">{{ $t('domotek.proc.params') }}</h2>
+			<div class="bio-proc-valores">
+				<button type="button" @click="openHeightDialog"><span class="ic verde"><v-icon>mdi-arrow-up-down</v-icon></span><span>{{ $t('domotek.proc.height') }}</span><strong>{{ alturaUV }}<small> mm</small></strong></button>
+				<button type="button" @click="openPowerDialog"><span class="ic lila"><v-icon>mdi-lightbulb-on-outline</v-icon></span><span>{{ $t('domotek.proc.power') }}</span><strong>{{ potenciaUV }}<small> %</small></strong></button>
+				<button type="button" @click="openTimeDialog"><span class="ic azul"><v-icon>mdi-timer-outline</v-icon></span><span>{{ $t('domotek.proc.exposure') }}</span><strong>{{ $display(exposicionUV / 60, 2) }}<small> min</small></strong></button>
+			</div>
+			<p class="bio-tenue bio-proc-nota">{{ $t('domotek.proc.tapToChange') }}</p>
+			<div style="flex: 1"></div>
+			<footer class="bio-cal-pie">
+				<button type="button" class="bio-cal-sec" @click="handleBack">{{ $t('domotek.tools.back') }}</button>
+				<button type="button" class="bio-cal-principal ancho" @click="CambiaStep('3')">{{ $t('domotek.calibracion.continue') }}</button>
+			</footer>
+		</main>
+
+		<!-- 3 · Auto -->
+		<main v-show="pasos === '3'" class="bio-proc-cuerpo">
+			<h2 class="bio-proc-h2">{{ $t('domotek.proc.autoMode') }}</h2>
+			<div class="bio-proc-lista">
+				<div class="fila cab">
+					<span><strong>{{ $t('panel.ultraviolet.autoUvMode') }}</strong><small>{{ $t('domotek.proc.appliesDuringPrint') }}</small></span>
+					<button type="button" class="interruptor" :class="{ on: enableUV }" role="switch" :aria-checked="!!enableUV" @click="enableUV = !enableUV"><i></i></button>
+				</div>
+				<div class="fila" :class="{ tenue: !enableUV }">
+					<span>{{ $t('panel.ultraviolet.applyBefore') }}</span>
+					<button type="button" class="interruptor" :class="{ on: firstLayerUV }" role="switch" :aria-checked="!!firstLayerUV" :disabled="!enableUV" @click="firstLayerUV = !firstLayerUV"><i></i></button>
+				</div>
+				<div class="fila" :class="{ tenue: !enableUV }">
+					<span>{{ $t('domotek.varios.applyEvery') }}</span>
+					<div class="bio-proc-contador">
+						<button type="button" :disabled="!enableUV || cadenceAmountUV <= Math.max(1, minCadenceAmountUV)" @click="cadenceAmountUV = cadenceAmountUV - 1">−</button>
+						<button type="button" class="valor" :disabled="!enableUV" @click="openLayersDialog"><strong>{{ cadenceAmountUV }}</strong> {{ $t('domotek.varios.layers') }}</button>
+						<button type="button" :disabled="!enableUV || cadenceAmountUV >= maxCadenceAmountUV" @click="cadenceAmountUV = cadenceAmountUV + 1">+</button>
+					</div>
+					<button type="button" class="interruptor" :class="{ on: cadenceEnableUV }" role="switch" :aria-checked="!!cadenceEnableUV" :disabled="!enableUV" @click="cadenceEnableUV = !cadenceEnableUV"><i></i></button>
+				</div>
+				<div class="fila" :class="{ tenue: !enableUV }">
+					<span>{{ $t('panel.ultraviolet.applyWhen') }}</span>
+					<button type="button" class="interruptor" :class="{ on: aplicarFinUV }" role="switch" :aria-checked="!!aplicarFinUV" :disabled="!enableUV" @click="aplicarFinUV = !aplicarFinUV"><i></i></button>
+				</div>
+			</div>
+			<div style="flex: 1"></div>
+			<footer class="bio-cal-pie">
+				<button type="button" class="bio-cal-sec" @click="CambiaStep('2')">{{ $t('domotek.tools.back') }}</button>
+				<button type="button" class="bio-cal-principal ancho" @click="CambiaStep('S')">{{ $t('domotek.proc.seeSummary') }}</button>
+			</footer>
+		</main>
+	</div>
+	<v-row v-else class="mb-0 pb-0"  > 
 		<v-col cols="12" align="center" class="py-0">
 			<v-stepper v-model="pasos" class="blue lighten-5 panelStepper"  >
 				<v-stepper-header class="Stephead">
@@ -170,50 +343,6 @@
 						</v-card>
 
 						<!-- DIÁLOGO PARA ENTRADA MANUAL DE COORDENADAS -->
-						<v-dialog v-model="dialogManualCoords" persistent max-width="380px">
-							<v-card>
-								<v-card-title class="justify-center text-center">
-									<span class="headline">{{ $t('panel.ultraviolet.manualEditCoordsTittle') }}</span>
-								</v-card-title>
-								<v-card-text class="pb-0">
-									<v-container>
-										<v-row class="mb-1">
-											<v-col cols="12" sm="6" class="py-1">
-												<label class="mb-1 d-block font-weight-medium">{{ $t('panel.ultraviolet.CoordsX') }}</label>
-												<v-text-field v-model="manualX" @keydown="handleKeydownManualInput" outlined dense @focus="activeManualInput = 'x'" :rules="[rules.coordRange, rules.required]" :error-messages="manualXError" hide-details="auto" label=""   
-												></v-text-field>
-											</v-col>
-											<v-col cols="12" sm="6" class="py-1">
-												<label class="mb-1 d-block font-weight-medium">{{ $t('panel.ultraviolet.CoordsY') }}</label>
-												<v-text-field v-model="manualY"  @keydown="handleKeydownManualInput" outlined dense @focus="activeManualInput = 'y'" :rules="[rules.coordRange, rules.required]" :error-messages="manualYError" hide-details="auto" label=""
-												></v-text-field>
-											</v-col>
-										</v-row>
-										
-										<!-- Teclado Numérico Personalizado -->
-										<div class="numeric-keypad text-center">
-											<v-row dense v-for="(row, rowIndex) in keypadLayout" :key="rowIndex">
-												<v-col v-for="key in row" :key="key.value" class="pa-1">
-													<v-btn v-if="key.value !== 'EMPTY'" block class ="btn-medium-custom" :color="key.color || 'grey lighten-2'"  @click="handleKeyPress(key.value)" >
-														<v-icon v-if="key.icon">{{ key.icon }}</v-icon>
-														<span v-else class="headline">{{ key.text }}</span>
-													</v-btn>
-												</v-col>
-											</v-row>
-										</div>
-									</v-container>
-								</v-card-text>
-								<v-card-actions>
-									<v-spacer></v-spacer>
-									<v-btn color="blue darken-1" text @click="cancelManualInput">
-										{{ $t('generic.cancel') }}
-									</v-btn>
-									<v-btn color="blue darken-1" text @click="confirmManualInput" :disabled="!!manualXError || !!manualYError">
-										{{ $t('generic.ok') }}
-									</v-btn>
-								</v-card-actions>
-							</v-card>
-						</v-dialog>
 					</v-stepper-content>
 				</v-stepper-items>
 
@@ -288,42 +417,6 @@
 							</v-card>
 						</v-card>
 						<!-- CANVAS GRANDE: se abre por encima de todo para dibujar con mas precision -->
-						<v-dialog v-model="dialogFreehandBig" :max-width="freehandBigPx + 200">
-							<v-card class="pa-3">
-								<div style="display: flex; align-items: center; justify-content: center; gap: 12px;">
-									<div style="display: flex; align-items: flex-end; gap: 5px;">
-										<span style="writing-mode: vertical-rl; transform: rotate(180deg); font-weight: bold; font-size: 0.9em; letter-spacing: 1px; align-self: center;">{{ $t('domotek.varios.ejeY') }}</span>
-										<div style="display: flex; flex-direction: column; align-items: center;">
-											<canvas
-												ref="freehandCanvasBig"
-												:width="freehandBigPx"
-												:height="freehandBigPx"
-												@pointerdown="handleFreehandPointerDown"
-												@pointermove="handleFreehandPointerMove"
-												@pointerup="handleFreehandPointerUp"
-												@pointerleave="handleFreehandPointerUp"
-												style="border: 1px solid #999; cursor: crosshair; background-color: white; touch-action: none;"
-											></canvas>
-											<div style="width: 100%; margin-top: 5px; display: flex; justify-content: center; position: relative;">
-												<span style="position: absolute; left: 0; bottom: 0; font-weight: bold; font-size: 0.8em; color: #333;">(0,0)</span>
-												<span style="font-weight: bold; font-size: 0.9em; letter-spacing: 1px;">{{ $t('domotek.varios.ejeX') }}</span>
-											</div>
-										</div>
-									</div>
-									<div style="display: flex; flex-direction: column; gap: 80px;">
-										<v-btn class="btnAction" small color="primary" @click="undoLastFreehandStroke" :disabled="strokes.length === 0">
-											{{ $t('panel.ultraviolet.undoStroke') }}
-										</v-btn>
-										<v-btn class="btnAction" small color="error" @click="clearFreehandPath" :disabled="strokes.length === 0">
-											{{ $t('list.eventLog.clear', 'Borrar') }}
-										</v-btn>
-										<v-btn class="btnAction" small color="primary" @click="closeFreehandBig">
-											<v-icon>mdi-arrow-collapse-all</v-icon>
-										</v-btn>
-									</div>
-								</div>
-							</v-card>
-						</v-dialog>
 					</v-stepper-content>
 				</v-stepper-items>
 
@@ -372,137 +465,8 @@
 							<v-btn class="btnContinue mt-10 mr-5" color="primary" @click="handleBack"> <v-icon dark left> mdi-arrow-left-bold-outline </v-icon> {{ $t('domotek.toolNames.BACK') }}</v-btn>
 							<v-btn class="btnContinue mt-10 "  color="primary" @click="CambiaStep('3')"> {{ $t('domotek.toolNames.CONTINUE') }} <v-icon dark right> mdi-arrow-right-bold-outline </v-icon></v-btn> 
 						</v-card>
-						<v-dialog v-model="dialogManualHeight" persistent max-width="380px">
-							<v-card>
-								<v-card-title class="justify-center text-center">
-									<span class="headline">{{ $t('domotek.varios.exposureheightMm') }} </span>
-								</v-card-title>
-								<v-card-text class="pb-0">
-									<v-container>
-										<!-- Campo de texto único para la altura -->
-										<v-row justify="center">
-											<v-col cols="12" class="py-1">
-												<v-text-field v-model="manualHeightInput" @keydown="handleKeydownManualInput"  outlined class="title text-center font-weight-bold" :rules="[rules.required, rules.positiveNumber, rules.HeightRange]" :error-messages="manualHeightError"></v-text-field>
-											</v-col>
-										</v-row>
 
-										<!-- Teclado Numérico Personalizado -->
-										 <div class="numeric-keypad text-center">
-											<v-row dense v-for="(row, rowIndex) in keypadLayout" :key="rowIndex">
-												<v-col v-for="key in row" :key="key.value" class="pa-1">
-												<template v-if="key.value !== 'EMPTY'">
-													<v-btn block class ="btn-medium-custom" :color="key.color || 'grey lighten-2'" @click="handleHeightKeyPress(key.value)">
-														<v-icon v-if="key.icon">{{ key.icon }}</v-icon>
-														<span v-else class="headline">{{ key.text }}</span>
-													</v-btn>
-												</template>
-												<template v-else>
-													<div style="visibility: hidden; height: 48px;"></div>
-												</template>
-												</v-col>
-											</v-row>
-										</div>
-									</v-container>
-								</v-card-text>
-								<v-card-actions>
-									<v-spacer></v-spacer>
-									<v-btn color="blue darken-1" text @click="cancelManualHeight">
-										{{ $t('generic.cancel') }}
-									</v-btn>
-									<v-btn color="blue darken-1" text @click="confirmManualHeight" :disabled="!!manualHeightError || !manualHeightInput">
-										{{ $t('generic.ok') }}
-									</v-btn>
-								</v-card-actions>
-							</v-card>
-						</v-dialog>
 
-						<v-dialog v-model="dialogManualPower" persistent max-width="380px">
-							<v-card>
-								<v-card-title class="justify-center text-center">
-									<span class="headline">{{ $t('panel.ultraviolet.UvPower') }} </span>
-								</v-card-title>
-								<v-card-text class="pb-0">
-									<v-container>
-										<!-- Campo de texto único para la potencia -->
-										<v-row justify="center">
-											<v-col cols="12" class="py-1">
-												<v-text-field v-model="manualPowerInput" @keydown="handleKeydownManualInput"  outlined class="title text-center font-weight-bold" :rules="[rules.required, rules.positiveNumber, rules.PowerRange]" :error-messages="manualPowerError"></v-text-field>
-											</v-col>
-										</v-row>
-
-										<!-- Teclado Numérico Personalizado -->
-										 <div class="numeric-keypad text-center">
-											<v-row dense v-for="(row, rowIndex) in keypadLayout" :key="rowIndex">
-												<v-col v-for="key in row" :key="key.value" class="pa-1">
-												<template v-if="key.value !== 'EMPTY'">
-													<v-btn block class ="btn-medium-custom" :color="key.color || 'grey lighten-2'" @click="handlePowerKeyPress(key.value)">
-														<v-icon v-if="key.icon">{{ key.icon }}</v-icon>
-														<span v-else class="headline">{{ key.text }}</span>
-							  						</v-btn>
-												</template>
-								 				<template v-else>
-													<div style="visibility: hidden; height: 48px;"></div>
-										 		</template>
-												</v-col>
-											</v-row>
-										</div>
-									</v-container>
-								</v-card-text> 
-								<v-card-actions>
-									<v-spacer></v-spacer>
-									<v-btn color="blue darken-1" text @click="cancelManualPower">
-										{{ $t('generic.cancel') }}
-									</v-btn>
-									<v-btn color="blue darken-1" text @click="confirmManualPower" :disabled="!!manualPowerError || !manualPowerInput">
-										{{ $t('generic.ok') }}
-									</v-btn>
-								</v-card-actions>
-							</v-card>
-						</v-dialog>
-
-						<v-dialog v-model="dialogManualTime" persistent max-width="380px">
-							<v-card>
-								<v-card-title class="justify-center text-center">
-									<span class="headline">{{ $t('domotek.varios.exposureTimeM') }} </span>
-								</v-card-title>
-								<v-card-text class="pb-0">
-									<v-container>
-										<!-- Campo de texto único para el tiempo -->
-										<v-row justify="center">
-											<v-col cols="12" class="py-1">
-												<v-text-field v-model="manualTimeInput" @keydown="handleKeydownManualInput"  outlined class="title text-center font-weight-bold" :rules="[rules.required, rules.positiveNumber, rules.TimeRange]" :error-messages="manualTimeError"></v-text-field>
-											</v-col>
-										</v-row>
-
-										<!-- Teclado Numérico Personalizado -->
-										 <div class="numeric-keypad text-center">
-											<v-row dense v-for="(row, rowIndex) in keypadLayout" :key="rowIndex">
-												<v-col v-for="key in row" :key="key.value" class="pa-1">
-												<template v-if="key.value !== 'EMPTY'">
-													<v-btn block class ="btn-medium-custom" :color="key.color || 'grey lighten-2'" @click="handleTimeKeyPress(key.value)">
-														<v-icon v-if="key.icon">{{ key.icon }}</v-icon>
-														<span v-else class="headline">{{ key.text }}</span>
-													</v-btn>
-												</template>
-												<template v-else>
-													<div style="visibility: hidden; height: 48px;"></div>
-												</template>
-												</v-col>
-											</v-row>
-										</div>
-									</v-container>
-								</v-card-text>
-								<v-card-actions>
-									<v-spacer></v-spacer>
-									<v-btn color="blue darken-1" text @click="cancelManualTime">
-										{{ $t('generic.cancel') }}
-									</v-btn>
-									<v-btn color="blue darken-1" text @click="confirmManualTime" :disabled="!!manualTimeError || !manualTimeInput">
-										{{ $t('generic.ok') }}
-									</v-btn>
-								</v-card-actions>
-							</v-card>
-						</v-dialog>
 					</v-stepper-content>
 				</v-stepper-items>
 
@@ -539,49 +503,6 @@
 							<v-btn class="btnContinue mt-10 mr-5" color="primary" @click="CambiaStep('2')"> <v-icon dark left> mdi-arrow-left-bold-outline </v-icon> {{ $t('domotek.toolNames.BACK') }}</v-btn>
 							<v-btn class="btnContinue mt-10"  color="primary" @click="CambiaStep('S')"> {{ $t('domotek.varios.settings') }} <v-icon dark right> mdi-cog </v-icon></v-btn> 
 						</v-card>
-						<v-dialog v-model="dialogManualLayers" persistent max-width="380px">
-							<v-card>
-								<v-card-title class="justify-center text-center">
-									<span class="headline">{{  $t('domotek.varios.Layers') }} </span>
-								</v-card-title>
-								<v-card-text class="pb-0">
-									<v-container>
-										<!-- Campo de texto único para la cantidad de capas -->
-										<v-row justify="center">
-											<v-col cols="12" class="py-1">
-												<v-text-field v-model="manualLayersInput" @keydown="handleKeydownManualInput"  outlined class="title text-center font-weight-bold" :rules="[rules.required, rules.LayersRange]" :error-messages="manualLayersError"></v-text-field>
-											</v-col>
-										</v-row>
-
-										<!-- Teclado Numérico Personalizado -->
-										 <div class="numeric-keypad text-center">
-											<v-row dense v-for="(row, rowIndex) in keypadLayout" :key="rowIndex">
-												<v-col v-for="key in row" :key="key.value" class="pa-1">
-												<template v-if="key.value !== 'EMPTY'">
-													<v-btn block class ="btn-medium-custom" :color="key.color || 'grey lighten-2'" @click="handleLayersKeyPress(key.value)">
-														<v-icon v-if="key.icon">{{ key.icon }}</v-icon>
-														<span v-else class="headline">{{ key.text }}</span>
-													</v-btn>
-												</template>
-												<template v-else>
-													<div style="visibility: hidden; height: 48px;"></div>
-												</template>
-												</v-col>
-											</v-row>
-										</div>
-									</v-container>
-								</v-card-text>
-								<v-card-actions>
-									<v-spacer></v-spacer>
-									<v-btn color="blue darken-1" text @click="cancelManualLayers">
-										{{ $t('generic.cancel') }}
-									</v-btn>
-									<v-btn color="blue darken-1" text @click="confirmManualLayers" :disabled="!!manualLayersError || !manualLayersInput">
-										{{ $t('generic.ok') }}
-									</v-btn>
-								</v-card-actions>
-							</v-card>
-						</v-dialog>
 					</v-stepper-content>
 				</v-stepper-items>
 
@@ -684,6 +605,266 @@
 				</v-stepper-items>
 			</v-stepper>
 			<!-- Dialogos y aviso dentro de la misma columna: asi no crean filas vacias que alargan el panel -->
+		</v-col>
+	</v-row>
+	<!-- diálogos compartidos por las dos vistas -->
+						<v-dialog v-model="dialogManualCoords" persistent :max-width="temaBio ? 760 : '380px'" :content-class="temaBio ? 'bio-teclado-dialogo' : ''">
+							<bio-teclado-valor v-if="temaBio" :abierto="dialogManualCoords" :titulo="$t('panel.ultraviolet.manualEditCoordsTittle')" icono="mdi-crosshairs-gps" color="lila" unidad="mm" :campos="[{ id: 'x', etiqueta: 'X', valor: manualX, error: manualXError }, { id: 'y', etiqueta: 'Y', valor: manualY, error: manualYError }]" :activo="activeManualInput" :rango="$t('domotek.keypad.coordRange', [minCoord, maxCoord])" :atajos="[{ valor: 'centro', texto: $t('domotek.varios.center', 'Centro') }]" @activar="id => activeManualInput = id" @tecla="handleKeyPress" @atajo="() => { manualX = String(Math.round(maxCoord / 2)); manualY = String(Math.round(maxCoord / 2)); manualXError = ''; manualYError = ''; }" @aceptar="confirmManualInput" @cancelar="cancelManualInput"></bio-teclado-valor>
+							<v-card v-else>
+								<v-card-title class="justify-center text-center">
+									<span class="headline">{{ $t('panel.ultraviolet.manualEditCoordsTittle') }}</span>
+								</v-card-title>
+								<v-card-text class="pb-0">
+									<v-container>
+										<v-row class="mb-1">
+											<v-col cols="12" sm="6" class="py-1">
+												<label class="mb-1 d-block font-weight-medium">{{ $t('panel.ultraviolet.CoordsX') }}</label>
+												<v-text-field v-model="manualX" @keydown="handleKeydownManualInput" outlined dense @focus="activeManualInput = 'x'" :rules="[rules.coordRange, rules.required]" :error-messages="manualXError" hide-details="auto" label=""   
+												></v-text-field>
+											</v-col>
+											<v-col cols="12" sm="6" class="py-1">
+												<label class="mb-1 d-block font-weight-medium">{{ $t('panel.ultraviolet.CoordsY') }}</label>
+												<v-text-field v-model="manualY"  @keydown="handleKeydownManualInput" outlined dense @focus="activeManualInput = 'y'" :rules="[rules.coordRange, rules.required]" :error-messages="manualYError" hide-details="auto" label=""
+												></v-text-field>
+											</v-col>
+										</v-row>
+										
+										<!-- Teclado Numérico Personalizado -->
+										<div class="numeric-keypad text-center">
+											<v-row dense v-for="(row, rowIndex) in keypadLayout" :key="rowIndex">
+												<v-col v-for="key in row" :key="key.value" class="pa-1">
+													<v-btn v-if="key.value !== 'EMPTY'" block class ="btn-medium-custom" :color="key.color || 'grey lighten-2'"  @click="handleKeyPress(key.value)" >
+														<v-icon v-if="key.icon">{{ key.icon }}</v-icon>
+														<span v-else class="headline">{{ key.text }}</span>
+													</v-btn>
+												</v-col>
+											</v-row>
+										</div>
+									</v-container>
+								</v-card-text>
+								<v-card-actions>
+									<v-spacer></v-spacer>
+									<v-btn color="blue darken-1" text @click="cancelManualInput">
+										{{ $t('generic.cancel') }}
+									</v-btn>
+									<v-btn color="blue darken-1" text @click="confirmManualInput" :disabled="!!manualXError || !!manualYError">
+										{{ $t('generic.ok') }}
+									</v-btn>
+								</v-card-actions>
+							</v-card>
+						</v-dialog>
+						<v-dialog v-model="dialogFreehandBig" :max-width="freehandBigPx + 200">
+							<v-card class="pa-3">
+								<div style="display: flex; align-items: center; justify-content: center; gap: 12px;">
+									<div style="display: flex; align-items: flex-end; gap: 5px;">
+										<span style="writing-mode: vertical-rl; transform: rotate(180deg); font-weight: bold; font-size: 0.9em; letter-spacing: 1px; align-self: center;">{{ $t('domotek.varios.ejeY') }}</span>
+										<div style="display: flex; flex-direction: column; align-items: center;">
+											<canvas
+												ref="freehandCanvasBig"
+												:width="freehandBigPx"
+												:height="freehandBigPx"
+												@pointerdown="handleFreehandPointerDown"
+												@pointermove="handleFreehandPointerMove"
+												@pointerup="handleFreehandPointerUp"
+												@pointerleave="handleFreehandPointerUp"
+												style="border: 1px solid #999; cursor: crosshair; background-color: white; touch-action: none;"
+											></canvas>
+											<div style="width: 100%; margin-top: 5px; display: flex; justify-content: center; position: relative;">
+												<span style="position: absolute; left: 0; bottom: 0; font-weight: bold; font-size: 0.8em; color: #333;">(0,0)</span>
+												<span style="font-weight: bold; font-size: 0.9em; letter-spacing: 1px;">{{ $t('domotek.varios.ejeX') }}</span>
+											</div>
+										</div>
+									</div>
+									<div style="display: flex; flex-direction: column; gap: 80px;">
+										<v-btn class="btnAction" small color="primary" @click="undoLastFreehandStroke" :disabled="strokes.length === 0">
+											{{ $t('panel.ultraviolet.undoStroke') }}
+										</v-btn>
+										<v-btn class="btnAction" small color="error" @click="clearFreehandPath" :disabled="strokes.length === 0">
+											{{ $t('list.eventLog.clear', 'Borrar') }}
+										</v-btn>
+										<v-btn class="btnAction" small color="primary" @click="closeFreehandBig">
+											<v-icon>mdi-arrow-collapse-all</v-icon>
+										</v-btn>
+									</div>
+								</div>
+							</v-card>
+						</v-dialog>
+						<v-dialog v-model="dialogManualHeight" persistent :max-width="temaBio ? 760 : '380px'" :content-class="temaBio ? 'bio-teclado-dialogo' : ''">
+							<bio-teclado-valor v-if="temaBio" :abierto="dialogManualHeight" :titulo="$t('domotek.proc.height')" icono="mdi-arrow-up-down" color="acento" :valor="manualHeightInput" unidad="mm" :error="manualHeightError" :actual="alturaUV" :permitido="`${minAlturaUV} – ${maxAlturaUV} mm`" :rango="$t('domotek.keypad.rangeGeneric', [minAlturaUV, maxAlturaUV, 'mm'])" :decimales="false" :atajos="[20, 40, 60, 80].filter(v => v >= minAlturaUV && v <= maxAlturaUV).map(v => ({ valor: v }))" @tecla="handleHeightKeyPress" @atajo="v => { manualHeightInput = String(v); validateHeight(); }" @aceptar="confirmManualHeight" @cancelar="cancelManualHeight"></bio-teclado-valor>
+							<v-card v-else>
+								<v-card-title class="justify-center text-center">
+									<span class="headline">{{ $t('domotek.varios.exposureheightMm') }} </span>
+								</v-card-title>
+								<v-card-text class="pb-0">
+									<v-container>
+										<!-- Campo de texto único para la altura -->
+										<v-row justify="center">
+											<v-col cols="12" class="py-1">
+												<v-text-field v-model="manualHeightInput" @keydown="handleKeydownManualInput"  outlined class="title text-center font-weight-bold" :rules="[rules.required, rules.positiveNumber, rules.HeightRange]" :error-messages="manualHeightError"></v-text-field>
+											</v-col>
+										</v-row>
+
+										<!-- Teclado Numérico Personalizado -->
+										 <div class="numeric-keypad text-center">
+											<v-row dense v-for="(row, rowIndex) in keypadLayout" :key="rowIndex">
+												<v-col v-for="key in row" :key="key.value" class="pa-1">
+												<template v-if="key.value !== 'EMPTY'">
+													<v-btn block class ="btn-medium-custom" :color="key.color || 'grey lighten-2'" @click="handleHeightKeyPress(key.value)">
+														<v-icon v-if="key.icon">{{ key.icon }}</v-icon>
+														<span v-else class="headline">{{ key.text }}</span>
+													</v-btn>
+												</template>
+												<template v-else>
+													<div style="visibility: hidden; height: 48px;"></div>
+												</template>
+												</v-col>
+											</v-row>
+										</div>
+									</v-container>
+								</v-card-text>
+								<v-card-actions>
+									<v-spacer></v-spacer>
+									<v-btn color="blue darken-1" text @click="cancelManualHeight">
+										{{ $t('generic.cancel') }}
+									</v-btn>
+									<v-btn color="blue darken-1" text @click="confirmManualHeight" :disabled="!!manualHeightError || !manualHeightInput">
+										{{ $t('generic.ok') }}
+									</v-btn>
+								</v-card-actions>
+							</v-card>
+						</v-dialog>
+						<v-dialog v-model="dialogManualPower" persistent :max-width="temaBio ? 760 : '380px'" :content-class="temaBio ? 'bio-teclado-dialogo' : ''">
+							<bio-teclado-valor v-if="temaBio" :abierto="dialogManualPower" :titulo="$t('domotek.proc.power')" icono="mdi-lightbulb-on-outline" color="lila" :valor="manualPowerInput" unidad="%" :error="manualPowerError" :actual="potenciaUV" :permitido="`${minPotenciaUV} – ${maxPotenciaUV} %`" :rango="$t('domotek.keypad.rangeGeneric', [minPotenciaUV, maxPotenciaUV, '%'])" :decimales="false" :atajos="[25, 50, 75, 100].map(v => ({ valor: v }))" @tecla="handlePowerKeyPress" @atajo="v => { manualPowerInput = String(v); validatePower(); }" @aceptar="confirmManualPower" @cancelar="cancelManualPower"></bio-teclado-valor>
+							<v-card v-else>
+								<v-card-title class="justify-center text-center">
+									<span class="headline">{{ $t('panel.ultraviolet.UvPower') }} </span>
+								</v-card-title>
+								<v-card-text class="pb-0">
+									<v-container>
+										<!-- Campo de texto único para la potencia -->
+										<v-row justify="center">
+											<v-col cols="12" class="py-1">
+												<v-text-field v-model="manualPowerInput" @keydown="handleKeydownManualInput"  outlined class="title text-center font-weight-bold" :rules="[rules.required, rules.positiveNumber, rules.PowerRange]" :error-messages="manualPowerError"></v-text-field>
+											</v-col>
+										</v-row>
+
+										<!-- Teclado Numérico Personalizado -->
+										 <div class="numeric-keypad text-center">
+											<v-row dense v-for="(row, rowIndex) in keypadLayout" :key="rowIndex">
+												<v-col v-for="key in row" :key="key.value" class="pa-1">
+												<template v-if="key.value !== 'EMPTY'">
+													<v-btn block class ="btn-medium-custom" :color="key.color || 'grey lighten-2'" @click="handlePowerKeyPress(key.value)">
+														<v-icon v-if="key.icon">{{ key.icon }}</v-icon>
+														<span v-else class="headline">{{ key.text }}</span>
+							  						</v-btn>
+												</template>
+								 				<template v-else>
+													<div style="visibility: hidden; height: 48px;"></div>
+										 		</template>
+												</v-col>
+											</v-row>
+										</div>
+									</v-container>
+								</v-card-text> 
+								<v-card-actions>
+									<v-spacer></v-spacer>
+									<v-btn color="blue darken-1" text @click="cancelManualPower">
+										{{ $t('generic.cancel') }}
+									</v-btn>
+									<v-btn color="blue darken-1" text @click="confirmManualPower" :disabled="!!manualPowerError || !manualPowerInput">
+										{{ $t('generic.ok') }}
+									</v-btn>
+								</v-card-actions>
+							</v-card>
+						</v-dialog>
+						<v-dialog v-model="dialogManualTime" persistent :max-width="temaBio ? 760 : '380px'" :content-class="temaBio ? 'bio-teclado-dialogo' : ''">
+							<bio-teclado-valor v-if="temaBio" :abierto="dialogManualTime" :titulo="$t('domotek.proc.exposure')" icono="mdi-timer-outline" color="azul" :valor="manualTimeInput" unidad="min" :error="manualTimeError" :actual="$display(exposicionUV / 60, 2)" :permitido="`${minExposureTimeUV} – ${maxExposureTimeUV} min`" :rango="$t('domotek.keypad.rangeGeneric', [minExposureTimeUV, maxExposureTimeUV, 'min'])" :atajos="[0.5, 1, 2, 5].map(v => ({ valor: v, texto: $display(v, v % 1 ? 1 : 0) }))" @tecla="handleTimeKeyPress" @atajo="v => { manualTimeInput = String(v); validateTime(); }" @aceptar="confirmManualTime" @cancelar="cancelManualTime"></bio-teclado-valor>
+							<v-card v-else>
+								<v-card-title class="justify-center text-center">
+									<span class="headline">{{ $t('domotek.varios.exposureTimeM') }} </span>
+								</v-card-title>
+								<v-card-text class="pb-0">
+									<v-container>
+										<!-- Campo de texto único para el tiempo -->
+										<v-row justify="center">
+											<v-col cols="12" class="py-1">
+												<v-text-field v-model="manualTimeInput" @keydown="handleKeydownManualInput"  outlined class="title text-center font-weight-bold" :rules="[rules.required, rules.positiveNumber, rules.TimeRange]" :error-messages="manualTimeError"></v-text-field>
+											</v-col>
+										</v-row>
+
+										<!-- Teclado Numérico Personalizado -->
+										 <div class="numeric-keypad text-center">
+											<v-row dense v-for="(row, rowIndex) in keypadLayout" :key="rowIndex">
+												<v-col v-for="key in row" :key="key.value" class="pa-1">
+												<template v-if="key.value !== 'EMPTY'">
+													<v-btn block class ="btn-medium-custom" :color="key.color || 'grey lighten-2'" @click="handleTimeKeyPress(key.value)">
+														<v-icon v-if="key.icon">{{ key.icon }}</v-icon>
+														<span v-else class="headline">{{ key.text }}</span>
+													</v-btn>
+												</template>
+												<template v-else>
+													<div style="visibility: hidden; height: 48px;"></div>
+												</template>
+												</v-col>
+											</v-row>
+										</div>
+									</v-container>
+								</v-card-text>
+								<v-card-actions>
+									<v-spacer></v-spacer>
+									<v-btn color="blue darken-1" text @click="cancelManualTime">
+										{{ $t('generic.cancel') }}
+									</v-btn>
+									<v-btn color="blue darken-1" text @click="confirmManualTime" :disabled="!!manualTimeError || !manualTimeInput">
+										{{ $t('generic.ok') }}
+									</v-btn>
+								</v-card-actions>
+							</v-card>
+						</v-dialog>
+						<v-dialog v-model="dialogManualLayers" persistent :max-width="temaBio ? 760 : '380px'" :content-class="temaBio ? 'bio-teclado-dialogo' : ''">
+							<bio-teclado-valor v-if="temaBio" :abierto="dialogManualLayers" :titulo="$t('domotek.varios.Layers')" icono="mdi-layers-outline" color="acento" :valor="manualLayersInput" :error="manualLayersError" :actual="cadenceAmountUV" :permitido="`${Math.max(1, minCadenceAmountUV)} – ${maxCadenceAmountUV}`" :rango="$t('domotek.keypad.rangeGeneric', [Math.max(1, minCadenceAmountUV), maxCadenceAmountUV, $t('domotek.varios.layers')])" :decimales="false" :atajos="[1, 2, 3, 5].map(v => ({ valor: v }))" @tecla="handleLayersKeyPress" @atajo="v => { manualLayersInput = String(v); validateLayers(); }" @aceptar="confirmManualLayers" @cancelar="cancelManualLayers"></bio-teclado-valor>
+							<v-card v-else>
+								<v-card-title class="justify-center text-center">
+									<span class="headline">{{  $t('domotek.varios.Layers') }} </span>
+								</v-card-title>
+								<v-card-text class="pb-0">
+									<v-container>
+										<!-- Campo de texto único para la cantidad de capas -->
+										<v-row justify="center">
+											<v-col cols="12" class="py-1">
+												<v-text-field v-model="manualLayersInput" @keydown="handleKeydownManualInput"  outlined class="title text-center font-weight-bold" :rules="[rules.required, rules.LayersRange]" :error-messages="manualLayersError"></v-text-field>
+											</v-col>
+										</v-row>
+
+										<!-- Teclado Numérico Personalizado -->
+										 <div class="numeric-keypad text-center">
+											<v-row dense v-for="(row, rowIndex) in keypadLayout" :key="rowIndex">
+												<v-col v-for="key in row" :key="key.value" class="pa-1">
+												<template v-if="key.value !== 'EMPTY'">
+													<v-btn block class ="btn-medium-custom" :color="key.color || 'grey lighten-2'" @click="handleLayersKeyPress(key.value)">
+														<v-icon v-if="key.icon">{{ key.icon }}</v-icon>
+														<span v-else class="headline">{{ key.text }}</span>
+													</v-btn>
+												</template>
+												<template v-else>
+													<div style="visibility: hidden; height: 48px;"></div>
+												</template>
+												</v-col>
+											</v-row>
+										</div>
+									</v-container>
+								</v-card-text>
+								<v-card-actions>
+									<v-spacer></v-spacer>
+									<v-btn color="blue darken-1" text @click="cancelManualLayers">
+										{{ $t('generic.cancel') }}
+									</v-btn>
+									<v-btn color="blue darken-1" text @click="confirmManualLayers" :disabled="!!manualLayersError || !manualLayersInput">
+										{{ $t('generic.ok') }}
+									</v-btn>
+								</v-card-actions>
+							</v-card>
+						</v-dialog>
 			<v-dialog v-model="dialogUV" max-width="500">
 				<v-card>                                                                                  
 					<v-card-title class="headline">
@@ -737,12 +918,13 @@
 			<v-snackbar content-class="snack" v-model="snackbar" :timeout="400" absolute left top :min-width="50"   color="light-blue white--text" >
 				{{this.snackbarValor}}
 			</v-snackbar>
-		</v-col>
-	</v-row>
+</div>
 </template>
 <script>
 'use strict'
 import { mapState, mapGetters, mapActions } from 'vuex'
+
+import { paletaBio } from '../../utils/temaBio.js'
 
 export default {
 	data(){
@@ -923,6 +1105,36 @@ export default {
 		}),
 		...mapGetters('machine/model', ['global']),
 
+		temaBio() { return this.$store.state.settings.temaBio; }, // domotek
+		bioColores() { // colores de los lienzos según el tema (oscuro o claro)
+			const c = paletaBio();
+			return this.temaBio
+				? { rejilla: c.linea, borde: c.linea2, punto: c.lila, puntoEdit: c.amarillo, puntoBorde: c.lilaBg, texto: c.texto, trazo: c.lila, relleno: `rgba(${c.lilaRgb},0.18)`, rayado: `rgba(${c.lilaRgb},0.45)`, cierra: c.verde, cierraFondo: `rgba(${c.verdeRgb},0.22)`, zona: c.zona, abierto: c.peligro }
+				: { rejilla: '#ddd', borde: '#999', punto: 'red', puntoEdit: '#1976d2', puntoBorde: 'darkred', texto: '#000', trazo: '#1976d2', relleno: 'rgba(25,118,210,0.22)', rayado: 'rgba(25,118,210,0.55)', cierra: '#2e7d32', cierraFondo: 'rgba(46,125,50,0.25)', zona: 'rgba(0,0,0,0.06)', abierto: 'red' };
+		},
+		bioPasos() {
+			const lista = [{ id: 'S', texto: this.$t('domotek.proc.summary') }, { id: '1', texto: `1 · ${this.$t('domotek.proc.pattern')}` }];
+			if (this.patronUV === 2) { lista.push({ id: '1.5', texto: `1.5 · ${this.$t('domotek.proc.pointsStep')}` }); }
+			if (this.patronUV === 3) { lista.push({ id: '1.5', texto: `1.5 · ${this.$t('domotek.proc.strokeStep')}` }); }
+			lista.push({ id: '2', texto: `2 · ${this.$t('domotek.proc.params')}` }, { id: '3', texto: '3 · Auto' });
+			return lista;
+		},
+		bioPatrones() {
+			const ico = {
+				1: '<svg viewBox="0 0 48 48" aria-hidden="true"><rect x="5" y="5" width="38" height="38" rx="6" fill="none" stroke="currentColor" stroke-width="3"/><rect x="11" y="11" width="26" height="26" rx="3" fill="currentColor" opacity=".25"/></svg>',
+				2: '<svg viewBox="0 0 48 48" aria-hidden="true"><rect x="5" y="5" width="38" height="38" rx="6" fill="none" stroke="currentColor" stroke-width="3"/><circle cx="17" cy="19" r="4" fill="currentColor"/><circle cx="31" cy="15" r="4" fill="currentColor"/><circle cx="26" cy="32" r="4" fill="currentColor"/></svg>',
+				3: '<svg viewBox="0 0 48 48" aria-hidden="true"><rect x="5" y="5" width="38" height="38" rx="6" fill="none" stroke="currentColor" stroke-width="3"/><path d="M12 32c4-10 8-12 11-8s6 4 13-10" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>'
+			};
+			return [
+				{ id: 1, nombre: this.$t('domotek.varios.allPlatform'), desc: this.$t('domotek.proc.fullSweep') },
+				{ id: 2, nombre: this.$t('domotek.varios.customPoint'), desc: this.$t('domotek.proc.pointsDesc') },
+				{ id: 3, nombre: this.$t('domotek.varios.freehand'), desc: this.$t('domotek.proc.freehandDesc') }
+			].map(p => ({ ...p, svg: ico[p.id] }));
+		},
+		bioNombrePatron() {
+			const p = { 1: 'allPlatform', 2: 'customPoint', 3: 'freehand' }[this.patronUV];
+			return p ? this.$t('domotek.varios.' + p) : '—';
+		},
 		patronUV: {
 			get() {
 				return this.$store.state.machine.model.global.patronUV},
@@ -1279,11 +1491,12 @@ export default {
 			}
 		},
         drawGrid() {
+			const col = this.bioColores;
             if (!this.ctx) return;
             const canvas = this.$refs.gridCanvas;
 			const ctx = this.ctx;
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.strokeStyle = '#ddd';
+            ctx.strokeStyle = col.rejilla;
             ctx.lineWidth = 0.5;
             for (let x = 0; x <= this.canvasSizePx; x += this.cellSizePx) {
                 ctx.beginPath();
@@ -1297,24 +1510,24 @@ export default {
                 ctx.lineTo(this.canvasSizePx, Math.round(y));
                 ctx.stroke();
             }
-            ctx.strokeStyle = '#999';
+            ctx.strokeStyle = col.borde;
             ctx.lineWidth = 1;
             ctx.strokeRect(0, 0, this.canvasSizePx, this.canvasSizePx);
 
 			// Puntos numerados
-			ctx.font = '10px sans-serif';
+			ctx.font = this.temaBio ? '11px "IBM Plex Sans", sans-serif' : '10px sans-serif';
 			this.customPoints.forEach((p, i) => {
 				const px = p.x * this.pxPerMm;
 				const py = (this.gridRealSizeMm - p.y) * this.pxPerMm;
 				ctx.beginPath();
-				ctx.arc(px, py, i === this.editingPointIndex ? 5 : 3, 0, 2 * Math.PI, false);
-				ctx.fillStyle = (i === this.editingPointIndex) ? '#1976d2' : 'red';
+				ctx.arc(px, py, this.temaBio ? (i === this.editingPointIndex ? 6 : 5) : (i === this.editingPointIndex ? 5 : 3), 0, 2 * Math.PI, false);
+				ctx.fillStyle = (i === this.editingPointIndex) ? col.puntoEdit : col.punto;
 				ctx.fill();
 				ctx.lineWidth = 1;
-				ctx.strokeStyle = 'darkred';
+				ctx.strokeStyle = col.puntoBorde;
 				ctx.stroke();
-				ctx.fillStyle = '#000';
-				ctx.fillText(String(i + 1), px + 5, py - 4);
+				ctx.fillStyle = col.texto;
+				ctx.fillText(String(i + 1), px + (this.temaBio ? 7 : 5), py - (this.temaBio ? 6 : 4));
 			});
         },
         handleCanvasClick(event) {
@@ -1548,9 +1761,9 @@ export default {
 				if (i === 0) ctx.moveTo(p.x, p.y); else ctx.lineTo(p.x, p.y);
 			});
 			ctx.closePath();
-			ctx.fillStyle = 'rgba(25,118,210,0.22)';
+			ctx.fillStyle = this.bioColores.relleno;
 			ctx.fill();
-			ctx.strokeStyle = 'rgba(25,118,210,0.55)';
+			ctx.strokeStyle = this.bioColores.rayado;
 			ctx.lineWidth = 0.7;
 			this.computeFillSegments(stroke).forEach(sg => {
 				const a = this.freehandMmToPixel(sg[0].x, sg[0].y);
@@ -1641,7 +1854,7 @@ export default {
 			ctx.clearRect(0, 0, canvas.width, canvas.height);
 
 			// Rejilla
-			ctx.strokeStyle = '#ddd';
+			ctx.strokeStyle = this.bioColores.rejilla;
 			ctx.lineWidth = 0.5;
 			for (let x = 0; x <= size; x += cell) {
 				ctx.beginPath();
@@ -1655,12 +1868,12 @@ export default {
 				ctx.lineTo(size, Math.round(y));
 				ctx.stroke();
 			}
-			ctx.strokeStyle = '#999';
+			ctx.strokeStyle = this.bioColores.borde;
 			ctx.lineWidth = 1;
 			ctx.strokeRect(0, 0, size, size);
 
 			// Sub-trazos ya guardados
-			ctx.strokeStyle = '#1976d2';
+			ctx.strokeStyle = this.bioColores.trazo;
 			ctx.lineWidth = this.dialogFreehandBig ? 3 : 2;
 			ctx.lineJoin = 'round';
 			ctx.lineCap = 'round';
@@ -1678,15 +1891,15 @@ export default {
 				ctx.save();
 				ctx.beginPath();
 				ctx.arc(st.x, st.y, r, 0, 2 * Math.PI);
-				ctx.fillStyle = willClose ? 'rgba(46,125,50,0.25)' : 'rgba(0,0,0,0.06)';
+				ctx.fillStyle = willClose ? this.bioColores.cierraFondo : this.bioColores.zona;
 				ctx.fill();
 				ctx.setLineDash([3, 3]);
 				ctx.lineWidth = 1;
-				ctx.strokeStyle = willClose ? '#2e7d32' : '#999';
+				ctx.strokeStyle = willClose ? this.bioColores.cierra : this.bioColores.borde;
 				ctx.stroke();
 				ctx.restore();
 
-				ctx.strokeStyle = willClose ? '#2e7d32' : 'red';
+				ctx.strokeStyle = willClose ? this.bioColores.cierra : this.bioColores.abierto;
 				this.drawStrokePolyline(ctx, this.currentStroke);
 			}
 		},
@@ -2210,6 +2423,9 @@ export default {
 	},
 	
 	watch: {
+		bioColores() { // domotek: al cambiar de modo claro/oscuro se vuelven a pintar los lienzos
+			this.$nextTick(() => { if (this.ctx) { this.drawGrid(); } if (this.$refs.freehandCanvas) { this.drawFreehandCanvas(); } });
+		},
 		// Otro cliente (PC / pantalla de la impresora) ha cambiado los puntos → recargar desde la impresora
 		'$store.state.machine.model.global.uvPointsRev'(newVal) {
 			console.log('[UV-SYNC] cambio uvPointsRev →', newVal, '(mia:', this.lastOwnPointsRev, ')');
